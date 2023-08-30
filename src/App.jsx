@@ -9,12 +9,14 @@ import Home from "./pages/Home"
 import { LOGIN_ROUTE, DASHBOARD_ROUTE, USERS_ROUTE } from "./consts/Routes";
 
 function App() {
-  const {session, setSession} = useContext(SessionContext);
+  const {session} = useContext(SessionContext);
   
   return (
     <React.Fragment>
       <Routes>
-        <Route path="/" element={ <Login /> } />
+        <Route path="/" element={ <ProtectedRoutes isAllowed={!session} redirectTo={`/${DASHBOARD_ROUTE}`}>
+            <Login />
+          </ProtectedRoutes> } />
         <Route path={`/${LOGIN_ROUTE}`} element={ 
           <ProtectedRoutes isAllowed={!session} redirectTo={`/${DASHBOARD_ROUTE}`}>
             <Login />

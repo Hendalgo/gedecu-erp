@@ -45,7 +45,7 @@ const SideBar = ({children}) => {
           </ul>
           <div>
             <div className="pb-5 nav nav-pills flex-column mb-auto">
-              <Link className="nav-link"  to="/" onClick={()=> setSession()}>
+              <Link className="nav-link"  to="/" onClick={()=> {localStorage.removeItem("session"); setSession(false) }}>
                 <ReactSVG
                   className="bi me-2 "
                   wrapper="span"

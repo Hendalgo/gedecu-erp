@@ -9,13 +9,13 @@ const Login = () => {
 
   const handleSubmit = (event) =>{
     event.preventDefault();
-    setSession({
+    window.localStorage.setItem("session", JSON.stringify({
       name: "Marcos",
       token: "",
       permission: 1,
       permissionTitle: "Administrador"
-    });
-    <Navigate to={`/${DASHBOARD_ROUTE}`} />
+    }));
+    location.reload();
   }
   return (
     <div className="container-fluid">
