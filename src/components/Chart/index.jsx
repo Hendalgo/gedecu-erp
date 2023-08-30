@@ -1,281 +1,129 @@
 import React from 'react'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2'
+import "./Chart.css"
 
-const data = [
-  {
-    "id": "japan",
-    "color": "hsl(235, 70%, 50%)",
-    "data": [
-      {
-        "x": "plane",
-        "y": 62
-      },
-      {
-        "x": "helicopter",
-        "y": 54
-      },
-      {
-        "x": "boat",
-        "y": 257
-      },
-      {
-        "x": "train",
-        "y": 259
-      },
-      {
-        "x": "subway",
-        "y": 237
-      },
-      {
-        "x": "bus",
-        "y": 217
-      },
-      {
-        "x": "car",
-        "y": 45
-      },
-      {
-        "x": "moto",
-        "y": 76
-      },
-      {
-        "x": "bicycle",
-        "y": 58
-      },
-      {
-        "x": "horse",
-        "y": 133
-      },
-      {
-        "x": "skateboard",
-        "y": 291
-      },
-      {
-        "x": "others",
-        "y": 166
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+const options={
+  scales:{
+    y: {
+      min: 0,
+      max: 10000
+    },
+    x:{
+      ticks: {color: "#6C757D"},
+      grid:{
+        display: false
       }
-    ]
+    }
   },
-  {
-    "id": "france",
-    "color": "hsl(223, 70%, 50%)",
-    "data": [
-      {
-        "x": "plane",
-        "y": 133
+  plugins:{
+    legend:{
+      display: false,
+    },
+    tooltip:{
+      backgroundColor: "#ffffff",
+      borderColor: "#E6EDFF",
+      borderWidth: 1,
+      titleColor: "#6C757D", 
+      titleFont:{
+        family: "Inter",
+        weight: 400
       },
-      {
-        "x": "helicopter",
-        "y": 103
+      titleAlign: "center",
+      bodyColor: "#000",
+      bodyAlign: "center",
+      usePointStyle: true,
+      pointStyle: "circle",
+      boxPadding: 4,
+      boxWidth: 6,
+      bodyFont:{
+        family: "Inter",
+        weight: 700,
+        size: 16
       },
-      {
-        "x": "boat",
-        "y": 64
-      },
-      {
-        "x": "train",
-        "y": 91
-      },
-      {
-        "x": "subway",
-        "y": 300
-      },
-      {
-        "x": "bus",
-        "y": 229
-      },
-      {
-        "x": "car",
-        "y": 219
-      },
-      {
-        "x": "moto",
-        "y": 288
-      },
-      {
-        "x": "bicycle",
-        "y": 24
-      },
-      {
-        "x": "horse",
-        "y": 124
-      },
-      {
-        "x": "skateboard",
-        "y": 246
-      },
-      {
-        "x": "others",
-        "y": 297
-      }
-    ]
-  },
-  {
-    "id": "us",
-    "color": "hsl(122, 70%, 50%)",
-    "data": [
-      {
-        "x": "plane",
-        "y": 199
-      },
-      {
-        "x": "helicopter",
-        "y": 143
-      },
-      {
-        "x": "boat",
-        "y": 67
-      },
-      {
-        "x": "train",
-        "y": 97
-      },
-      {
-        "x": "subway",
-        "y": 62
-      },
-      {
-        "x": "bus",
-        "y": 127
-      },
-      {
-        "x": "car",
-        "y": 80
-      },
-      {
-        "x": "moto",
-        "y": 142
-      },
-      {
-        "x": "bicycle",
-        "y": 278
-      },
-      {
-        "x": "horse",
-        "y": 221
-      },
-      {
-        "x": "skateboard",
-        "y": 35
-      },
-      {
-        "x": "others",
-        "y": 25
-      }
-    ]
-  },
-  {
-    "id": "germany",
-    "color": "hsl(65, 70%, 50%)",
-    "data": [
-      {
-        "x": "plane",
-        "y": 231
-      },
-      {
-        "x": "helicopter",
-        "y": 254
-      },
-      {
-        "x": "boat",
-        "y": 249
-      },
-      {
-        "x": "train",
-        "y": 14
-      },
-      {
-        "x": "subway",
-        "y": 28
-      },
-      {
-        "x": "bus",
-        "y": 165
-      },
-      {
-        "x": "car",
-        "y": 121
-      },
-      {
-        "x": "moto",
-        "y": 158
-      },
-      {
-        "x": "bicycle",
-        "y": 121
-      },
-      {
-        "x": "horse",
-        "y": 126
-      },
-      {
-        "x": "skateboard",
-        "y": 138
-      },
-      {
-        "x": "others",
-        "y": 290
-      }
-    ]
-  },
-  {
-    "id": "norway",
-    "color": "hsl(330, 70%, 50%)",
-    "data": [
-      {
-        "x": "plane",
-        "y": 179
-      },
-      {
-        "x": "helicopter",
-        "y": 143
-      },
-      {
-        "x": "boat",
-        "y": 122
-      },
-      {
-        "x": "train",
-        "y": 185
-      },
-      {
-        "x": "subway",
-        "y": 254
-      },
-      {
-        "x": "bus",
-        "y": 79
-      },
-      {
-        "x": "car",
-        "y": 8
-      },
-      {
-        "x": "moto",
-        "y": 127
-      },
-      {
-        "x": "bicycle",
-        "y": 63
-      },
-      {
-        "x": "horse",
-        "y": 208
-      },
-      {
-        "x": "skateboard",
-        "y": 63
-      },
-      {
-        "x": "others",
-        "y": 202
-      }
-    ]
+      padding: 12 
+    }
   }
-]
+}
+const data = {
+    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    datasets: [{
+      label: "Ingresos",
+      data: [5000, 3000, 8000, 5000, 4000, 2000, 5000, 3000, 8000, 5000, 4000, 2000],
+      fill: false,
+      borderColor: "#198754",
+      backgroundColor: "#198754",
+      tension: 0.4  
+
+    },
+    {
+      label: "Egresos",
+      data: [3000, 4000, 1000, 5000, 4000, 3000, 6000, 3000, 2000, 5000, 1000, 2000],
+      fill: false,
+      borderColor: "#DC3545",
+      backgroundColor: "#DC3545",
+      tension: 0.4
+
+    }
+  ]
+  };  
 const Chart = () => {
   return (
     <div className="d-flex">
-      qlq
+      <div className='container-fluid bg-white ChartContainer'>
+        <div className="row">
+          <div className="col-12">
+            <div className="d-flex justify-content-between align-items-center ChartTop">
+              <div className='d-flex'>
+                <span className='Income d-flex align-items-center'>Ingresos</span>
+                <span className='Outcome d-flex align-items-center'>Egresos</span>
+              </div>
+              <div className='d-flex ChartFilterContainer'>
+                <select name="date" className='form-select'>
+                  <option value="day">Día</option>
+                  <option value="week">Semana</option>
+                  <option value="month">Mes</option>
+                  <option value="quarter">Trimestre</option>
+                  <option value="semester">Semestre</option>
+                  <option value="year">Año</option>
+                </select>
+                <select name="date" className='form-select'>
+                  <option value="day">Día</option>
+                  <option value="week">Semana</option>
+                  <option value="month">Mes</option>
+                  <option value="quarter">Trimestre</option>
+                  <option value="semester">Semestre</option>
+                  <option value="year">Año</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <Line 
+            options={options}
+            data={data}
+          />
+        </div>
+      </div>
     </div>
   )
 }

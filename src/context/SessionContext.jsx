@@ -8,6 +8,7 @@ export const SessionProvider = ({children}) => {
     name: "Marcos",
     token: "",
     permission: 1,
+    permissionTitle: "Administrador"
   });
   return (
     <SessionContext.Provider value={{session, setSession}}>

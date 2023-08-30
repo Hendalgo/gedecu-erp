@@ -1,8 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react';
+import { SessionContext } from '../../context/SessionContext';
 
-const Header = () => {
+const Header = ({title}) => {
+  const {session} = useContext(SessionContext);
   return (
-    <div>Header</div>
+    <div className='d-flex bg-white'>
+      <div>
+        <span>{title}</span>
+      </div>
+      <div>
+        <img src="" alt="" />
+        <div>
+          <span>{session.name}</span>
+          <span>{session.permissionTitle}</span>
+        </div>
+      </div>
+    </div>
   )
 }
 

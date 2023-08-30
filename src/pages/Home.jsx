@@ -7,6 +7,7 @@ import Card from '../components/Card'
 import Chart from '../components/Chart'
 import { ReactSVG } from 'react-svg'
 import BankCard from '../components/BankCard'
+import Header from '../components/Header'
 
 const table = [
   {
@@ -70,12 +71,14 @@ const Home = () => {
   const {session} = useContext(SessionContext);
   return (
     <>
-      <div className="container">
+      <div className="container-fluid">
         <div className="row">
           <div className="col-12">
-            <div className="container">
+            <div className="container-fluid">
               <div className="row">
-                <div className="container">
+              </div>
+              <div className="row">
+                <div className="container-fluid">
                   <div className="row">
                     <div className="col-9">
                       <div className="row WelcomeContainer pt-4 pb-3">
@@ -120,7 +123,7 @@ const Home = () => {
                     <div className="col-3 mt-4 radius" style={{overflow: "hidden"}}>
                       <div className='BankAmountContainer'>
                         <div className='d-flex
-                      flex-column  align-items-center'>
+                      flex-column  align-items-center BankAmountTop'>
                           <ReactSVG
                             src='/bank.svg'
                             className='TotalAmountBank'
