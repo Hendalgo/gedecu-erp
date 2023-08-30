@@ -3,15 +3,51 @@ import { NavLink,Link } from "react-router-dom";
 import './SideBar.css';
 import { ReactSVG } from "react-svg";
 import { SessionContext } from "../../context/SessionContext";
+import { Accordion } from "react-bootstrap";
+import { REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
 
 const SideBar = ({children}) => {
   const {setSession} = useContext(SessionContext);
   const Menus = [
-    { title: "Escritorio", src: "home-blue-icon", link: "" },
-    { title: "Reportes", src: "document-white-icon", link: "reports" },
-    { title: "Locales", src: "map-marker-home", link: "stores" },
-    { title: "Bancos ", src: "bank", link: "banks" },
-    { title: "Usuarios", src: "user", link: "users" },
+    { 
+      title: "Escritorio", 
+      src: "home-blue-icon", 
+      link: "" 
+    },
+    { 
+      title: "Reportes", 
+      src: "document-white-icon", 
+      link: "reports", 
+      others:[
+        {
+          name: "Crear nuevo reporte",
+          link: REPORTS_NEW_ROUTE
+        },
+        {
+          name: "Duplicados",
+          link: REPORTS_DUPLICATE_ROUTE
+        },
+        {
+          name: "Inconsistencias",
+          link: REPORTS_MISS_ROUTE
+        }
+      ] 
+    },
+    { 
+      title: "Locales", 
+      src: "map-marker-home", 
+      link: "stores" 
+    },
+    { 
+      title: "Bancos ", 
+      src: "bank", 
+      link: "banks" 
+    },
+    { 
+      title: "Usuarios", 
+      src: "user", 
+      link: "users" 
+    },
   ];
   return (
     <div className="container-fluid AppContainer" >
@@ -29,17 +65,45 @@ const SideBar = ({children}) => {
                 key={index}
                 className={`SideBarItem p-1`}
               >
-                <NavLink 
+                {
+                  !Menu.others
+                  ?<NavLink 
                   className={`nav-link`}
                   to={Menu.link}
-                >
-                  <ReactSVG
-                    className="bi me-2 "
-                    wrapper="span"
-                    src={`/${Menu.src}.svg`} 
-                  />
-                  {Menu.title}
-                </NavLink>
+                  >
+                    <ReactSVG
+                      className="bi me-2 "
+                      wrapper="span"
+                      src={`/${Menu.src}.svg`} 
+                    />
+                    {Menu.title}
+                  </NavLink>
+                  :<Accordion>
+                    <Accordion.Item>
+                      <Accordion.Header>
+                        
+                        <ReactSVG
+                            className="bi me-2 "
+                            wrapper="span"
+                            src={`/${Menu.src}.svg`} 
+                          />
+                        {Menu.title}
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        {
+                          Menu.others.map( e=>
+                            <NavLink 
+                              className={`nav-link`}
+                              to={e.link}
+                            >
+                              {e.name}
+                            </NavLink>  
+                          )
+                        }
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  </Accordion>
+                }
               </li>
             ))}
           </ul>

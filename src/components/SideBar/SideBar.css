@@ -28,3 +28,16 @@
 .nav-link.active svg{
   fill: var(--primary-default-500);
 }
+.accordion-button{
+  padding: 10px 8px !important;
+  
+  fill: #6C7DA3;
+  color: #6C7DA3 !important;
+  box-shadow: none !important;
+}
+.accordion-button:not(.collapsed){
+  background: var(--blue-100, #E7F1FF) !important;
+}
+.accordion-item{
+  border: none !important;
+}
