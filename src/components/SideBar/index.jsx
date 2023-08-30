@@ -45,7 +45,7 @@ const SideBar = ({children}) => {
           </ul>
           <div>
             <div className="pb-5 nav nav-pills flex-column mb-auto">
-              <Link className="nav-link"  to="/" onClick={()=> setSession(false)}>
+              <Link className="nav-link"  to="/" onClick={()=> setSession()}>
                 <ReactSVG
                   className="bi me-2 "
                   wrapper="span"
