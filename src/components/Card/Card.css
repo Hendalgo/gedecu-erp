@@ -1,0 +1,15 @@
+.CardContainer{
+  border-radius: 8px;
+  border: 1px solid #E6EDFF;
+}
+.CountryName{
+  font-size: 12px;
+  color: var(--gray-600, #6C757D);
+}
+.TotalCard{
+  font-size: 18px;
+  font-weight: 600; 
+}
+.CardIcon img{
+  border-radius: 50px;
+}

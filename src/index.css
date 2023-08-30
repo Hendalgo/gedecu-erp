@@ -1,0 +1,82 @@
+:root{
+  --primary-neutral-dark-900: #0A0818;
+  --primary-neutral-dark-800: #100E1E;
+  --primary-neutral-dark-700: #191625;
+  --primary-neutral-dark-600: #22202C;
+  --primary-neutral-default-500: #2E2C34;
+  --primary-neutral-ligth-400: #7A7585;
+  --primary-neutral-ligth-300: #B5B0C2;
+  --primary-neutral-ligth-200: #E0DCEA;
+  --primary-neutral-ligth-100: #EFEDF4;
+  --primary-neutral-white: #FFFFFF;
+
+  --primary-dark-900: #002966;
+  --primary-dark-800: #00398F;
+  --primary-dark-700: #0049B8;
+  --primary-dark-600: #005AE0;
+  --primary-default-500: #0066FF;
+  --primary-light-400: #3385FF;
+  --primary-light-300: #5C9DFF;
+  --primary-light-200: #85B6FF;
+  --primary-light-100: #ADCEFF;
+  --primary-white: #E6EDFF;
+}
+@font-face {
+  font-family: Inter;
+  src: url("/public/fonts/Inter-VariableFont_slnt\,wght.ttf");
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter;
+}
+body{
+
+}
+.tooltip{
+  font-size: 12px;
+  background-color: var(--primary-light-100);
+  border-radius: 4px;
+  padding: 8px 8px;
+  position: relative;
+}
+.tooltip::after{
+  content: ".";
+  color: transparent;
+  position: absolute !important;
+  width: 8px;
+  height: 8px;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  transform: rotate(45deg);
+  background-color: var(--primary-light-100);
+}
+h6{
+  margin-bottom: 0 !important;
+}
+.TableP{
+  border-radius: 12px !important;
+  border: 1px solid #E6EDFF !important;
+  
+  overflow: hidden !important;
+  border-collapse: unset;
+}
+.DownloadButton{
+  border: none;
+  background-color: transparent;
+  color: var(--blue-500, #0D6EFD);
+  font-size: 13px;
+  font-weight: 500;
+}
+.DownloadButton>span{
+  margin-right: 6px;
+}
+.DownloadIcon span{
+  background: var(--blue-100, #E7F1FF);
+  padding: 8px;
+  border-radius: 6px;
+  
+}

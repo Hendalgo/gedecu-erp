@@ -1,0 +1,8 @@
+.TitleIcon span{
+  padding: 8px;
+  background-color: var(--primary-neutral-white);
+  box-shadow: 0px 2px 10px 0px rgba(124, 141, 181, 0.12);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}

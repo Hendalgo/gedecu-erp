@@ -1,0 +1,29 @@
+.welcome{
+  color: #6C7DA3;
+}
+.WelcomeContainer{
+  border-bottom: 1px solid var(--primary-white);
+}
+.BankAmountContainer{
+  padding: 40px 20px 20px 20px;
+  border-radius: 12px;
+  border: 1px solid #E6EDFF;
+  background: var(--gray-white, #FFF);
+}
+.BankAmountContainer>div{
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #E6EDFF;
+}
+.BankAmountContainer h6{
+  margin-top: 28px;
+}
+.TotalAmountBank span{
+  border-radius: 50px;
+  padding: 20px;
+  
+  background: var(--blue-100, #E7F1FF);
+}
+.TotalAmountBank svg{
+  fill: #0D6EFD;
+}
