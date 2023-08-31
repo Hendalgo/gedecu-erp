@@ -7,7 +7,8 @@ import Card from '../components/Card'
 import Chart from '../components/Chart'
 import { ReactSVG } from 'react-svg'
 import BankCard from '../components/BankCard'
-import Header from '../components/Header'
+import Header from '../components/Header';
+import DownloadButton from '../components/DownloadButton'
 
 const table = [
   {
@@ -152,14 +153,7 @@ const Home = () => {
                     icon="/refresh.svg"
                     description="Transacciones realizadas"
                   />
-                  <button className='DownloadButton'>
-                    <ReactSVG 
-                      src="/download.svg"
-                      wrapper='span'
-                      className='DownloadIcon'
-                    />
-                    Descargar
-                  </button>
+                  <DownloadButton />
                 </div>
               </div>
               <div className="row pt-4">
