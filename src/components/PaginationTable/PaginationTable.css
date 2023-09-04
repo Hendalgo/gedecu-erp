@@ -1,0 +1,33 @@
+.PaginationContainer ul{
+  list-style: none;
+  display: flex;
+  width: fit-content;
+  
+  border-radius: 3.2px 0px 0px 3.2px;
+  border: 1px solid var(--gray-300, #DEE2E6);
+  padding: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+}
+.PaginationContainer li{
+  padding: 5px 9px;
+  background: var(--HitBox, rgba(255, 255, 255, 1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-primary, #0D6EFD);
+  text-decoration: none;
+
+}
+.PaginationContainer .selected{
+  background: var(--theme-primary, #0D6EFD);
+  color: var(--gray-white, #FFF);
+}
+.PaginationContainer span{
+  color: var(--gray-600, #6C757D);
+  /* Body/Small */
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+}

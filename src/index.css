@@ -66,11 +66,9 @@ h6{
   margin-bottom: 0 !important;
 }
 .TableP{
-  border-radius: 12px !important;
-  border: 1px solid #E6EDFF !important;
+  border-radius: 4px 4px 12px 12px !important;
   
   overflow: hidden !important;
-  border-collapse: unset;
 }
 .DownloadButton{
   border: none;
@@ -87,4 +85,37 @@ h6{
   padding: 8px;
   border-radius: 6px;
   
+}
+.ModalBodyTitle{
+  color: var(--blue-800, #052C65);
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 21px */
+}
+.ModalBodyContent{
+  color: var(--body-text-body-color, #212529);
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; 
+}
+.ModalTopTitle{
+  color: var(--blue-800, #052C65);
+  /* Heading/H4 */
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 120%; /* 28.8px */
+}
+.ModalTopSubTitle{
+  color: var(--body-text-body-color, #212529);
+  font-family: Inter;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 22.5px */
 }
