@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard"
 import { SessionContext } from "./context/SessionContext"
 import ProtectedRoutes from "./components/ProtectedRoutes"
 import Home from "./pages/Home"
-import { LOGIN_ROUTE, DASHBOARD_ROUTE, USERS_ROUTE, REPORTS_NEW_ROUTE } from "./consts/Routes";
+import { LOGIN_ROUTE, DASHBOARD_ROUTE, USERS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_ROUTE } from "./consts/Routes";
 import { elements } from "chart.js";
 import Reports from "./pages/Reports";
 
@@ -27,7 +27,8 @@ function App() {
          <Route element={<ProtectedRoutes isAllowed={ !!session} redirectTo={`/${LOGIN_ROUTE}`} />}>
           <Route path={`/${DASHBOARD_ROUTE}`} element={ <Dashboard />}>
             <Route index element={ <Home/> }  />
-            <Route path={`${REPORTS_NEW_ROUTE}`} element={<Reports />} />
+            <Route path={`${REPORTS_ROUTE}`} element={<Reports />}>
+            </Route>
             <Route path={`${USERS_ROUTE}`}/>
           </Route>
          </Route>

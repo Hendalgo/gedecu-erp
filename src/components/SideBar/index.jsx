@@ -4,7 +4,7 @@ import './SideBar.css';
 import { ReactSVG } from "react-svg";
 import { SessionContext } from "../../context/SessionContext";
 import { Accordion } from "react-bootstrap";
-import { REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
+import { REPORTS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
 
 const SideBar = ({children}) => {
   const {setSession} = useContext(SessionContext);
@@ -81,13 +81,18 @@ const SideBar = ({children}) => {
                   :<Accordion>
                     <Accordion.Item>
                       <Accordion.Header>
-                        
-                        <ReactSVG
-                            className="bi me-2 "
-                            wrapper="span"
-                            src={`/${Menu.src}.svg`} 
-                          />
-                        {Menu.title}
+                          <NavLink
+                            
+                            className={`nav-link`}
+                            to={REPORTS_ROUTE}
+                          >
+                          <ReactSVG
+                              className="bi me-2 "
+                              wrapper="span"
+                              src={`/${Menu.src}.svg`} 
+                            />
+                          {Menu.title}
+                        </NavLink>
                       </Accordion.Header>
                       <Accordion.Body>
                         {
@@ -95,6 +100,7 @@ const SideBar = ({children}) => {
                             <NavLink 
                               className={`nav-link`}
                               to={e.link}
+                              key={e}
                             >
                               {e.name}
                             </NavLink>  
@@ -118,7 +124,7 @@ const SideBar = ({children}) => {
                 Cerrar Sesión
               </Link>
             </div>
-            <img src="logo-broders.png" alt="Logo broders" />
+            <img src="/logo-broders.png" alt="Logo broders" />
           </div>
         </div>
         <div className="col-10" style={{maxHeight: "100vh", overflowY: "scroll"}}>
