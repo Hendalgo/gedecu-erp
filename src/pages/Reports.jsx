@@ -8,6 +8,7 @@ import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
 import { Modal } from 'react-bootstrap'
+import { Outlet } from 'react-router-dom'
 
 const data = [
   {
@@ -95,7 +96,13 @@ const table = [
   },
 ]
 
+
 const Reports = () => {
+  
+  return <Outlet/>
+}
+
+export const ReportsIndex = ()=>{
   const {session} = useContext(SessionContext);
   const [itemOffset, setItemsOffset] = useState(0);
   const [modalShow, setModalShow] = useState(false)
@@ -105,14 +112,14 @@ const Reports = () => {
   const handleModal = (e)=>{
     setModalShow(true);
   }
-  return (
+  return(
     <div className="container-fluid">
          
       <div className="row WelcomeContainer pt-4 pb-3">
         <div className="d-flex justify-content-between">
           <div className=''>
             <h6 className='welcome'>Bienvenido, {session.name} 👋</h6>
-            <h4>Vista General</h4>
+            <h4>Reportes</h4>
           </div>
           <div className="">
             <div className="d-flex align-items-center g-4">
@@ -149,6 +156,7 @@ const Reports = () => {
                 <th scope='col'>Motivo</th>
                 <th scope='col'>Método de pago</th>
                 <th scope='col'>Monto</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -175,6 +183,7 @@ const Reports = () => {
                             <span style={{border: category.borderColor, backgroundColor: category.backgroundColor, color: category.color, padding: "2px 8px", borderRadius: "4px"}}>{category.title}</span></td>
                             <td>{e.payment}</td>
                             <td>{e.amount}</td>
+                            <td></td>
                           </tr>)  
                   }
                 )

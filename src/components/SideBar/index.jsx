@@ -4,7 +4,7 @@ import './SideBar.css';
 import { ReactSVG } from "react-svg";
 import { SessionContext } from "../../context/SessionContext";
 import { Accordion } from "react-bootstrap";
-import { REPORTS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
+import {DASHBOARD_INDEX_ROUTE, REPORTS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
 
 const SideBar = ({children}) => {
   const {setSession} = useContext(SessionContext);
@@ -12,7 +12,7 @@ const SideBar = ({children}) => {
     { 
       title: "Escritorio", 
       src: "home-blue-icon", 
-      link: "" 
+      link: DASHBOARD_INDEX_ROUTE 
     },
     { 
       title: "Reportes", 
@@ -21,7 +21,7 @@ const SideBar = ({children}) => {
       others:[
         {
           name: "Crear nuevo reporte",
-          link: REPORTS_NEW_ROUTE
+          link: "reports/"+REPORTS_NEW_ROUTE
         },
         {
           name: "Duplicados",
@@ -96,11 +96,11 @@ const SideBar = ({children}) => {
                       </Accordion.Header>
                       <Accordion.Body>
                         {
-                          Menu.others.map( e=>
+                          Menu.others.map( (e, index)=>
                             <NavLink 
                               className={`nav-link`}
                               to={e.link}
-                              key={e}
+                              key={index}
                             >
                               {e.name}
                             </NavLink>  
