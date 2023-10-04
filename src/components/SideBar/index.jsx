@@ -5,6 +5,7 @@ import { ReactSVG } from "react-svg";
 import { SessionContext } from "../../context/SessionContext";
 import { Accordion } from "react-bootstrap";
 import {DASHBOARD_INDEX_ROUTE, REPORTS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from "../../consts/Routes";
+import { logout } from "../../helpers/logout";
 
 const SideBar = ({children}) => {
   const {setSession} = useContext(SessionContext);
@@ -20,16 +21,12 @@ const SideBar = ({children}) => {
       link: "reports", 
       others:[
         {
-          name: "Crear nuevo reporte",
-          link: "reports/"+REPORTS_NEW_ROUTE
-        },
-        {
           name: "Duplicados",
-          link: REPORTS_DUPLICATE_ROUTE
+          link: "reports/"+REPORTS_DUPLICATE_ROUTE
         },
         {
           name: "Inconsistencias",
-          link: REPORTS_MISS_ROUTE
+          link: "reports/"+REPORTS_MISS_ROUTE
         }
       ] 
     },
@@ -115,7 +112,7 @@ const SideBar = ({children}) => {
           </ul>
           <div>
             <div className="pb-5 nav nav-pills flex-column mb-auto">
-              <Link className="nav-link"  to="/" onClick={()=> {localStorage.removeItem("session"); setSession(false) }}>
+              <Link className="nav-link"  onClick={()=> logout().then().finally(()=> setSession(false)) }>
                 <ReactSVG
                   className="bi me-2 "
                   wrapper="span"

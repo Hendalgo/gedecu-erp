@@ -11,6 +11,12 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2'
 import "./Chart.css"
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { getBanks } from '../../helpers/banks';
+import { useRef } from 'react';
+import { getReports } from '../../helpers/reports';
+import { useFormatDate } from '../../hooks/useFormatDate';
 
 ChartJS.register(
   CategoryScale,
@@ -20,72 +26,105 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
-);
-const options={
-  scales:{
-    y: {
-      min: 0,
-      max: 10000
+); 
+const Chart = () => {
+  const [banks, setBanks] = useState([]);
+  const [options, setOptions] = useState({
+    scales:{
+      y: {
+        min: 0,
+        max: 10000
+      },
+      x:{
+        ticks: {color: "#6C757D"},
+        grid:{
+          display: false
+        }
+      }
     },
-    x:{
-      ticks: {color: "#6C757D"},
-      grid:{
-        display: false
+    plugins:{
+      legend:{
+        display: false,
+      },
+      tooltip:{
+        backgroundColor: "#ffffff",
+        borderColor: "#E6EDFF",
+        borderWidth: 1,
+        titleColor: "#6C757D", 
+        titleFont:{
+          family: "Inter",
+          weight: 400
+        },
+        titleAlign: "center",
+        bodyColor: "#000",
+        bodyAlign: "center",
+        usePointStyle: true,
+        pointStyle: "circle",
+        boxPadding: 4,
+        boxWidth: 6,
+        bodyFont:{
+          family: "Inter",
+          weight: 700,
+          size: 16
+        },
+        padding: 12 
       }
     }
-  },
-  plugins:{
-    legend:{
-      display: false,
-    },
-    tooltip:{
-      backgroundColor: "#ffffff",
-      borderColor: "#E6EDFF",
-      borderWidth: 1,
-      titleColor: "#6C757D", 
-      titleFont:{
-        family: "Inter",
-        weight: 400
-      },
-      titleAlign: "center",
-      bodyColor: "#000",
-      bodyAlign: "center",
-      usePointStyle: true,
-      pointStyle: "circle",
-      boxPadding: 4,
-      boxWidth: 6,
-      bodyFont:{
-        family: "Inter",
-        weight: 700,
-        size: 16
-      },
-      padding: 12 
-    }
-  }
-}
-const data = {
+  });
+  const [data, setData] = useState({
     labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-    datasets: [{
-      label: "Ingresos",
-      data: [5000, 3000, 8000, 5000, 4000, 2000, 5000, 3000, 8000, 5000, 4000, 2000],
-      fill: false,
-      borderColor: "#198754",
-      backgroundColor: "#198754",
-      tension: 0.4  
-
-    },
-    {
-      label: "Egresos",
-      data: [3000, 4000, 1000, 5000, 4000, 3000, 6000, 3000, 2000, 5000, 1000, 2000],
-      fill: false,
-      borderColor: "#DC3545",
-      backgroundColor: "#DC3545",
-      tension: 0.4
-
-    }
+    datasets: [
   ]
-  };  
-const Chart = () => {
+  });
+  const formRef = useRef();
+  useEffect(()=>{
+    getBanks().then(e => setBanks(e.data));
+    handleFilter();
+  }, [formRef])
+  
+  const handleFilter = ()=>{
+    const form = new FormData(formRef.current);
+
+    const data =  getReports(`bank=${form.get('bank') || 1}&period=${form.get('period') || 'daily'}`).then( ({data})=> {
+
+      const  maxAmount = data.reduce((max, obj)=> Math.max(max, obj.amount), -Infinity);
+      setOptions({...options, scales:{
+        y: {
+          min: 0,
+          max: maxAmount
+        },
+        x:{
+          ticks: {color: "#6C757D"},
+          grid:{
+            display: false
+          }
+        }
+      }});
+      const chartdata = [];
+      const labels = []
+      data.map( e => {
+        chartdata.push(e.amount);
+        labels.push(useFormatDate(e.created_at));
+      });
+
+      setData({
+        labels: labels,
+        datasets: [
+          {
+            label: "Ingresos",
+            data: chartdata,
+            fill: false,
+            borderColor: "#198754",
+            backgroundColor: "#198754",
+            tension: 0.4  
+      
+          }
+        ]
+      })
+    });
+
+    
+  }
   return (
     <div className="d-flex">
       <div className='container-fluid bg-white ChartContainer'>
@@ -97,22 +136,28 @@ const Chart = () => {
                 <span className='Outcome d-flex align-items-center'>Egresos</span>
               </div>
               <div className='d-flex ChartFilterContainer'>
-                <select name="date" className='form-select'>
-                  <option value="day">Día</option>
-                  <option value="week">Semana</option>
-                  <option value="month">Mes</option>
-                  <option value="quarter">Trimestre</option>
-                  <option value="semester">Semestre</option>
-                  <option value="year">Año</option>
-                </select>
-                <select name="date" className='form-select'>
-                  <option value="day">Día</option>
-                  <option value="week">Semana</option>
-                  <option value="month">Mes</option>
-                  <option value="quarter">Trimestre</option>
-                  <option value="semester">Semestre</option>
-                  <option value="year">Año</option>
-                </select>
+                <form onChange={handleFilter} ref={formRef} className='d-flex'>
+                  <select  name="period" className='form-select'>
+                    <option defaultChecked value="daily">Día</option>
+                    <option value="week">Semana</option>
+                    <option value="month">Mes</option>
+                    <option value="quarter">Trimestre</option>
+                    <option value="semester">Semestre</option>
+                    <option value="year">Año</option>
+                  </select>
+                  {
+                    banks.length > 0
+                    ?
+                    <select  name="bank" className='form-select'>
+                      {
+                        banks.map((e)=>
+                          <option value= {e.id} key={e.id}>{e.name}</option>
+                        )
+                      }
+                    </select>
+                    :null
+                  }
+                </form>
               </div>
             </div>
           </div>

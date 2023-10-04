@@ -7,3 +7,5 @@ export const REPORTS_NEW_ROUTE = "new";
 export const REPORTS_DUPLICATE_ROUTE = "duplicate";
 export const REPORTS_MISS_ROUTE = "miss";
 export const REPORTS_ROUTE = "reports"
+export const STORES_ROUTE = "stores"
+export const BANKS_ROUTE = "banks"

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import AddButton from '../components/AddButton'
 import './Home.css'
@@ -9,67 +9,24 @@ import { ReactSVG } from 'react-svg'
 import BankCard from '../components/BankCard'
 import Header from '../components/Header';
 import DownloadButton from '../components/DownloadButton'
+import { getReports } from '../helpers/reports'
+import { getBanks, getBanksTotal } from '../helpers/banks'
+import { useFormatDate } from '../hooks/useFormatDate'
+import BalanceLoader from '../components/Loaders/BalanceLoader'
+import TableLoader from '../components/Loaders/TableLoader'
 
-const table = [
-  {
-    id: "1",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "2",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "3",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "4",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "5",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "6",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-  {
-    id: "7",
-    date: "17 Ago, 2023",
-    type: "Transferencia",
-    payment: "Banco - Mercantil",
-    amount: "2.500,00",
-    currency: "Bs.S"
-  },
-]
 const Home = () => {
   const {session} = useContext(SessionContext);
+  const [reports, setReports] = useState([]);
+  const  [loadingReports, setLoadingReports] = useState(true);
+  const [loadingBanks, setLoadingBanks] = useState(true);
+  const [banks, setBanks] = useState([]);
+  const [countriesTotal, setCountriesTotal] = useState([]);
+  useEffect(()=>{
+    getReports().then( r => setReports(r.data)).finally(()=> setLoadingReports(false));
+    getBanks().then(r => setBanks(r.data)).finally(()=> setLoadingBanks(false));
+    getBanksTotal().then(r => setCountriesTotal(r));
+  }, []);
   return (
     <>
       <div className="container-fluid">
@@ -104,15 +61,25 @@ const Home = () => {
                       <Title title="Balances" icon="/chart-histogram.svg" description="Balances" />
                     </div>
                     <div className="pt-4 row">
-                      <div className="col-4">
-                        <Card country="Venezuela - VE" currency="Bs.D" total="10.000,00" img="/venezuela-flag.png" percent="1.01"/>
-                      </div>
-                      <div className="col-4">
-                        <Card country="Colombia - CO" currency="$" total="1.000.000,00" img="/colombia-flag.png" percent="4.01"/>
-                      </div>
-                      <div className="col-4">
-                        <Card country="Efectivo" currency="$" total="1.000.000,00" img="/imoney.png" percent="-2.01"/>
-                      </div>
+                      {
+                        countriesTotal.length > 0
+                        ?countriesTotal.map((e, index)=>
+                          <div key={index} className={`col-${Math.floor((12/countriesTotal.length))}`}>
+                            <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE',{minimumFractionDigits: 2})} img="/venezuela-flag.png" percent="1.01"/>
+                          </div>
+                        )
+                        :<>
+                          <div className='col-4'>
+                            <BalanceLoader/>
+                          </div>
+                          <div className='col-4'>
+                            <BalanceLoader/>
+                          </div>
+                          <div className='col-4'>
+                            <BalanceLoader/>
+                          </div>
+                        </>
+                      }
                     </div>
                     <div className="row pt-4">
                       <Title title="Estadísticas" icon="/arrow-grow.svg" description="Estadísticas" />
@@ -122,26 +89,29 @@ const Home = () => {
                     </div>
                     </div>
                     <div className="col-3 mt-4 radius" style={{overflow: "hidden"}}>
-                      <div className='BankAmountContainer'>
-                        <div className='d-flex
-                      flex-column  align-items-center BankAmountTop'>
-                          <ReactSVG
-                            src='/bank.svg'
-                            className='TotalAmountBank'
-                            wrapper='span'
-                          />
-                          <h6>Montos Bancarios</h6>
+                      {
+                        loadingBanks?<TableLoader height={1400}/>
+                        :<div className='BankAmountContainer'>
+                          <div className='d-flex
+                        flex-column  align-items-center BankAmountTop'>
+                            <ReactSVG
+                              src='/bank.svg'
+                              className='TotalAmountBank'
+                              wrapper='span'
+                            />
+                            <h6>Montos Bancarios</h6>
+                          </div>
+                          <div style={{overflowY: "scroll", maxHeight: 500}} >
+                              {
+                                banks.length > 0 
+                                ?banks.map( e =>
+                                  <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={e.country.currency.symbol} name={e.name} icon="/venezuela-bank.png" />
+                                )
+                                :null
+                              }
+                          </div>
                         </div>
-                        <div style={{overflowY: "scroll", maxHeight: 500}} >
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                            <BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" /><BankCard amount="2.000,00" currency="Bs.D" name="Banco de Venezuela" icon="/venezuela-bank.png" />
-                        </div>
-                      </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -156,32 +126,37 @@ const Home = () => {
                   <DownloadButton />
                 </div>
               </div>
-              <div className="row pt-4">
+              <div className="row pt-4 pb-2">
                 <div className="d-flex">
-                  <table className='table TableP table-striped' >
-                    <thead>
-                      <tr>
-                        <th scope='col'>ID Transacción</th>
-                        <th scope='col'>Fecha</th>
-                        <th scope='col'>Motivo</th>
-                        <th scope='col'>Método de pago</th>
-                        <th scope='col'>Monto</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        table.map(e=>
-                          <tr key={e.id}>
-                            <td scope='row'>{e.id}</td>
-                            <td>{e.date}</td>
-                            <td>{e.type}</td>
-                            <td>{e.payment}</td>
-                            <td>{e.amount}</td>
-                          </tr>  
-                        )
-                      }
-                    </tbody>
-                  </table>
+                  {
+                    loadingReports?<TableLoader/>
+                    :<table className='table TableP table-striped' >
+                      <thead>
+                        <tr>
+                          <th scope='col'>ID Transacción</th>
+                          <th scope='col'>Fecha</th>
+                          <th scope='col'>Motivo</th>
+                          <th scope='col'>Método de pago</th>
+                          <th scope='col'>Monto</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          reports || reports.legth === 0
+                          ?reports.map(e=>
+                            <tr key={e.id}>
+                              <td scope='row'>{e.id}</td>
+                              <td>{useFormatDate(e.created_at)}</td>
+                              <td ><span className='ReportTypeTableStyle' style={{color: JSON.parse(e.type.config).styles.color, backgroundColor: JSON.parse(e.type.config).styles.backgroundColor, borderColor: JSON.parse(e.type.config).styles.borderColor}}>{e.type.name}</span></td>
+                              <td><span className="ReportTypeTableStyle"  style={{color: '#2E2C34', backgroundColor: '#EFEDF4', borderColor: '#E0DCEA'}}>{e.bank.name}</span></td>
+                              <td>{`${e.bank.country.currency.symbol} ${e.bank.amount.toLocaleString('de-DE',{ minimumFractionDigits: 2})}`}</td>
+                            </tr>  
+                          )
+                          :'No hay reportes que mostrar'
+                        }
+                      </tbody>
+                    </table>
+                  }
                 </div>
               </div>
             </div>

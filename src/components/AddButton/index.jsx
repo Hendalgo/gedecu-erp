@@ -2,9 +2,9 @@ import React from 'react'
 import { ReactSVG } from 'react-svg'
 import "./AddButton.css";
 
-const AddButton = ({text = "reporte"}) => {
+const AddButton = ({text = "reporte", add}) => {
   return (
-    <div className="d-sm-flex align-items-center bg-white AddButtonContainer">
+    <button onClick={add} className="d-sm-flex align-items-center bg-white AddButtonContainer">
       <ReactSVG
         src='/plus.svg'
         className='AddButtonIconContainer'
@@ -14,7 +14,7 @@ const AddButton = ({text = "reporte"}) => {
         <span >Nuevo</span>
         <span className='AddText'>{text}</span>
       </div>
-    </div>
+    </button>
   )
 }
 
