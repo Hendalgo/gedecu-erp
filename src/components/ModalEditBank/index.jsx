@@ -1,31 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createUser, getUsersRoles, updateUser } from '../../helpers/users';
-import { getCountriesCount } from '../../helpers/banks';
+import { getCountriesCount, updateBank } from '../../helpers/banks';
 
-const ModalEditBank = ({modalShow, setModalShow, user, setUser}) => {
-  const [roles, setRoles] = useState();
+const ModalEditBank = ({modalShow, setModalShow, bank, setBank}) => {
   const [countries, setCountries] = useState();
   const [alertType, setAlertType] = useState('danger');
   const [errorMessage, setErrorMessage] = useState();
   const form = useRef();
   useEffect(()=>{
-    getUsersRoles().then( r => setRoles(r));
     getCountriesCount().then(r => setCountries(r));
   }, []);
   const handleUser =  async()=>{
     try {
-      const formData = new FormData(form.current);
-      let userUpdate = user;
-        if (userUpdate.password == '') {
-          console.log('aui')
-          delete userUpdate.password;
-        }
-      const request  = await updateUser(user.id, userUpdate);
+      const request  = await updateBank(bank.id, {
+        name: bank.name,
+        amount: bank.amount,
+        country_id: bank.country_id
+      });
 
       switch (request.status) {
         case 201:
-          setErrorMessage('Usuario actualizado con éxito');
+          setErrorMessage('Banco actualizado con éxito');
           setAlertType('success');
           
           window.location.reload();
@@ -36,17 +31,17 @@ const ModalEditBank = ({modalShow, setModalShow, user, setUser}) => {
           break;
       
         default:
-          setErrorMessage("Error actualizando el usuario");
+          setErrorMessage("Error actualizando el banco");
           setAlertType('danger')
           break;
       }
     } catch (error) {
-        setErrorMessage("Error actualizando el usuario");
+        setErrorMessage("Error actualizando el banco");
         setAlertType('danger')
     }
   }
   return (
-    user?<Modal show={modalShow} size='lg' onHide={()=> setModalShow(false)}>
+    bank?<Modal show={modalShow} size='lg' onHide={()=> setModalShow(false)}>
     <Modal.Header closeButton>
       <Modal.Title>
         <div className="container">
@@ -67,41 +62,21 @@ const ModalEditBank = ({modalShow, setModalShow, user, setUser}) => {
           <div className='d-flex mb-3'>
             <div className='me-4'>
               <label htmlFor="name">Nombre</label>
-              <input required onChange={(e)=> setUser({...user, name: e.target.value})} className='form-control' type="text" name='name' value={user.name} />
+              <input required onChange={(e)=> setBank({...bank, name: e.target.value})} className='form-control' type="text" name='name' value={bank.name} />
             </div>
             <div>
-              <label htmlFor="email">Email</label>
-              <input readOnly onChange={(e)=> setUser({...user, email: e.target.value})} className='form-control' type="email" name='email' value={user.email}/> 
+              <label htmlFor="email">Monto</label>
+              <input onChange={(e)=> setBank({...bank, amount: e.target.value})} className='form-control' type="text" name='email' value={bank.amount}/> 
             </div>
           </div> 
-          <div className='mb-3'>
-            <label htmlFor="password">Contraseña</label>
-            <input required name='password'  onChange={(e)=> setUser({...user, password: e.target.value})} className='form-control' type="password" />
-          </div>
-          <div className='mb-3'>
-            <label htmlFor="confirm-password">Confirmar Contraseña</label>
-            <input required name='password_confirmation' onChange={(e)=> setUser({...user, password_confirmation: e.target.value})} className='form-control' type="password" />
-          </div>
           <div className="d-flex mb-3">
-            <div className='me-4'>
-              <label htmlFor="role">Rol</label>
-              <select required className="form-select" name="role" id="">
-                {
-                  roles?
-                  roles.map((e)=>{
-                    return <option key={e.id} selected={e.id === user.role_id? true:false} style={{textTransform: 'capitalize'}} value={e.id}>{e.name}</option>
-                  })
-                  :null
-                }
-              </select>
-            </div>
             <div>
               <label htmlFor="country">País</label>
               <select required className="form-select" name="country" id="">
                 {
                   countries?
                   countries.map(e=>{
-                    return <option key={e.id} selected={e.id === user.country_id? true:false} style={{textTransform: 'capitalize'}} value={e.id}>{e.name}</option>
+                    return <option key={e.id} defaultValue={e.id === bank.country_id? true:false} style={{textTransform: 'capitalize'}} value={e.id}>{e.name}</option>
                   })
                   :null
                 }
@@ -121,7 +96,7 @@ const ModalEditBank = ({modalShow, setModalShow, user, setUser}) => {
         </Alert>
         :null
       }
-      <button onClick={handleUser} className='btn btn-primary'>Editar Usuario</button>
+      <button onClick={handleUser} className='btn btn-primary'>Editar banco</button>
     </Modal.Footer>
   </Modal>
   :null

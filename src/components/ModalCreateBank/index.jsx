@@ -94,7 +94,7 @@ const ModalCreateBank = ({modalShow, setModalShow}) => {
           </Alert>
           :null
         }
-        <button onClick={handleUser} className='btn btn-primary'>Crear Usuario</button>
+        <button onClick={handleUser} className='btn btn-primary'>Crear banco</button>
       </Modal.Footer>
     </Modal>
   )

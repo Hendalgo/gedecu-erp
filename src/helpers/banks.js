@@ -16,6 +16,14 @@ export const createBank = async(form)=>{
     return error.response
   }  
 }
+export const updateBank = async(id, formData) =>{
+  try {
+    const request = await API_INSTANCE.put(BANKS_URL+"/"+id, formData);
+    return request
+  } catch (error) {
+    return error.response
+  }
+}
 export const getBanksTotal = async()=>{
   try {
     const request = await API_INSTANCE.get(BANKS_TOTAL_URL);

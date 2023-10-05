@@ -64,7 +64,7 @@ const Users = () => {
             <table className='table TableP table-striped' >
               <thead>
                 <tr className='pt-4'>
-                  <th scope='col'>ID Usuario</th>
+                  <th scope='col'>Email</th>
                   <th scope='col'>Nombre</th>
                   <th scope='col'>País</th>
                   <th scope='col'>Rol</th>
@@ -78,7 +78,7 @@ const Users = () => {
                       return(<tr key={e.id}>
                               <td scope='row'>
                                 <div className="d-flex justify-content-between align-items-center">
-                                  <span>{e.id}</span>
+                                  <span>{e.email}</span>
                                 </div>
                               </td>
                               <td>{e.name}</td>

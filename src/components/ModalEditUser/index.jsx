@@ -18,7 +18,6 @@ const ModalEditUser = ({modalShow, setModalShow, user, setUser}) => {
       const formData = new FormData(form.current);
       let userUpdate = user;
         if (userUpdate.password == '') {
-          console.log('aui')
           delete userUpdate.password;
         }
       const request  = await updateUser(user.id, userUpdate);

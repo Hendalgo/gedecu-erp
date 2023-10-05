@@ -6,6 +6,7 @@ import PaginationTable from '../components/PaginationTable'
 import ModalViewReport from '../components/ModalViewReport'
 import { getStores } from '../helpers/stores'
 import Welcome from '../components/Welcome'
+import ModalCreateStore from '../components/ModalCreateStore'
 
 const Stores = () => {
   const {session} = useContext(SessionContext);
@@ -32,7 +33,7 @@ const Stores = () => {
   }
   return(
     <div className="container-fluid">
-      <Welcome text='Locales'/>
+      <Welcome text='Locales' add={()=> setModalShow(true)}/>
       <div className="row mt-4">
         <form onSubmit={handleSearch} action="" ref={form} className="form-group row">
           <div className="col-8"></div>
@@ -117,7 +118,7 @@ const Stores = () => {
           :null
         }
       <div className="">
-        <ModalViewReport setModalShow={setModalShow} modalShow={modalShow} report={store} />
+        <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
       </div>
     </div>
   )

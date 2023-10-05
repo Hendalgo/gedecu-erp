@@ -9,3 +9,11 @@ export const getStores= async(query)=>{
     
   }
 }
+export const createStore = async(form)=>{
+  try {
+    const request = await API_INSTANCE.post(STORES_URL, form);
+    return request;
+  } catch (error) {
+    return error.response
+  }  
+}
