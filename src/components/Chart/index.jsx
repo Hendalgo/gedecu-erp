@@ -82,48 +82,61 @@ const Chart = () => {
     handleFilter();
   }, [formRef])
   
-  const handleFilter = ()=>{
-    const form = new FormData(formRef.current);
+  const handleFilter = async ()=>{
+    try {
+      const form = new FormData(formRef.current);
 
-    const data =  getReports(`bank=${form.get('bank') || 1}&period=${form.get('period') || 'daily'}`).then( ({data})=> {
-
-      const  maxAmount = data.reduce((max, obj)=> Math.max(max, obj.amount), -Infinity);
-      setOptions({...options, scales:{
-        y: {
-          min: 0,
-          max: maxAmount
-        },
-        x:{
-          ticks: {color: "#6C757D"},
-          grid:{
-            display: false
-          }
+    const dataI = (await getReports(`bank=${form.get('bank') || 1}&movement=income&period=${form.get('period') || 'daily'}`)).data;
+    const dataE = (await getReports(`bank=${form.get('bank') || 1}&movement=expense&period=${form.get('period') || 'daily'}`)).data;
+    setOptions({...options, scales:{
+      y: {
+        min: 0
+      },
+      x:{
+        ticks: {color: "#6C757D"},
+        grid:{
+          display: false
         }
-      }});
-      const chartdata = [];
+      }
+    }});
+      const chartdataI = [];
       const labels = []
-      data.map( e => {
-        chartdata.push(e.amount);
+      dataI.map( e => {
+        chartdataI.push(e.amount);
         labels.push(useFormatDate(e.created_at));
       });
-
+      const chartdataE = [];
+      const labelE = []
+      dataE.map( e => {
+        chartdataE.push(e.amount);
+        labels.push(useFormatDate(e.created_at));
+      });
       setData({
         labels: labels,
         datasets: [
           {
             label: "Ingresos",
-            data: chartdata,
+            data: chartdataI,
             fill: false,
             borderColor: "#198754",
             backgroundColor: "#198754",
             tension: 0.4  
       
+          },
+          {
+            label: "Egreso",
+            data: chartdataE,
+            fill: false,
+            borderColor: "#DC3545",
+            backgroundColor: "#DC3545",
+            tension: 0.4  
+      
           }
         ]
       })
-    });
-
-    
+    } catch (error) {
+      console.error(error);
+    }
   }
   return (
     <div className="d-flex">

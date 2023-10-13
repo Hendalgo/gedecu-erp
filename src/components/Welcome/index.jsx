@@ -2,7 +2,7 @@ import React, {useContext} from 'react'
 import { SessionContext } from '../../context/SessionContext';
 import DownloadButton from '../DownloadButton';
 import AddButton from '../AddButton';
-const Welcome = ({text, add}) => {
+const Welcome = ({text, add, textButton}) => {
   
   const {session} = useContext(SessionContext);
   return (
@@ -15,9 +15,9 @@ const Welcome = ({text, add}) => {
         <div className="">
           <div className="d-flex align-items-center g-4">
             <div className="me-4  ">
-              <DownloadButton />
+              {/*<DownloadButton />*/}
             </div>
-              <AddButton add={add} text={text}/>
+              <AddButton add={add} text={textButton?textButton:text}/>
             <div >
             </div>
           </div>

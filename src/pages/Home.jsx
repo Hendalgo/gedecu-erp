@@ -14,10 +14,14 @@ import { getBanks, getBanksTotal } from '../helpers/banks'
 import { useFormatDate } from '../hooks/useFormatDate'
 import BalanceLoader from '../components/Loaders/BalanceLoader'
 import TableLoader from '../components/Loaders/TableLoader'
+import ModalCreateReport from '../components/ModalCreateReport'
+import ModalCreateUser from '../components/ModalCreateUser'
 
 const Home = () => {
   const {session} = useContext(SessionContext);
   const [reports, setReports] = useState([]);
+  const [modalReport, setModalReport] = useState(false);
+  const [modalUser, setModalUser] = useState(false);
   const  [loadingReports, setLoadingReports] = useState(true);
   const [loadingBanks, setLoadingBanks] = useState(true);
   const [banks, setBanks] = useState([]);
@@ -48,10 +52,10 @@ const Home = () => {
                         <div className="">
                           <div className="d-flex g-4">
                             <div className="me-4  ">
-                              <AddButton />
+                              <AddButton  text='Usuario'add={()=>{setModalReport(true)}}/>
                             </div>
                             <div >
-                              <AddButton />
+                              <AddButton   text='Reporte'add={()=>{setModalReport(true)}}/>
                             </div>
                           </div>
                         </div>
@@ -65,7 +69,7 @@ const Home = () => {
                         countriesTotal.length > 0
                         ?countriesTotal.map((e, index)=>
                           <div key={index} className={`col-${Math.floor((12/countriesTotal.length))}`}>
-                            <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE',{minimumFractionDigits: 2})} img="/venezuela-flag.png" percent="1.01"/>
+                            <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE',{minimumFractionDigits: 2})} img="/fi-br-money.png" percent={e.growth_percentage}/>
                           </div>
                         )
                         :<>
@@ -105,7 +109,7 @@ const Home = () => {
                               {
                                 banks.length > 0 
                                 ?banks.map( e =>
-                                  <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={e.country.currency.symbol} name={e.name} icon="/venezuela-bank.png" />
+                                  <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={e.country.currency.symbol} name={e.name}/>
                                 )
                                 :null
                               }
@@ -123,7 +127,7 @@ const Home = () => {
                     icon="/refresh.svg"
                     description="Transacciones realizadas"
                   />
-                  <DownloadButton />
+                  <DownloadButton  />
                 </div>
               </div>
               <div className="row pt-4 pb-2">
@@ -143,15 +147,22 @@ const Home = () => {
                       <tbody>
                         {
                           reports || reports.legth === 0
-                          ?reports.map(e=>
-                            <tr key={e.id}>
-                              <td scope='row'>{e.id}</td>
-                              <td>{useFormatDate(e.created_at)}</td>
-                              <td ><span className='ReportTypeTableStyle' style={{color: JSON.parse(e.type.config).styles.color, backgroundColor: JSON.parse(e.type.config).styles.backgroundColor, borderColor: JSON.parse(e.type.config).styles.borderColor}}>{e.type.name}</span></td>
-                              <td><span className="ReportTypeTableStyle"  style={{color: '#2E2C34', backgroundColor: '#EFEDF4', borderColor: '#E0DCEA'}}>{e.bank.name}</span></td>
-                              <td>{`${e.bank.country.currency.symbol} ${e.bank.amount.toLocaleString('de-DE',{ minimumFractionDigits: 2})}`}</td>
-                            </tr>  
-                          )
+                          ?reports.map(e=>{
+                            let currency;
+                            if (e.bank_income) {
+                              currency = e.bank_income.country.currency.symbol
+                            }
+                            else{
+                              currency = e.bank.country.currency.symbol
+                            }
+                            return <tr key={e.id}>
+                                <td scope='row'>{e.id}</td>
+                                <td>{useFormatDate(e.created_at)}</td>
+                                <td ><span className='ReportTypeTableStyle' style={{color: JSON.parse(e.type.config).styles.color, backgroundColor: JSON.parse(e.type.config).styles.backgroundColor, borderColor: JSON.parse(e.type.config).styles.borderColor}}>{e.type.name}</span></td>
+                                <td><span className="ReportTypeTableStyle"  style={{color: '#2E2C34', backgroundColor: '#EFEDF4', borderColor: '#E0DCEA'}}>{e.bank.name}</span></td>
+                                <td>{`${currency} ${e.amount.toLocaleString('de-DE',{ minimumFractionDigits: 2})}`}</td>
+                            </tr>
+                          })
                           :'No hay reportes que mostrar'
                         }
                       </tbody>
@@ -162,6 +173,8 @@ const Home = () => {
             </div>
           </div>
         </div>
+        <ModalCreateUser setModalShow={setModalUser} modalShow={modalUser}/>
+        <ModalCreateReport setModalShow={setModalReport} modalShow={modalReport}/>
       </div>
     </>
   )

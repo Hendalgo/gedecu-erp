@@ -9,6 +9,7 @@ import { getBanks, getCountriesCount } from '../helpers/banks'
 import Welcome from '../components/Welcome'
 import ModalCreateBank from '../components/ModalCreateBank'
 import ModalEditBank from '../components/ModalEditBank'
+import TableLoader from '../components/Loaders/TableLoader'
 
 const Banks = () => {
   const {session} = useContext(SessionContext);
@@ -24,19 +25,19 @@ const Banks = () => {
     getBanks("order=created_at&order_by=desc").then(r=> setBanks(r));
   }, [])
   const handleChange = (offset)=>{
-    getBanks(`order=created_at&order_by=desc&page=${offset.selected+1}&search=${form.current.search.value}`).then(r=> setBanks(r));
+    getBanks(`order=created_at&order_by=desc&page=${offset.selected+1}${form.current.filter_type.value !== 'false'?`&country=${form.current.filter_type.value}`:''}&search=${form.current.search.value}`).then(r=> setBanks(r));
   }
   const handleModal = (id)=>{
     setEditBank( bank.data.find( (el)=> el.id === id));
     setModalShow(true);
   }
   const handleType = (e) => {
-    getBanks(`order=created_at&order_by=desc&country=${e}&search=${form.current.search.value}`).then(r => setBanks(r));
+    getBanks(`order=created_at&order_by=desc&country=${e?`&country=${e}`:''}&search=${form.current.search.value}`).then(r => setBanks(r));
   }
   const handleSearch = (e)=>{
     e.preventDefault();
     if (form.current.search !== '') {
-      getBanks(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r=> setBanks(r));
+      getBanks(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false'?`&country=${form.current.filter_type.value}`:''}&search=${form.current.search.value}`).then(r=> setBanks(r));
     }
   }
   const handleBank = (e)=>{
@@ -45,7 +46,7 @@ const Banks = () => {
   }
   return(
     <div className="container-fluid">
-      <Welcome text='Bancos'  add={()=> setModalShow(true)}/>
+      <Welcome text='Bancos'  add={()=> setModalShow(true)} textButton='Banco'/>
       <div className="row mt-4">
         <form onSubmit={handleSearch} action="" ref={form} className="form-group row">
           <div className="col-8"><FilterTableButtons data={countryBank} callback={handleType}/></div>
@@ -106,13 +107,6 @@ const Banks = () => {
                                       </defs>
                                     </svg>
                                   </button>
-                                  <button className='TableActionButtons'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                      <path d="M15.3332 3C15.3332 2.44772 14.8855 2 14.3332 2H11.8158C11.3946 0.804906 10.267 0.0040625 8.99985 0H6.99985C5.73269 0.0040625 4.6051 0.804906 4.18385 2H1.6665C1.11422 2 0.666504 2.44772 0.666504 3C0.666504 3.55228 1.11422 4 1.6665 4H1.99985V12.3333C1.99985 14.3584 3.64147 16 5.6665 16H10.3332C12.3582 16 13.9998 14.3584 13.9998 12.3333V4H14.3332C14.8855 4 15.3332 3.55228 15.3332 3ZM11.9998 12.3333C11.9998 13.2538 11.2537 14 10.3332 14H5.6665C4.74604 14 3.99985 13.2538 3.99985 12.3333V4H11.9998V12.3333Z" fill="#495057"/>
-                                      <path d="M6.33301 12C6.88529 12 7.33301 11.5523 7.33301 11V7C7.33301 6.44772 6.88529 6 6.33301 6C5.78073 6 5.33301 6.44772 5.33301 7V11C5.33301 11.5523 5.78073 12 6.33301 12Z" fill="#495057"/>
-                                      <path d="M9.6665 12C10.2188 12 10.6665 11.5523 10.6665 11V7C10.6665 6.44772 10.2188 6 9.6665 6C9.11422 6 8.6665 6.44772 8.6665 7V11C8.6665 11.5523 9.11422 12 9.6665 12Z" fill="#495057"/>
-                                      </svg>
-                                  </button>
                                 </div>
                               </td>
                             </tr>)  
@@ -124,8 +118,8 @@ const Banks = () => {
             </div>
           </div>
           </>
-          :null
-          :null
+          :<div className='d-flex justify-content-center align-items-center'>No hay bancos para mostrar</div>
+          :<div className='mt-4'><TableLoader/></div>
         }
       <div className="">
         <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />

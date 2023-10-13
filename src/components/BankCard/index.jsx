@@ -1,10 +1,11 @@
 import React from 'react'
 import "./BankCard.css"
-const BankCard = ({amount, currency, name, icon}) => {
+import useRandColor from '../../hooks/useRandColor'
+const BankCard = ({amount, currency, name}) => {
   return (
     <div className='d-flex align-items-center mb-2'>
       <div>
-        <img src={icon} alt={name} className='BankImage img-fluid' />
+        <span style={{backgroundColor: useRandColor(), height: 40, width: 40, display: 'block', borderRadius: 4}} className='BankImage img-fluid'> </span>
       </div>
       <div className='d-flex flex-column'>
         <span className='BankName'>{name}</span>

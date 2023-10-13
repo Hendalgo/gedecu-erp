@@ -8,6 +8,14 @@ export const getBanks = async(querys)=>{
     
   }
 }
+export const getBank = async(id)=>{
+  try {
+    const request = await API_INSTANCE.get(BANKS_URL+"/"+id);
+    return request.data;
+  } catch (error) {
+    
+  }
+}
 export const createBank = async(form)=>{
   try {
     const request = await API_INSTANCE.post(BANKS_URL, form);
