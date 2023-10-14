@@ -3,8 +3,8 @@ import { ReactSVG } from 'react-svg'
 const DownloadButton = () => {
   return (
     <button className='DownloadButton'>
-      <ReactSVG 
-        src="/download.svg"
+      <ReactSVG
+        src='/download.svg'
         wrapper='span'
         className='DownloadIcon'
       />
