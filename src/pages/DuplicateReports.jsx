@@ -30,6 +30,7 @@ const DuplicateReports = () => {
   const [modalCreateShow, setModalCreateShow] = useState(false)
   const [reports, setReports] = useState([])
   const form = useRef()
+  const formDate = useRef()
   useEffect(() => {
     getReports('order=created_at&order_by=desc&duplicated=yes').then(r => setReports(r))
   }, [])
@@ -42,12 +43,20 @@ const DuplicateReports = () => {
     setModalShow(true)
   }
   const handleType = (e) => {
-    getReports(`order=created_at&order_by=desc&duplicated=yes${e ? `&duplicated_status=${e}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
+    
+    setOffset(1);
+    
+    const date = formDate.current.date.value? `&date=${formDate.current.date.value}`:'';
+    getReports(`order=created_at${date}&order_by=desc&duplicated=yes${e ? `&duplicated_status=${e}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
   const handleSearch = (e) => {
     e.preventDefault()
+    
+    setOffset(1);
     if (form.current.search !== '') {
-      getReports(`order=created_at&order_by=desc&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
+      
+      const date = formDate.current.date.value? `&date=${formDate.current.date.value}`:'';
+      getReports(`order=created_at${date}&order_by=desc&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
     }
   }
   const handleDone = (id) => {
@@ -64,6 +73,16 @@ const DuplicateReports = () => {
 
     getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
+  const handleDate = (e)=>{
+    setOffset(1);
+    e.preventDefault();
+    if (formDate.current.date.value) {
+      getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e=> console.error(e));
+    }
+    else{
+      getReports(`search=${form.current.search.value}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e=> console.error(e));
+    }
+  }
   return (
     <>
       <div className='container-fluid'>
@@ -73,6 +92,15 @@ const DuplicateReports = () => {
             <div className='col-8'><FilterTableButtons data={reportType} callback={handleType} /></div>
             <div className='col-4'><SearchBar text='reportes' /></div>
           </form>
+        </div>
+        
+        <div className="row mt-3">
+          <div className="col-3">
+            <form ref={formDate} onSubmit={(e)=>handleDate(e)}className="d-flex" method="post">
+              <input style={{borderRadius: "0.25rem 0 0 0.25rem"}} type="date" name="date" className="form-control form-control-sm" id="" />
+              <input  style={{borderRadius: "0 0.25rem 0.25rem 0"}} type="submit" className="btn btn-secondary" value="Filtrar"/>
+            </form>
+          </div>
         </div>
         {
         Array.isArray(reports.data)
