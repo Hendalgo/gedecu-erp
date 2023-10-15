@@ -9,7 +9,6 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [users, setUsers] = useState([])
   const [display, setDisplay] = useState('hidden')
   const [alertType, setAlertType] = useState('danger')
-  const [searcherValue, setSearcherValue] = useState()
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
   useEffect(() => {
