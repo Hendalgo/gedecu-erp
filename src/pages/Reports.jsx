@@ -38,22 +38,20 @@ export const ReportsIndex = () => {
     setModalShow(true)
   }
   const handleType = (e) => {
-    
-    const date = formDate.current.date.value? `&date=${formDate.current.date.value}`:'';
+    const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
     getReports(`order=created_at${date}&order_by=desc${e ? `&type_id=${e}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
   const handleSearch = (e) => {
     e.preventDefault()
     if (form.current.search !== '') {
-      
-       const date = formDate.current.date.value? `&date=${formDate.current.date.value}`:'';
+      const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
       getReports(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}${date}`).then(r => setReports(r))
     }
   }
-  const handleDate = (e)=>{
-    e.preventDefault();
+  const handleDate = (e) => {
+    e.preventDefault()
     if (formDate.current.date.value) {
-      getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e=> console.error(e));
+      getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e => console.error(e))
     }
   }
   return (
@@ -66,12 +64,12 @@ export const ReportsIndex = () => {
             <div className='col-4'><SearchBar text='reportes' /></div>
           </form>
         </div>
-        
-        <div className="row mt-3">
-          <div className="col-3">
-            <form ref={formDate} onSubmit={(e)=>handleDate(e)}className="d-flex" method="post">
-              <input style={{borderRadius: "0.25rem 0 0 0.25rem"}} type="date" name="date" className="form-control form-control-sm" id="" />
-              <input  style={{borderRadius: "0 0.25rem 0.25rem 0"}} type="submit" className="btn btn-secondary" value="Filtrar"/>
+
+        <div className='row mt-3'>
+          <div className='col-3'>
+            <form ref={formDate} onSubmit={(e) => handleDate(e)} className='d-flex' method='post'>
+              <input style={{ borderRadius: '0.25rem 0 0 0.25rem' }} type='date' name='date' className='form-control form-control-sm' id='' />
+              <input style={{ borderRadius: '0 0.25rem 0.25rem 0' }} type='submit' className='btn btn-secondary' value='Filtrar' />
             </form>
           </div>
         </div>
@@ -131,7 +129,7 @@ export const ReportsIndex = () => {
                         </td>
                         <td>{e.bank.name}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
-                        
+
                       </tr>
                     )
                   }

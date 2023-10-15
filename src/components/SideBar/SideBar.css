@@ -29,14 +29,20 @@
   fill: var(--primary-default-500);
 }
 .accordion-button{
-  padding: 10px 8px !important;
-  
+  padding: 0px !important;
+  padding-right: 8px !important;
   fill: #6C7DA3;
   color: #6C7DA3 !important;
   box-shadow: none !important;
 }
+.accordion-item.active{
+  background-color: #E7F1FF !important;
+  .accordion-button{
+    background-color: #E7F1FF !important;
+  }
+}
 .accordion-button:not(.collapsed){
-  background: var(--blue-100, #E7F1FF) !important;
+  background-color: var(--blue-100, white) !important;
 }
 .accordion-item{
   border: none !important;

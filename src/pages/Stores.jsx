@@ -13,8 +13,8 @@ import ModalEditStore from '../components/ModalEditStore'
 const Stores = () => {
   const { session } = useContext(SessionContext)
   const [store, setStore] = useState()
-  const [modalShow, setModalShow] = useState(false);
-  const [modalEdit, setModalEdit] = useState(false);
+  const [modalShow, setModalShow] = useState(false)
+  const [modalEdit, setModalEdit] = useState(false)
   const [stores, setStores] = useState([])
   const form = useRef()
 
@@ -25,8 +25,8 @@ const Stores = () => {
     getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setStores(r))
   }
   const handleEdit = (e) => {
-    setStore(e);
-    setModalEdit(true);
+    setStore(e)
+    setModalEdit(true)
   }
   const handleSearch = (e) => {
     e.preventDefault()
@@ -85,7 +85,7 @@ const Stores = () => {
                         <td>{e.user.name}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
-                            <button onClick={()=>handleEdit(e)} className='TableActionButtons'>
+                            <button onClick={() => handleEdit(e)} className='TableActionButtons'>
                               <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'>
                                 <g clipPath='url(#clip0_156_194122)'>
                                   <path d='M15.216 0.783999C14.7065 0.2971 14.0288 0.0253906 13.324 0.0253906C12.6192 0.0253906 11.9416 0.2971 11.432 0.783999L1.07401 11.142C0.732617 11.4815 0.46192 11.8853 0.277573 12.3301C0.0932258 12.7749 -0.00111372 13.2519 9.9204e-06 13.7333V15C9.9204e-06 15.2652 0.105367 15.5196 0.292903 15.7071C0.48044 15.8946 0.734793 16 1.00001 16H2.26668C2.74838 16.0013 3.22556 15.907 3.67059 15.7227C4.11562 15.5383 4.51967 15.2676 4.85934 14.926L15.216 4.568C15.7171 4.06582 15.9985 3.3854 15.9985 2.676C15.9985 1.9666 15.7171 1.28617 15.216 0.783999ZM3.44401 13.512C3.13093 13.823 2.708 13.9984 2.26668 14H2.00001V13.7333C2.00138 13.2916 2.1767 12.8681 2.48801 12.5547L10.2 4.84467L11.1553 5.8L3.44401 13.512ZM13.8 3.154L12.5693 4.38667L11.6133 3.43067L12.8467 2.2C12.9753 2.07705 13.1464 2.00844 13.3243 2.00844C13.5023 2.00844 13.6734 2.07705 13.802 2.2C13.9277 2.32704 13.9981 2.49867 13.9977 2.67741C13.9974 2.85615 13.9263 3.02749 13.8 3.154Z' fill='#495057' />
@@ -114,7 +114,7 @@ const Stores = () => {
         }
       <div className=''>
         <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
-        <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore}/>
+        <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />
       </div>
     </div>
   )

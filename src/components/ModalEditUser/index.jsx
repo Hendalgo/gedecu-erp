@@ -86,26 +86,26 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                     <div className='me-4'>
                       <label htmlFor='role'>Rol</label>
                       <select required className='form-select' name='role' id=''>
-                  {
+                        {
                   roles
                     ? roles.map((e) => {
                       return <option key={e.id} selected={e.id === user.role_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
                     })
                     : null
                 }
-                </select>
+                      </select>
                     </div>
                     <div>
                       <label htmlFor='country'>País</label>
                       <select required className='form-select' name='country' id=''>
-                  {
+                        {
                   countries
                     ? countries.map(e => {
                       return <option key={e.id} selected={e.id === user.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
                     })
                     : null
                 }
-                </select>
+                      </select>
                     </div>
                   </div>
                 </form>

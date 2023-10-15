@@ -40,7 +40,7 @@ function App () {
               <Route path={`${REPORTS_ROUTE}`} element={<Reports />}>
                 <Route index element={<ReportsIndex />} />
                 <Route path={`${REPORTS_DUPLICATE_ROUTE}`} element={<DuplicateReports />} />
-                <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences/>}/>
+                <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
               </Route>
               <Route path={`${STORES_ROUTE}`} element={<Stores />} />
               <Route path={`${BANKS_ROUTE}`} element={<Banks />} />

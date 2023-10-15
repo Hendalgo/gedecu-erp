@@ -9,11 +9,11 @@ export const getStores = async (query) => {
 
   }
 }
-export const updateStore = async (id, data)=>{
+export const updateStore = async (id, data) => {
   try {
-    const request = await API_INSTANCE.put(STORES_URL+'/'+id, data);
+    const request = await API_INSTANCE.put(STORES_URL + '/' + id, data)
 
-    return request;
+    return request
   } catch (error) {
     return error.response
   }

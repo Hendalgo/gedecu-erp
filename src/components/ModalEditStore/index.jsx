@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { getCountriesCount, updateBank } from '../../helpers/banks'
+import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
-import {useUUID} from '../../hooks/useUUID'
+import { useUUID } from '../../hooks/useUUID'
 import { updateStore } from '../../helpers/stores'
 
 const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
@@ -42,18 +42,18 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
           break
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
       setErrorMessage('Error actualizando el local')
       setAlertType('danger')
     }
   }
-  
+
   const handleSearch = (e) => {
     getUsers(`search=${e.target.value}`).then(r => setUsers(r.data))
   }
-  const handleSelect = (e)=>{
-    form.current.search.id = e.id;
-    form.current.search.value = e.name;
+  const handleSelect = (e) => {
+    form.current.search.id = e.id
+    form.current.search.value = e.name
     setDisplay('hidden')
   }
   return (
@@ -75,39 +75,39 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
           <div className='container'>
             <div className='row'>
               <div className='d-flex'>
-              <form className='FormContainer' action='' ref={form}>
-                <div className='d-flex mb-3'>
-                  <div className='me-4'>
-                    <label htmlFor='name'>Nombre</label>
-                    <input required className='form-control' type='text' name='name' value={store.name} onChange={(e)=> setStore({...store, name: e.target.value})}/>
+                <form className='FormContainer' action='' ref={form}>
+                  <div className='d-flex mb-3'>
+                    <div className='me-4'>
+                      <label htmlFor='name'>Nombre</label>
+                      <input required className='form-control' type='text' name='name' value={store.name} onChange={(e) => setStore({ ...store, name: e.target.value })} />
+                    </div>
+                    <div>
+                      <label htmlFor='location'>Dirección</label>
+                      <input required className='form-control' type='text' name='location' value={store.location} onChange={(e) => setStore({ ...store, location: e.target.value })} />
+                    </div>
                   </div>
-                  <div>
-                    <label htmlFor='location'>Dirección</label>
-                    <input required className='form-control' type='text' name='location' value={store.location} onChange={(e)=> setStore({...store, location: e.target.value})} />
-                  </div>
-                </div>
-                <div className='d-flex mb-3'>
-                  <div>
-                    <label htmlFor='country_id'>País</label>
-                    <select required className='form-select' name='country' id=''>
-                      {
+                  <div className='d-flex mb-3'>
+                    <div>
+                      <label htmlFor='country_id'>País</label>
+                      <select required className='form-select' name='country' id=''>
+                        {
                     countries
                       ? countries.map(e => {
                         return <option key={e.id} defaultValue={e.id === store.country.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
                       })
                       : null
                   }
-                    </select>
-                  </div>
-                  <div className='ms-3'>
-                    <search role='search'>
-                      <label htmlFor='country_id'>Usuario</label>
-                      <input autoComplete='off' id={store.user.id} onChange={handleSearch} defaultValue={store.user.name} onBlur={() => setTimeout(() => setDisplay('hidden'), 100)} onFocus={() => setDisplay('visible')} className='form-control' type='search' name='search' />
-                      <fieldset className='UserSearch' style={{ visibility: display }}>
-                        {
+                      </select>
+                    </div>
+                    <div className='ms-3'>
+                      <search role='search'>
+                        <label htmlFor='country_id'>Usuario</label>
+                        <input autoComplete='off' id={store.user.id} onChange={handleSearch} defaultValue={store.user.name} onBlur={() => setTimeout(() => setDisplay('hidden'), 100)} onFocus={() => setDisplay('visible')} className='form-control' type='search' name='search' />
+                        <fieldset className='UserSearch' style={{ visibility: display }}>
+                          {
                     Array.isArray(users)
                       ? users.map((e) => {
-                        const uuid = useUUID();
+                        const uuid = useUUID()
                         return (
                           <div key={e.id}>
                             <label htmlFor={uuid}>
@@ -124,11 +124,11 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
                       })
                       : null
                   }
-                      </fieldset>
-                    </search>
+                        </fieldset>
+                      </search>
+                    </div>
                   </div>
-                </div>
-              </form>
+                </form>
               </div>
             </div>
           </div>

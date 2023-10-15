@@ -1,13 +1,19 @@
-import { useContext, useState } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { useContext, useState, useEffect } from 'react'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import './SideBar.css'
 import { ReactSVG } from 'react-svg'
 import { SessionContext } from '../../context/SessionContext'
 import { Accordion } from 'react-bootstrap'
-import { DASHBOARD_INDEX_ROUTE, REPORTS_ROUTE, REPORTS_NEW_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from '../../consts/Routes'
+import { DASHBOARD_INDEX_ROUTE, REPORTS_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from '../../consts/Routes'
 import { logout } from '../../helpers/logout'
 
 const SideBar = ({ children }) => {
+  const location = useLocation();
+  const [isActive, setIsActive] = useState(window.location.pathname.startsWith(REPORTS_ROUTE));
+
+  useEffect(() => {
+    setIsActive(location.pathname.startsWith('/dashboard/'+REPORTS_ROUTE));
+  }, [location]);
   const { setSession } = useContext(SessionContext)
   const Menus = [
     {
@@ -76,7 +82,7 @@ const SideBar = ({ children }) => {
                       {Menu.title}
                     </NavLink>
                     : <Accordion>
-                      <Accordion.Item>
+                      <Accordion.Item className={isActive ? "active" : ""}>
                         <Accordion.Header>
                           <NavLink
 
@@ -109,6 +115,16 @@ const SideBar = ({ children }) => {
                 }
               </li>
             ))}
+            <li className='SideBarItem p-1' style={{opacity: 0.5, textWrap:'nowrap'}}>
+              <a href='#' className='nav-link'>
+                <ReactSVG 
+                  className='bi me-2 '
+                  wrapper='span'
+                  src={`/world.svg`}
+                />
+                  Países (próximamente)
+              </a>
+            </li>
           </ul>
           <div>
             <div className='pb-5 nav nav-pills flex-column mb-auto'>

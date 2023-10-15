@@ -8,9 +8,9 @@ export const getReports = async (query) => {
     return error.response
   }
 }
-export const getInconsistences = async(query)=>{
+export const getInconsistences = async (query) => {
   try {
-    const request = await API_INSTANCE.get(REPORTS_URL+'/inconsistences' + '?' + query)
+    const request = await API_INSTANCE.get(REPORTS_URL + '/inconsistences' + '?' + query)
 
     return request.data
   } catch (error) {

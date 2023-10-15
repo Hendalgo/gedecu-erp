@@ -74,14 +74,14 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                     <div>
                       <label htmlFor='country'>País</label>
                       <select required className='form-select' name='country' id=''>
-                  {
+                        {
                   countries
                     ? countries.map(e => {
                       return <option key={e.id} defaultValue={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
                     })
                     : null
                 }
-                </select>
+                      </select>
                     </div>
                   </div>
                 </form>
