@@ -16,9 +16,24 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
   const handleUser = async () => {
     try {
       const formData = new FormData(form.current)
-      const userUpdate = user
-      if (userUpdate.password == '') {
-        delete userUpdate.password
+      let userUpdate = []
+      if (form.current.password.value === '') {
+        userUpdate = {
+          name: user.name,
+          email: user.email,
+          country_id: form.current.country.value,
+          role_id: form.current.role.value
+        }
+      }
+      else{
+        userUpdate = {
+          name: user.name,
+          email: user.email,
+          password: form.current.password.value,
+          password_confirmation: form.current.password_confirmation.value,
+          country_id: form.current.country.value,
+          role_id: form.current.role.value
+        }
       }
       const request = await updateUser(user.id, userUpdate)
 
@@ -89,7 +104,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                         {
                   roles
                     ? roles.map((e) => {
-                      return <option key={e.id} selected={e.id === user.role_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                      return <option key={e.id} style={{ textTransform: 'capitalize' }} selected={e.id === user.role_id} value={e.id}>{e.name}</option>
                     })
                     : null
                 }

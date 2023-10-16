@@ -102,7 +102,7 @@ const Chart = () => {
       const chartdataI = []
       let labels = Object.keys(data).reverse();
       const chartdataE = [];
-      if (formRef.current.period.value === 'year' || formRef.current.period.value === 'semester') {
+      if (formRef.current.period.value === 'year' ) {
         labels.forEach(element => {
           chartdataI.unshift(data[element].incomes);
         });
