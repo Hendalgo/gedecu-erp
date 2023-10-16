@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import Header from '../components/Header'
 import { SessionContext } from '../context/SessionContext'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
-import ModalViewReport from '../components/ModalViewReport'
 import { getBanks, getCountriesCount } from '../helpers/banks'
 import Welcome from '../components/Welcome'
 import ModalCreateBank from '../components/ModalCreateBank'
 import ModalEditBank from '../components/ModalEditBank'
 import TableLoader from '../components/Loaders/TableLoader'
+import { useCheckRole } from '../hooks/useCheckRole'
+import { Navigate } from 'react-router-dom'
 
 const Banks = () => {
   const { session } = useContext(SessionContext)
@@ -19,17 +19,15 @@ const Banks = () => {
   const [modalEditShow, setModalEditShow] = useState(false)
   const [banks, setBanks] = useState([])
   const form = useRef()
-
+  if (!useCheckRole(session)) {
+    return <Navigate to={"/"}/>
+  }
   useEffect(() => {
     getCountriesCount().then(r => setCountryBank(r))
     getBanks('order=created_at&order_by=desc').then(r => setBanks(r))
   }, [])
   const handleChange = (offset) => {
     getBanks(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
-  }
-  const handleModal = (id) => {
-    setEditBank(bank.data.find((el) => el.id === id))
-    setModalShow(true)
   }
   const handleType = (e) => {
     getBanks(`order=created_at&order_by=desc&country=${e ? `&country=${e}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))

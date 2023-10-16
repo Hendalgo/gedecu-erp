@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useContext } from 'react'
 import Welcome from '../components/Welcome'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
@@ -7,8 +7,13 @@ import { getUsers, getUsersRoles } from '../helpers/users'
 import ModalCreateUser from '../components/ModalCreateUser'
 import ModalEditUser from '../components/ModalEditUser'
 import TableLoader from '../components/Loaders/TableLoader'
+import { Navigate } from 'react-router-dom'
+import { useCheckRole } from '../hooks/useCheckRole'
+import { SessionContext } from '../context/SessionContext'
 
 const Users = () => {
+
+  const { session } = useContext(SessionContext)
   const [editUser, setEditUser] = useState({})
   const [userRoles, setUserRoles] = useState()
   const [modalShow, setModalShow] = useState(false)
@@ -16,6 +21,9 @@ const Users = () => {
   const [users, setUsers] = useState([])
   const form = useRef()
 
+  if (!useCheckRole(session)) {
+    return <Navigate to={"/"}/>
+  }
   useEffect(() => {
     getUsersRoles('order=created_at&order_by=desc').then(r => setUserRoles(r))
     getUsers().then(r => setUsers(r))

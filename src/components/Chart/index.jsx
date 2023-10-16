@@ -84,8 +84,7 @@ const Chart = () => {
     try {
       const form = new FormData(formRef.current)
 
-      const dataI = (await getReports(`bank=${form.get('bank') || 1}&movement=income&period=${form.get('period') || 'daily'}`)).data
-      const dataE = (await getReports(`bank=${form.get('bank') || 1}&movement=expense&period=${form.get('period') || 'daily'}`)).data
+      const data = (await getReports(`bank=${form.get('bank') || 1}&movement=income&period=${form.get('period') || 'daily'}`))
       setOptions({
         ...options,
         scales: {
@@ -101,17 +100,26 @@ const Chart = () => {
         }
       })
       const chartdataI = []
-      const labels = []
-      dataI.map(e => {
-        chartdataI.unshift(e.amount)
-        labels.unshift(useFormatDate(e.created_at))
-      })
-      const chartdataE = []
-      const labelE = []
-      dataE.map(e => {
-        chartdataE.unshift(e.amount)
-        labels.unshift(useFormatDate(e.created_at))
-      })
+      let labels = Object.keys(data).reverse();
+      const chartdataE = [];
+      if (formRef.current.period.value === 'year' || formRef.current.period.value === 'semester') {
+        labels.forEach(element => {
+          chartdataI.unshift(data[element].incomes);
+        });
+        labels.forEach(element => {
+          chartdataE.unshift(data[element].expenses);
+        });
+        
+        labels = labels.reverse();
+      }
+      else{
+        labels.forEach(element => {
+          chartdataI.push(data[element].incomes);
+        });
+        labels.forEach(element => {
+          chartdataE.push(data[element].expenses);
+        });
+      }
       setData({
         labels,
         datasets: [

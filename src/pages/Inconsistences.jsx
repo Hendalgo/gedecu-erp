@@ -1,12 +1,16 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useContext } from 'react'
 import { getInconsistences, updateReport } from '../helpers/reports'
 import Welcome from '../components/Welcome'
 import FilterTableButtons from '../components/FilterTableButtons'
 import InconsistenceCard from '../components/InconsistenceCard'
 import ModalViewReport from '../components/ModalViewReport'
 import PaginationTable from '../components/PaginationTable'
+import { SessionContext } from '../context/SessionContext'
+import { useCheckRole } from '../hooks/useCheckRole'
+import { Navigate } from 'react-router-dom'
 
 const Inconsistences = () => {
+  const {session} = useContext(SessionContext);
   const form = useRef()
   const formDate = useRef()
   const [modalShow, setModalShow] = useState(false)
@@ -16,6 +20,10 @@ const Inconsistences = () => {
   const [modalCreateShow, setModalCreateShow] = useState()
   const [reports, setReports] = useState()
   const [reportModal, setReportModal] = useState()
+
+  if (!useCheckRole(session)) {
+    return <Navigate to={"/"}/>
+  }
   useEffect(() => {
     getInconsistences().then(r => setReports(r))
   }, [])

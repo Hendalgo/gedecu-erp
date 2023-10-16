@@ -16,6 +16,7 @@ import BalanceLoader from '../components/Loaders/BalanceLoader'
 import TableLoader from '../components/Loaders/TableLoader'
 import ModalCreateReport from '../components/ModalCreateReport'
 import ModalCreateUser from '../components/ModalCreateUser'
+import { useCheckRole } from '../hooks/useCheckRole'
 
 const Home = () => {
   const { session } = useContext(SessionContext)
@@ -26,6 +27,7 @@ const Home = () => {
   const [loadingBanks, setLoadingBanks] = useState(true)
   const [banks, setBanks] = useState([])
   const [countriesTotal, setCountriesTotal] = useState([])
+  const topClass = useCheckRole(session)? 'col-9': 'col-12';
   useEffect(() => {
     getReports().then(r => setReports(r.data)).finally(() => setLoadingReports(false))
     getBanks().then(r => setBanks(r.data)).finally(() => setLoadingBanks(false))
@@ -41,7 +43,7 @@ const Home = () => {
               <div className='row'>
                 <div className='container-fluid'>
                   <div className='row'>
-                    <div className='col-9'>
+                    <div className={topClass}>
                       <div className='row WelcomeContainer pt-4 pb-3'>
                         <div className='d-flex justify-content-between'>
                           <div className=''>
@@ -50,9 +52,13 @@ const Home = () => {
                           </div>
                           <div className=''>
                             <div className='d-flex g-4'>
-                              <div className='me-4  '>
-                                <AddButton text='Usuario' add={() => { setModalReport(true) }} />
-                              </div>
+                              {
+                                useCheckRole(session)
+                                &&
+                                <div className='me-4  '>
+                                  <AddButton text='Usuario' add={() => { setModalUser(true) }} />
+                                </div>
+                              }
                               <div>
                                 <AddButton text='Reporte' add={() => { setModalReport(true) }} />
                               </div>
@@ -60,30 +66,36 @@ const Home = () => {
                           </div>
                         </div>
                       </div>
-                      <div className='row pt-4'>
-                        <Title title='Balances' icon='/chart-histogram.svg' description='Balances' />
-                      </div>
-                      <div className='pt-4 row'>
-                        {
-                        countriesTotal.length > 0
-                          ? countriesTotal.map((e, index) =>
-                            <div key={index} className={`col-${Math.floor((12 / countriesTotal.length))}`}>
-                              <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })} img='/fi-br-money.png' percent={e.growth_percentage} />
-                            </div>
-                          )
-                          : <>
-                            <div className='col-4'>
-                              <BalanceLoader />
-                            </div>
-                            <div className='col-4'>
-                              <BalanceLoader />
-                            </div>
-                            <div className='col-4'>
-                              <BalanceLoader />
-                            </div>
-                          </>
+                      {
+                        useCheckRole(session)
+                        &&
+                        <>
+                          <div className='row pt-4'>
+                            <Title title='Balances' icon='/chart-histogram.svg' description='Balances' />
+                          </div>
+                          <div className='pt-4 row'>
+                            {
+                              countriesTotal.length > 0
+                                ?countriesTotal.map((e, index) =>
+                                <div key={index} className={`col-${Math.floor((12 / countriesTotal.length))}`}>
+                                  <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })} img='/fi-br-money.png' percent={e.growth_percentage} />
+                                </div>
+                              )
+                              : <>
+                                <div className='col-4'>
+                                  <BalanceLoader />
+                                </div>
+                                <div className='col-4'>
+                                  <BalanceLoader />
+                                </div>
+                                <div className='col-4'>
+                                  <BalanceLoader />
+                                </div>
+                              </>
+                            }
+                          </div>
+                        </>
                       }
-                      </div>
                       <div className='row pt-4'>
                         <Title title='Estadísticas' icon='/arrow-grow.svg' description='Estadísticas' />
                       </div>
@@ -91,33 +103,37 @@ const Home = () => {
                         <Chart />
                       </div>
                     </div>
-                    <div className='col-3 mt-4 radius' style={{ overflow: 'hidden' }}>
-                      {
-                        loadingBanks
-                          ? <TableLoader height={1400} />
-                          : <div className='BankAmountContainer'>
-                            <div className='d-flex
-                        flex-column  align-items-center BankAmountTop'
-                            >
-                              <ReactSVG
-                                src='/bank.svg'
-                                className='TotalAmountBank'
-                                wrapper='span'
-                              />
-                              <h6>Montos Bancarios</h6>
+                    {
+                      useCheckRole(session)
+                      &&
+                      <div className='col-3 mt-4 radius' style={{ overflow: 'hidden' }}>
+                        {
+                          loadingBanks
+                            ? <TableLoader height={1400} />
+                            : <div className='BankAmountContainer'>
+                              <div className='d-flex
+                          flex-column  align-items-center BankAmountTop'
+                              >
+                                <ReactSVG
+                                  src='/bank.svg'
+                                  className='TotalAmountBank'
+                                  wrapper='span'
+                                />
+                                <h6>Montos Bancarios</h6>
+                              </div>
+                              <div style={{ overflowY: 'scroll', maxHeight: 500 }}>
+                                {
+                                  banks.length > 0
+                                    ? banks.map(e =>
+                                      <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={e.country.currency.symbol} name={e.name} />
+                                    )
+                                    : null
+                                }
+                              </div>
                             </div>
-                            <div style={{ overflowY: 'scroll', maxHeight: 500 }}>
-                              {
-                                banks.length > 0
-                                  ? banks.map(e =>
-                                    <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={e.country.currency.symbol} name={e.name} />
-                                  )
-                                  : null
-                              }
-                            </div>
-                          </div>
-                      }
-                    </div>
+                        }
+                      </div> 
+                    }
                   </div>
                 </div>
               </div>
@@ -128,7 +144,7 @@ const Home = () => {
                     icon='/refresh.svg'
                     description='Transacciones realizadas'
                   />
-                  <DownloadButton />
+                  {/* <DownloadButton /> */}
                 </div>
               </div>
               <div className='row pt-4 pb-2'>

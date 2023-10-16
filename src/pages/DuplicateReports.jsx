@@ -12,6 +12,7 @@ import Welcome from '../components/Welcome'
 import ModalCreateReport from '../components/ModalCreateReport'
 import TableLoader from '../components/Loaders/TableLoader'
 import CheckButton from '../components/CheckButton'
+import { useCheckRole } from '../hooks/useCheckRole'
 const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
   const [report, setReport] = useState()
@@ -122,7 +123,11 @@ const DuplicateReports = () => {
                         <th scope='col'>Motivo</th>
                         <th scope='col'>Método de pago</th>
                         <th scope='col'>Monto</th>
-                        <th />
+                        {
+                          useCheckRole(session)
+                          &&
+                          <th />
+                        }
                       </tr>
                     </thead>
                     <tbody>
@@ -156,18 +161,22 @@ const DuplicateReports = () => {
                         </td>
                         <td>{e.bank.name}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
-                        <td>
-                          <div className='d-flex justify-content-evenly align-items-center'>
-                            {
-                                    e.duplicated_status === null
-                                      ? <>
-                                        <CheckButton type='done' id={e.id} action={handleDone} />
-                                        <CheckButton type='cancel' id={e.id} action={handleCancel} />
-                                        </>
-                                      : null
-                                  }
-                          </div>
-                        </td>
+                        {
+                          useCheckRole(session)
+                          &&
+                          <td>
+                            <div className='d-flex justify-content-evenly align-items-center'>
+                              {
+                                      e.duplicated_status === null
+                                        ? <>
+                                          <CheckButton type='done' id={e.id} action={handleDone} />
+                                          <CheckButton type='cancel' id={e.id} action={handleCancel} />
+                                          </>
+                                        : null
+                                    }
+                            </div>
+                          </td>
+                        }
                       </tr>
                     )
                   }

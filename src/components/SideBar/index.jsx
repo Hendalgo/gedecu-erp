@@ -4,54 +4,25 @@ import './SideBar.css'
 import { ReactSVG } from 'react-svg'
 import { SessionContext } from '../../context/SessionContext'
 import { Accordion } from 'react-bootstrap'
-import { DASHBOARD_INDEX_ROUTE, REPORTS_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_MISS_ROUTE } from '../../consts/Routes'
+import { REPORTS_ROUTE} from '../../consts/Routes'
 import { logout } from '../../helpers/logout'
+import { AdminMenus, NormalUserMenu } from '../../consts/Menus'
+import { useCheckRole } from '../../hooks/useCheckRole'
 
 const SideBar = ({ children }) => {
   const location = useLocation();
   const [isActive, setIsActive] = useState(window.location.pathname.startsWith(REPORTS_ROUTE));
-
+  let menus = [];
   useEffect(() => {
     setIsActive(location.pathname.startsWith('/dashboard/'+REPORTS_ROUTE));
   }, [location]);
-  const { setSession } = useContext(SessionContext)
-  const Menus = [
-    {
-      title: 'Escritorio',
-      src: 'home-blue-icon',
-      link: DASHBOARD_INDEX_ROUTE
-    },
-    {
-      title: 'Reportes',
-      src: 'document-white-icon',
-      link: 'reports',
-      others: [
-        {
-          name: 'Duplicados',
-          link: 'reports/' + REPORTS_DUPLICATE_ROUTE
-        },
-        {
-          name: 'Inconsistencias',
-          link: 'reports/' + REPORTS_MISS_ROUTE
-        }
-      ]
-    },
-    {
-      title: 'Locales',
-      src: 'map-marker-home',
-      link: 'stores'
-    },
-    {
-      title: 'Bancos ',
-      src: 'bank',
-      link: 'banks'
-    },
-    {
-      title: 'Usuarios',
-      src: 'user',
-      link: 'users'
-    }
-  ]
+  const {session, setSession } = useContext(SessionContext)
+  if (useCheckRole(session)) {
+    menus = AdminMenus;
+  }
+  else{
+    menus = NormalUserMenu;
+  }
   return (
     <div className='container-fluid AppContainer'>
       <div className='row'>
@@ -63,7 +34,7 @@ const SideBar = ({ children }) => {
             />
           </div>
           <ul className='nav nav-pills flex-column mb-auto'>
-            {Menus.map((Menu, index) => (
+            {menus.map((Menu, index) => (
               <li
                 key={index}
                 className='SideBarItem p-1'
