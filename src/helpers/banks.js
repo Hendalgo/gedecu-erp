@@ -5,7 +5,7 @@ export const getBanks = async (querys) => {
     const request = await API_INSTANCE.get(BANKS_URL + '?' + querys)
     return request.data
   } catch (error) {
-
+    return error.response
   }
 }
 export const getBank = async (id) => {

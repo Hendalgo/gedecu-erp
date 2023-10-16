@@ -5,7 +5,7 @@ export const getUsers = async (querys) => {
     const request = await API_INSTANCE.get(USER_URL + '?' + querys)
     return request.data
   } catch (error) {
-
+    return error.response
   }
 }
 export const createUser = async (form) => {
@@ -22,7 +22,7 @@ export const getUsersRoles = async () => {
     const request = await API_INSTANCE.get(USER_URL + '/roles')
     return request.data
   } catch (error) {
-
+    return error.response
   }
 }
 export const updateUser = async (id, formData) => {

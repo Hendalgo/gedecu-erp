@@ -6,7 +6,7 @@ export const getStores = async (query) => {
 
     return request.data
   } catch (error) {
-
+    return error.response
   }
 }
 export const updateStore = async (id, data) => {
