@@ -1,4 +1,4 @@
-import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE } from "./Routes"
+import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE } from "./Routes"
 
 export const AdminMenus = [
   {
@@ -29,12 +29,23 @@ export const AdminMenus = [
   {
     title: 'Bancos ',
     src: 'bank',
-    link: 'banks'
+    link: 'banks',
+    others: [
+      {
+        name: 'Cuentas de banco',
+        link: 'banks/'+ BANK_ACCOUNTS_ROUTE
+      }
+    ]
   },
   {
     title: 'Usuarios',
     src: 'user',
     link: 'users'
+  },
+  {
+    title: 'Países',
+    src: 'world',
+    link: 'countries'
   }
 ]
 
@@ -54,10 +65,5 @@ export  const NormalUserMenu = [
         link: 'reports/' + REPORTS_DUPLICATE_ROUTE
       }
     ]
-  },
-  {
-    title: 'Locales',
-    src: 'map-marker-home',
-    link: 'stores'
-  },
+  }
 ]

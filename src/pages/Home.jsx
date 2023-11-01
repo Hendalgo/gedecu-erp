@@ -10,13 +10,14 @@ import BankCard from '../components/BankCard'
 import Header from '../components/Header'
 import DownloadButton from '../components/DownloadButton'
 import { getReports } from '../helpers/reports'
-import { getBanks, getBanksTotal } from '../helpers/banks'
+import { getBanks } from '../helpers/banks'
 import { useFormatDate } from '../hooks/useFormatDate'
 import BalanceLoader from '../components/Loaders/BalanceLoader'
 import TableLoader from '../components/Loaders/TableLoader'
 import ModalCreateReport from '../components/ModalCreateReport'
 import ModalCreateUser from '../components/ModalCreateUser'
 import { useCheckRole } from '../hooks/useCheckRole'
+import { getCountriesTotal } from '../helpers/countries'
 
 const Home = () => {
   const { session } = useContext(SessionContext)
@@ -31,7 +32,7 @@ const Home = () => {
   useEffect(() => {
     getReports().then(r => setReports(r.data)).finally(() => setLoadingReports(false))
     getBanks().then(r => setBanks(r.data)).finally(() => setLoadingBanks(false))
-    getBanksTotal().then(r => setCountriesTotal(r))
+    getCountriesTotal().then(r => setCountriesTotal(r))
   }, [])
   return (
     <>
@@ -155,7 +156,7 @@ const Home = () => {
                       : <table className='table TableP table-striped'>
                         <thead>
                           <tr>
-                            <th scope='col'>ID Transacción</th>
+                            <th scope='col'>Usuario</th>
                             <th scope='col'>Fecha</th>
                             <th scope='col'>Motivo</th>
                             <th scope='col'>Método de pago</th>
@@ -170,14 +171,14 @@ const Home = () => {
                               if (e.bank_income) {
                                 currency = e.bank_income.country.currency.symbol
                               } else {
-                                currency = e.bank.country.currency.symbol
+                                currency = e.bank_account.bank.country.currency.symbol
                               }
                               return (
                                 <tr key={e.id}>
-                                  <td scope='row'>{e.id}</td>
+                                  <td scope='row'>{e.user.name}</td>
                                   <td>{useFormatDate(e.created_at)}</td>
                                   <td><span className='ReportTypeTableStyle' style={{ color: JSON.parse(e.type.config).styles.color, backgroundColor: JSON.parse(e.type.config).styles.backgroundColor, borderColor: JSON.parse(e.type.config).styles.borderColor }}>{e.type.name}</span></td>
-                                  <td><span className='ReportTypeTableStyle' style={{ color: '#2E2C34', backgroundColor: '#EFEDF4', borderColor: '#E0DCEA' }}>{e.bank.name}</span></td>
+                                  <td><span className='ReportTypeTableStyle' style={{ color: '#2E2C34', backgroundColor: '#EFEDF4', borderColor: '#E0DCEA' }}>{e.bank_account.bank.name}</span></td>
                                   <td>{`${currency} ${e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}`}</td>
                                 </tr>
                               )

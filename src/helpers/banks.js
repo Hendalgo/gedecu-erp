@@ -32,15 +32,7 @@ export const updateBank = async (id, formData) => {
     return error.response
   }
 }
-export const getBanksTotal = async () => {
-  try {
-    const request = await API_INSTANCE.get(BANKS_TOTAL_URL)
-    return request.data[0]
-  } catch (error) {
-    console.log(error)
-    return []
-  }
-}
+
 export const getCountriesCount = async () => {
   try {
     const request = await API_INSTANCE.get(BANKS_COUNTRIES_URL)

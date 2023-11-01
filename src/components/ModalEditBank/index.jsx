@@ -16,7 +16,6 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
     try {
       const request = await updateBank(bank.id, {
         name: bank.name,
-        amount: useUnmask(form.current.amount.value),
         country_id: form.current.country.value
       })
       switch (request.status) {
@@ -67,21 +66,15 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                       <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' name='name' value={bank.name} />
                     </div>
                     <div>
-                      <label htmlFor='amount'>Monto</label>
-                      <input onBlur={(e) =>  e.target.value = useMaskStaless(e.target.value) } className='form-control' type='text' name='amount' defaultValue={useMaskStaless(bank.amount)} />
-                    </div>
-                  </div>
-                  <div className='d-flex mb-3'>
-                    <div>
                       <label htmlFor='country'>País</label>
                       <select required className='form-select' name='country' id=''>
                         {
-                  countries
-                    ? countries.map(e => {
-                      return <option key={e.id} selected={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
+                          countries
+                            ? countries.map(e => {
+                              return <option key={e.id} selected={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                            })
+                            : null
+                        }
                       </select>
                     </div>
                   </div>

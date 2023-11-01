@@ -26,3 +26,11 @@ export const createStore = async (form) => {
     return error.response
   }
 }
+export const deleteStore = async (id, data) => {
+  try {
+    const request = await API_INSTANCE.delete(STORES_URL + '/' + id, data)
+    return request
+  } catch (error) {
+    return error.response
+  }
+}

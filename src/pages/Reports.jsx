@@ -91,7 +91,7 @@ export const ReportsIndex = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Transacción</th>
+                        <th scope='col'>Realizado por:</th>
                         <th scope='col'>Fecha</th>
                         <th scope='col'>Motivo</th>
                         <th scope='col'>Método de pago</th>
@@ -106,13 +106,13 @@ export const ReportsIndex = () => {
                     if (e.bank_income) {
                       currency = e.bank_income.country.currency.symbol
                     } else {
-                      currency = e.bank.country.currency.symbol
+                      currency = e.bank_account.bank.country.currency.symbol
                     }
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
+                            <span>{e.user.name}</span>
                             <span>
                               <button className='btn' onClick={() => handleModal(e)}>
                                 <svg xmlns='http://www.w3.org/2000/svg' width='17' height='13' viewBox='0 0 17 13' fill='none'>
@@ -127,7 +127,7 @@ export const ReportsIndex = () => {
                         <td>
                           <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
                         </td>
-                        <td>{e.bank.name}</td>
+                        <td>{e.bank_account.bank.name}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
 
                       </tr>

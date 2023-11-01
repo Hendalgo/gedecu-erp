@@ -2,74 +2,73 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
-import { deleteStore, getStores } from '../helpers/stores'
 import Welcome from '../components/Welcome'
-import ModalCreateStore from '../components/ModalCreateStore'
 import TableLoader from '../components/Loaders/TableLoader'
-import ModalEditStore from '../components/ModalEditStore'
 import { useCheckRole } from '../hooks/useCheckRole'
 import ModalConfirmation from '../components/ModalConfirmation'
-import { Navigate } from 'react-router-dom'
+import { deleteCountry, getCountries} from '../helpers/countries'
+import ModalCreateCountry from '../components/ModalCreateCountry'
+import ModalEditCountry from '../components/ModalEditCountry'
 
-const Stores = () => {
+const Countries = () => {
   const { session } = useContext(SessionContext)
-  const [store, setStore] = useState()
+  const [country, setCountry] = useState()
   const [modalShow, setModalShow] = useState(false)
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const [offset, setOffset] = useState(1)
   const [modalEdit, setModalEdit] = useState(false)
-  const [stores, setStores] = useState([])
+  const [countries, setCountries] = useState([])
   const form = useRef()
 
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getStores('order=created_at&order_by=desc').then(r => setStores(r))
+    getCountries().then(r => setCountries(r));
   }, [])
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setStores(r))
+    getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setCountries(r))
   }
   const handleEdit = (e) => {
-    setStore(e)
+    setCountry(e)
     setModalEdit(true)
   }
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getStores(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setStores(r))
+      getCountries(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setCountries(r))
     }
   }
   const handleDelete = (e)=>{
-    deleteStore(e.id).then( 
-      getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setStores(r))
+    deleteCountry(e.id_country).then( 
+      getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setStores(r))
     ).catch();
   }
   return (
     <div className='container-fluid'>
       {
         useCheckRole(session)
-        ?<Welcome text='Locales' add={() => setModalShow(true)} textButton='Local' />
-        :<Welcome text='Locales' add={() => setModalShow(true)} textButton='Local' showButton= {false}/>
+        ?<Welcome text='Países' add={() => setModalShow(true)} textButton='País' />
+        :<Welcome text='Países' add={() => setModalShow(true)} textButton='País' showButton= {false}/>
       }
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
           <div className='col-8' />
-          <div className='col-4'><SearchBar text='Locales' /></div>
+          <div className='col-4'><SearchBar text='Países' /></div>
         </form>
       </div>
       {
-        Array.isArray(stores.data)
-          ? stores.data.length > 0
+        Array.isArray(countries.data)
+          ? countries.data.length > 0
 
             ? <>
               <div className='row mt-4'>
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' quantity={stores.last_page} itemsTotal={stores.total} handleChange={handleChange} />
+                    <PaginationTable text='locales' quantity={countries.last_page} itemsTotal={countries.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -78,28 +77,26 @@ const Stores = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Local</th>
-                        <th scope='col'>Nombre</th>
-                        <th scope='col'>Dirección</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Manejador</th>
+                        <th scope='col'>Código</th>
+                        <th scope='col'>Moneda</th>
+                        <th scope='col'>Balance</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
                     <tbody>
                       {
-                  stores.data.map(e => {
+                        countries.data.map(e => {
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
+                            <span>{e.country_name}</span>
                           </div>
                         </td>
-                        <td>{e.name}</td>
-                        <td>{e.location}</td>
-                        <td>{e.country.name}</td>
-                        <td>{e.user.name}</td>
+                        <td>{e.shortcode}</td>
+                        <td>{e.currency_name} - {e.currency_shortcode}</td>
+                        <td>{e.symbol} {e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -118,7 +115,7 @@ const Stores = () => {
                                 </svg>
                               </button>
                               <button onClick={()=>{
-                                setStore(e);
+                                setCountry(e);
                                 setModalConfirmShow(true);
                               }} className="TableActionButtons ms-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -140,16 +137,16 @@ const Stores = () => {
                 </div>
               </div>
             </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay locales para mostrar</div>
+            : <div className='d-flex justify-content-center align-items-center'>No hay países para mostrar</div>
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
-        <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Local"} action={()=>handleDelete(store)}/>
+        <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>
+        <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(country)}/>
       </div>
     </div>
   )
 }
 
-export default Stores
+export default Countries

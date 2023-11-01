@@ -64,7 +64,7 @@ const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
                         <NavLink
 
                           className='nav-link'
-                          to={REPORTS_ROUTE}
+                          to={Menu.link}
                         >
                           <ReactSVG
                             className='bi me-2 '
@@ -161,7 +161,7 @@ const SideBarBig = ({menus, setSession, isActive, children})=>{
                           <NavLink
 
                             className='nav-link'
-                            to={REPORTS_ROUTE}
+                            to={Menu.link}
                           >
                             <ReactSVG
                               className='bi me-2 '
@@ -189,16 +189,6 @@ const SideBarBig = ({menus, setSession, isActive, children})=>{
                 }
               </li>
             ))}
-            <li className='SideBarItem p-1' style={{opacity: 0.5, textWrap:'nowrap'}}>
-              <a href='#' className='nav-link'>
-                <ReactSVG 
-                  className='bi me-2 '
-                  wrapper='span'
-                  src={`/world.svg`}
-                />
-                  Países (próximamente)
-              </a>
-            </li>
           </ul>
           <div>
             <div className='pb-5 nav nav-pills flex-column mb-auto'>

@@ -28,8 +28,8 @@ const InconsistenceCard = ({ report, showModal, checkReport }) => {
       </Card.Body>
       <Card.Footer className='bg-white'>
         <Card.Text className='d-flex justify-content-between align-items-center'>
-          <span>{report.bank.name}</span>
-          <span className='fw-medium fs-4'>{report.bank.country.currency.symbol} {report.amount.toLocaleString('de-DE', { minimunfractions: 2 })}</span>
+          <span>{report.bank_account.bank.name}</span>
+          <span className='fw-medium fs-4'>{report.bank_account.bank.country.currency.symbol} {report.amount.toLocaleString('de-DE', { minimunfractions: 2 })}</span>
           {
             !report.inconsistence_check
               ? <CheckButton action={checkReport} id={report.id} />

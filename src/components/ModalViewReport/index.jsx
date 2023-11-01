@@ -18,14 +18,16 @@ const ModalViewReport = ({ modalShow, setModalShow, report }) => {
               const styles = JSON.parse(report.type.config).styles
               data['Banco de ingreso'] = <span style={{ fontWeight: 'bold', padding: 4, textWrap: 'nowrap' }}>{bank_income.name}</span>
               data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${bank_income.country.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
-              data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
+              data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
               data = {
 
                 'Tipo de reporte': <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.type.name}</span>,
                 ...data,
-                Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank.name}</span>,
+                Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank_account.bank.name}</span>,
                 Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
               }
+              data['Cuenta de:'] = report.bank_account.name;
+              data["Identifador"] = report.bank_account.bank_id;
               report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
               data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'
               data.Local = report.store.name
@@ -38,15 +40,18 @@ const ModalViewReport = ({ modalShow, setModalShow, report }) => {
           })()
         : (() => {
             const styles = JSON.parse(report.type.config).styles
-            data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${report.bank.country.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
-            meta_data.rate ? data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span> : null
+            data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.country.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
+            meta_data.rate ? data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span> : null
             data = {
 
               'Tipo de reporte': <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.type.name}</span>,
               ...data,
-              Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank.name}</span>,
+              Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank_account.bank.name}</span>, 
+              "Cuenta de:" : report.bank_account.name,
+              "Identificador" : report.bank_account.bank_id,
               Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
             }
+            
             report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
             data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'
             data.Local = report.store.name

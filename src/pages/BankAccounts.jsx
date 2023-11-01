@@ -1,59 +1,57 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { SessionContext } from '../context/SessionContext'
-import FilterTableButtons from '../components/FilterTableButtons'
-import SearchBar from '../components/SearchBar'
-import PaginationTable from '../components/PaginationTable'
-import { getBanks, getCountriesCount } from '../helpers/banks'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Welcome from '../components/Welcome'
-import ModalCreateBank from '../components/ModalCreateBank'
-import ModalEditBank from '../components/ModalEditBank'
-import TableLoader from '../components/Loaders/TableLoader'
-import { useCheckRole } from '../hooks/useCheckRole'
-import { Navigate, Outlet } from 'react-router-dom'
+import SearchBar from '../components/SearchBar';
+import { Navigate } from 'react-router-dom';
+import { SessionContext } from '../context/SessionContext';
+import { useCheckRole } from '../hooks/useCheckRole';
+import TableLoader from '../components/Loaders/TableLoader';
+import { getBankAccounts } from '../helpers/banksAccounts';
+import PaginationTable from '../components/PaginationTable';
+import ModalCreateBankAccount from '../components/ModalCreateBankAccount';
+import ModalEditBankAccount from '../components/ModalEditBankAccount';
 
-export const Banks = () => {
-  return <Outlet />
-}
-
-export const BanksIndex = () => {
+const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
   const [countryBank, setCountryBank] = useState([])
   const [bank, setEditBank] = useState()
   const [modalShow, setModalShow] = useState(false)
   const [modalEditShow, setModalEditShow] = useState(false)
-  const [banks, setBanks] = useState([])
+  const [banks, setBanks] = useState([]);
+  const [bankAccount, setBankAccount] = useState();
   const form = useRef()
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
   }
-  useEffect(() => {
-    getBanks('order=created_at&order_by=desc').then(r => setBanks(r))
+  useEffect(()=>{
+    getBankAccounts(``)
+    .then(r=>{
+      setBanks(r);
+    });
   }, [])
-  const handleChange = (offset) => {
-    getBanks(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
-  }
-  const handleType = (e) => {
-    getBanks(`order=created_at&order_by=desc&country=${e ? `&country=${e}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
-  }
   const handleSearch = (e) => {
     e.preventDefault()
     if (form.current.search !== '') {
-      getBanks(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
+      getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
     }
+  }
+  
+  const handleChange = (offset) => {
+    getBankAccounts(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setBanks(r))
   }
   const handleBank = (e) => {
     setModalEditShow(true)
-    setEditBank(e)
+    setBankAccount(e)
   }
   return (
-    <div className='container-fluid'>
-      <Welcome text='Bancos' add={() => setModalShow(true)} textButton='Banco' />
+    <div className="container-fluid">
+      <Welcome text={'Cuentas de banco'} textButton={'Cuenta'}  add={()=> setModalShow(true)}/>
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8'><FilterTableButtons data={countryBank} callback={handleType} /></div>
-          <div className='col-4'><SearchBar text='Bancos' /></div>
+          <div className='col-8'></div>
+          <div className='col-4'><SearchBar text='Cuentas' /></div>
         </form>
       </div>
+      
       {
         Array.isArray(banks.data)
           ? banks.data.length > 0
@@ -72,8 +70,9 @@ export const BanksIndex = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Banco</th>
+                        <th scope='col'>ID Cuenta</th>
                         <th scope='col'>Nombre</th>
+                        <th scope='col'>Banco</th>
                         <th scope='col'>País</th>
                         <th scope='col'>Monto</th>
                         <th />
@@ -86,12 +85,13 @@ export const BanksIndex = () => {
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
+                            <span>{e.identifier}</span>
                           </div>
                         </td>
                         <td>{e.name}</td>
-                        <td>{e.country.name}</td>
-                        <td>{e.country.currency.symbol} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        <td>{e.bank.name}</td>
+                        <td>{e.bank.country.name}</td>
+                        <td>{e.bank.country.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -122,11 +122,11 @@ export const BanksIndex = () => {
           : <div className='mt-4'><TableLoader /></div>
       }
       <div className=''>
-        <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />
-        <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />
+        <ModalCreateBankAccount setModalShow={setModalShow} modalShow={modalShow} />
+        <ModalEditBankAccount setModalShow={setModalEditShow} modalShow={modalEditShow} bankAccount ={bankAccount}/>
       </div>
     </div>
   )
 }
 
-export default Banks
+export default BankAccounts

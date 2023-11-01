@@ -63,21 +63,15 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
                     <input required className='form-control' type='text' name='name' />
                   </div>
                   <div>
-                    <label htmlFor='amount'>Monto inicial del banco</label>
-                    <input required className='form-control' type='text' name='amount' />
-                  </div>
-                </div>
-                <div className='d-flex mb-3'>
-                  <div>
                     <label htmlFor='country_id'>País</label>
                     <select required className='form-select' name='country_id' id=''>
                       {
-                    countries
-                      ? countries.map(e => {
-                        return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                      })
-                      : null
-                  }
+                        countries
+                          ? countries.map(e => {
+                            return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                          })
+                          : null
+                      }
                     </select>
                   </div>
                 </div>

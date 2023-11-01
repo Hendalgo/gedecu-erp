@@ -17,6 +17,7 @@ const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
   const [report, setReport] = useState()
   const [offset, setOffset] = useState(1)
+  
   const [reportType, setReportType] = useState([
     {
       id: 'done',
@@ -118,7 +119,7 @@ const DuplicateReports = () => {
                   <table className='table TableP table-borderless align-middle'>
                     <thead className=''>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Transacción</th>
+                        <th scope='col'>Realizado por</th>
                         <th scope='col'>Fecha</th>
                         <th scope='col'>Motivo</th>
                         <th scope='col'>Método de pago</th>
@@ -138,13 +139,13 @@ const DuplicateReports = () => {
                     if (e.bank_income) {
                       currency = e.bank_income.country.currency.symbol
                     } else {
-                      currency = e.bank.country.currency.symbol
+                      currency = e.bank_account.bank.country.currency.symbol
                     }
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
+                            <span>{e.user.name}</span>
                             <span>
                               <button className='btn' onClick={() => handleModal(e.id)}>
                                 <svg xmlns='http://www.w3.org/2000/svg' width='17' height='13' viewBox='0 0 17 13' fill='none'>
@@ -159,7 +160,7 @@ const DuplicateReports = () => {
                         <td>
                           <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
                         </td>
-                        <td>{e.bank.name}</td>
+                        <td>{e.bank_account.bank.name}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         {
                           useCheckRole(session)
@@ -167,13 +168,13 @@ const DuplicateReports = () => {
                           <td>
                             <div className='d-flex justify-content-evenly align-items-center'>
                               {
-                                      e.duplicated_status === null
-                                        ? <>
-                                          <CheckButton type='done' id={e.id} action={handleDone} />
-                                          <CheckButton type='cancel' id={e.id} action={handleCancel} />
-                                          </>
-                                        : null
-                                    }
+                                e.duplicated_status === null
+                                ?<> 
+                                  <CheckButton type='done' id={e.id} action={handleDone} />
+                                  <CheckButton type='cancel' id={e.id} action={handleCancel} />
+                                </>
+                                : null
+                              }
                             </div>
                           </td>
                         }
