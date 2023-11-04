@@ -9,66 +9,69 @@ import ModalConfirmation from '../components/ModalConfirmation'
 import { deleteCountry, getCountries} from '../helpers/countries'
 import ModalCreateCountry from '../components/ModalCreateCountry'
 import ModalEditCountry from '../components/ModalEditCountry'
+import { deleteReportTypes, getReportTypes } from '../helpers/reports'
+import ModalCreateReportType from '../components/ModalCreateReportType'
+import ModalEditReportType from '../components/ModalEditReportType'
 
-const Countries = () => {
+const ReportTypes = () => {
   const { session } = useContext(SessionContext)
-  const [country, setCountry] = useState()
+  const [type, setType] = useState()
   const [modalShow, setModalShow] = useState(false)
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const [offset, setOffset] = useState(1)
   const [modalEdit, setModalEdit] = useState(false)
-  const [countries, setCountries] = useState([])
+  const [types, setTypes] = useState([])
   const form = useRef()
 
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getCountries().then(r => setCountries(r));
+    getReportTypes().then(r=> setTypes(r));
   }, [])
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setCountries(r))
+    getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setTypes(r))
   }
   const handleEdit = (e) => {
-    setCountry(e)
+    setType(e)
     setModalEdit(true)
   }
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getCountries(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setCountries(r))
+      getReportTypes(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setTypes(r))
     }
   }
   const handleDelete = (e)=>{
-    deleteCountry(e.id_country).then( 
-      getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setCountries(r))
+    deleteReportTypes(e.id).then( 
+      getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setTypes(r))
     ).catch();
   }
   return (
     <div className='container-fluid'>
       {
         useCheckRole(session)
-        ?<Welcome text='Países' add={() => setModalShow(true)} textButton='País' />
-        :<Welcome text='Países' add={() => setModalShow(true)} textButton='País' showButton= {false}/>
+        ?<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' />
+        :<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' showButton= {false}/>
       }
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
           <div className='col-8' />
-          <div className='col-4'><SearchBar text='Países' /></div>
+          <div className='col-4'><SearchBar text='Reporte' /></div>
         </form>
       </div>
       {
-        Array.isArray(countries.data)
-          ? countries.data.length > 0
+        Array.isArray(types.data)
+          ? types.data.length > 0
 
             ? <>
               <div className='row mt-4'>
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' quantity={countries.last_page} itemsTotal={countries.total} handleChange={handleChange} />
+                    <PaginationTable text='locales' quantity={types.last_page} itemsTotal={types.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -77,26 +80,38 @@ const Countries = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>País</th>
-                        <th scope='col'>Código</th>
-                        <th scope='col'>Moneda</th>
-                        <th scope='col'>Balance</th>
+                        <th scope='col'>Nombre</th>
+                        <th scope='col'>Descripción</th>
+                        <th scope='col'>Tipo</th>
+                        
+                        <th scope='col'>Nro° de reportes</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
                     <tbody>
                       {
-                        countries.data.map(e => {
+                        types.data.map(e => {
+                          
+                    const color = JSON.parse(e.config).styles
+                    const type = ()=>{
+                      if (e.type === 'income') {
+                        return 'Ingreso'
+                      }
+                      else if(e.type === 'expense'){
+                        return 'Egreso'
+                      }
+                      return 'Neutro'
+                    }
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.country_name}</span>
+                            <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.name}</span>
                           </div>
                         </td>
-                        <td>{e.shortcode}</td>
-                        <td>{e.currency_name} - {e.currency_shortcode}</td>
-                        <td>{e.symbol} {e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        <td>{e.description}</td>
+                        <td>{type()}</td>
+                        <td>{e.count}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -115,7 +130,7 @@ const Countries = () => {
                                 </svg>
                               </button>
                               <button onClick={()=>{
-                                setCountry(e);
+                                setType(e);
                                 setModalConfirmShow(true);
                               }} className="TableActionButtons ms-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -137,16 +152,16 @@ const Countries = () => {
                 </div>
               </div>
             </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay países para mostrar</div>
+            : <div className='d-flex justify-content-center align-items-center'>No hay tipos para mostrar</div>
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>
-        <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(country)}/>
+        <ModalCreateReportType modalShow={modalShow} setModalShow={setModalShow}/>
+        <ModalEditReportType modalShow={modalEdit} setModalShow={setModalEdit} data={type}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(type)}/>
       </div>
     </div>
   )
 }
 
-export default Countries
+export default ReportTypes

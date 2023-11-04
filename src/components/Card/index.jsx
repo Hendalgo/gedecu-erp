@@ -7,7 +7,7 @@ const Card = ({ country, currency, total, percent, img }) => {
     <div className='bg-white CardContainer'>
       <div className='px-4 pt-4 pb-3 d-flex justify-content-between'>
         <div>
-          <div className='CountryName pb-1'>
+          <div className='CountryName pb-1' style={{textWrap: 'nowrap'}}>
             <ReactSVG
               src='/world.svg'
               className='me-2'
@@ -15,7 +15,7 @@ const Card = ({ country, currency, total, percent, img }) => {
             />
             {country}
           </div>
-          <div className='TotalCard'>
+          <div className='TotalCard' style={{textWrap: 'nowrap'}}>
             {`${currency} ${total}`}
           </div>
         </div>
@@ -33,7 +33,7 @@ const Card = ({ country, currency, total, percent, img }) => {
               src='/down.svg'
               wrapper='span'
             />}
-        <span>{percent}% día de hoy</span>
+        <span>{percent.toFixed(2)}% día de hoy</span>
       </div>
     </div>
   )

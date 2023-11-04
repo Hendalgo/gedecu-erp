@@ -6,7 +6,7 @@ import Dashboard from './pages/Dashboard'
 import { SessionContext } from './context/SessionContext'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import Home from './pages/Home'
-import { LOGIN_ROUTE, DASHBOARD_INDEX_ROUTE, DASHBOARD_ROUTE, USERS_ROUTE, REPORTS_ROUTE, REPORTS_DUPLICATE_ROUTE, STORES_ROUTE, BANKS_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, COUNTRIES_ROUTE } from './consts/Routes'
+import { LOGIN_ROUTE, DASHBOARD_INDEX_ROUTE, DASHBOARD_ROUTE, USERS_ROUTE, REPORTS_ROUTE, REPORTS_DUPLICATE_ROUTE, STORES_ROUTE, BANKS_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, COUNTRIES_ROUTE, REPORTS_TYPE_ROUTE } from './consts/Routes'
 import Reports, { ReportsIndex } from './pages/Reports'
 import DuplicateReports from './pages/DuplicateReports'
 import Users from './pages/Users'
@@ -15,6 +15,7 @@ import Banks, { BanksIndex } from './pages/Banks'
 import Inconsistences from './pages/Inconsistences'
 import BankAccounts from './pages/BankAccounts'
 import Countries from './pages/Countries'
+import ReportTypes from './pages/ReportTypes'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -43,6 +44,7 @@ function App () {
                 <Route index element={<ReportsIndex />} />
                 <Route path={`${REPORTS_DUPLICATE_ROUTE}`} element={<DuplicateReports />} />
                 <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
+                <Route path={`${REPORTS_TYPE_ROUTE}`} element={<ReportTypes />} />
               </Route>
               <Route path={`${STORES_ROUTE}`} element={<Stores />} />
               <Route path={`${BANKS_ROUTE}`} element={<Banks/>}>

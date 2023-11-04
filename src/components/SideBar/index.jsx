@@ -12,12 +12,9 @@ import useScreenSize from '../../hooks/useScreenSize'
 
 const SideBar = ({ children }) => {
   const location = useLocation();
-  const [isActive, setIsActive] = useState(window.location.pathname.startsWith(REPORTS_ROUTE));
+  const [isActive, setIsActive] = useState(AdminMenus);
   const {width, maxHeight} = useScreenSize() 
   let menus = [];
-  useEffect(() => {
-    setIsActive(location.pathname.startsWith('/dashboard/'+REPORTS_ROUTE));
-  }, [location]);
   const {session, setSession } = useContext(SessionContext)
   if (useCheckRole(session)) {
     menus = AdminMenus;
@@ -29,7 +26,23 @@ const SideBar = ({ children }) => {
     ?<SideBarBig menus={menus} setSession={setSession} isActive={isActive}>{children}</SideBarBig>
     :<SideBarSmall menus={menus} setSession={setSession} isActive={isActive}>{children}</SideBarSmall>
 }
-const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
+const SideBarSmall = ({menus, setSession, children}) =>{
+  const location = useLocation();
+  const [isActive, setIsActive] = useState(menus);
+  useEffect(() => {
+    setIsActive(
+      menus.map( e=>  {
+        if (window.location.pathname.startsWith("/dashboard/"+e.link)){
+          e.isActive = true;
+        }
+        else{
+          e.isActive = false;
+        }
+        return e;
+      })
+    )
+  }, [location, menus]);
+  return (
   <div className='container-fluid AppContainer'>
     <div className='row'>
       <div className='col-3 SideBarCol d-flex flex-column flex-shrink-0 p-3'>
@@ -40,7 +53,7 @@ const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
           />
         </div>
         <ul className='nav nav-pills flex-column mb-auto'>
-          {menus.map((Menu, index) => (
+          {isActive.map((Menu, index) => (
             <li
               key={index}
               className='SideBarItem p-1'
@@ -59,7 +72,7 @@ const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
                     {Menu.title}
                   </NavLink>
                   : <Accordion>
-                    <Accordion.Item className={isActive ? "active" : ""}>
+                    <Accordion.Item className={Menu.isActive ? "active" : ""}>
                       <Accordion.Header>
                         <NavLink
 
@@ -92,16 +105,6 @@ const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
               }
             </li>
           ))}
-          <li className='SideBarItem p-1' style={{opacity: 0.5, textWrap:'nowrap'}}>
-            <a href='#' className='nav-link'>
-              <ReactSVG 
-                className='bi me-2 '
-                wrapper='span'
-                src={`/world.svg`}
-              />
-                Países (próximamente)
-            </a>
-          </li>
         </ul>
         <div>
           <div className='pb-5 nav nav-pills flex-column mb-auto'>
@@ -124,8 +127,23 @@ const SideBarSmall = ({menus, setSession, isActive, children}) =>{return (
   </div>
   )
 }
-const SideBarBig = ({menus, setSession, isActive, children})=>{
+const SideBarBig = ({menus, setSession, children})=>{
   
+  const location = useLocation();
+  const [isActive, setIsActive] = useState(menus);
+  useEffect(() => {
+    setIsActive(
+      menus.map( e=>  {
+        if (window.location.pathname.startsWith("/dashboard/"+e.link)){
+          e.isActive = true;
+        }
+        else{
+          e.isActive = false;
+        }
+        return e;
+      })
+    )
+  }, [location, menus]);
   return (
     <div className='container-fluid AppContainer'>
       <div className='row'>
@@ -137,7 +155,7 @@ const SideBarBig = ({menus, setSession, isActive, children})=>{
             />
           </div>
           <ul className='nav nav-pills flex-column mb-auto'>
-            {menus.map((Menu, index) => (
+            {isActive.map((Menu, index) => (
               <li
                 key={index}
                 className='SideBarItem p-1'
@@ -156,7 +174,7 @@ const SideBarBig = ({menus, setSession, isActive, children})=>{
                       {Menu.title}
                     </NavLink>
                     : <Accordion>
-                      <Accordion.Item className={isActive ? "active" : ""}>
+                      <Accordion.Item className={Menu.isActive ? "active" : ""}>
                         <Accordion.Header>
                           <NavLink
 

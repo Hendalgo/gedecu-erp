@@ -27,7 +27,8 @@ export const BanksIndex = () => {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getBanks('order=created_at&order_by=desc').then(r => setBanks(r))
+    getBanks('order=created_at&order_by=desc').then(r => setBanks(r));
+    getCountriesCount().then(r =>setCountryBank(r));
   }, [])
   const handleChange = (offset) => {
     getBanks(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))

@@ -1,21 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Modal, Alert, Tooltip, OverlayTrigger } from 'react-bootstrap'
+import { Modal, Alert} from 'react-bootstrap'
 import { createReport, getReportTypes } from '../../helpers/reports'
-import { useMask } from '../../hooks/useMask'
 import { getStores } from '../../helpers/stores'
-import { useUUID } from '../../hooks/useUUID'
 import { useUnmask } from '../../hooks/useUnmask'
 import SearchSelect from '../SearchSelect'
 import { getBankAccounts } from '../../helpers/banksAccounts'
+import DecimalInput from '../DecimalInput'
+import Select from 'react-select';
 
 const ModalCreateReport = ({ modalShow, setModalShow }) => {
   const form = useRef()
+  const typeData = {
+    income: 'Ingreso',
+    expense: 'Egreso',
+    neutro: 'Neutro'
+  }
+  const [currency, setCurrency] = useState('');
+  const [banks, setBanks] = useState([]);
   const [errorMessage, setErrorMessage] = useState(false)
   const [reportTypes, setReportTypes] = useState([])
   const [alertType, setAlertType] = useState('danger')
-  const [stores, setStores] = useState([])
   const [options, setOptions] = useState({
-    rate: true,
+    rate: false,
     payment_reference: false,
     store: true,
     bank: true,
@@ -23,10 +29,6 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
     duplicated: true,
     bank_account_ie: false
   })
-  const [banks, setBanks] = useState([]);
-  const [banksDesc, setBanksDesc] = useState([]);
-  const [amount, setAmount] = useState('')
-  const [tasa, setTasa] = useState('')
   const handleReport = async () => {
     try {
       setErrorMessage(false)
@@ -35,13 +37,12 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
         amount: useUnmask(formData.amount.value),
         type: parseInt(formData.type.value),
         duplicated: formData.duplicated.checked,
-        bank: formData.bank.id,
-        store: formData.store.id,
+        bank: formData.bank.value,
+        store: formData.store.value,
         notes: formData.notes.value
       }
       formData.rate ? data.rate = useUnmask(formData.rate.value) : null
-      console.log(formData)
-      formData.bank_account_ie ? data.bank_income = formData.bank_account_ie.id : null
+      formData.bank_account_ie ? data.bank_income = formData.bank_account_ie.value : null
       formData.payment_reference ? data.payment_reference = formData.payment_reference.value : null
 
       const request = await createReport(data)
@@ -69,38 +70,90 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
     }
   }
   useEffect(() => {
-    getReportTypes().then(r => setReportTypes(r))
+    getReportTypes(`paginated=no`).then(r => {
+      if (Array.isArray(r)) {
+        const income = r.filter(e => e.type === 'income').map(e => ({ value: e.id, label: e.name, type: e.type }));;
+        const expense =  r.filter(e=> e.type === 'expense').map(e => ({ value: e.id, label: e.name, type: e.type }));;
+        const neutro = r.filter(e=> e.type === 'neutro').map(e => ({ value: e.id, label: e.name, type: e.type }));;
+
+        setReportTypes([
+          {
+            label: 'Ingreso',
+            options: income
+          },
+          {
+            label: 'Egreso',
+            options: expense
+          },
+          {
+            label: 'Neutro',
+            options: neutro
+          },
+        ])
+      }
+    });
   }, [])
 
-  const handleSearchBank = (e) => {
-    getBankAccounts(`search=${e.target.value}`)
-    .then(r => {
-      setBanks(r.data);
-      setBanksDesc(['bank.name', 'bank.country.name']);
-    })
+  const handleSearchBank = async (e) => {
+    try {
+      const banks = await getBankAccounts(`search=${e}`);
+      setBanks(banks.data);
+      return banks.data;
+    } catch (error) {
+      
+    }
   }
-  const handleSearchStore = (e) => {
-    getStores(`search=${e.target.value}`).then(r => setStores(r.data))
+  const handleSearchStore = async(e) => {
+    try {
+      const stores = await getStores(`search=${e}`);
+      return stores.data
+    } catch (error) {
+      
+    }
   }
   const handleType = (e) => {
-    const type =  reportTypes.find( el => el.id === parseInt(e.target.value));
-    if (type.type === 'income') {
-      setOptions({
-        ...options,
-        bank_account_ie: true
-      })
+    const type =  reportTypes.map( el => el.options).flat().find(el => el.value === e.value);
+    if (type) {
+      if (type.type === 'income') {
+        !form.current.bank_account_ie && setCurrency('');
+        setOptions({
+          ...options,
+          rate: true,
+          payment_reference: true,
+          bank_account_ie: true
+        })
+      }
+      else if(type.type === 'expense'){
+        !form.current.bank_account_ie && setCurrency('');
+        setOptions({
+          ...options,
+          rate: true,
+          payment_reference: false,
+          bank_account_ie: true
+        })
+      }
+      else{
+        const bank = banks.find(el => el.id === parseFloat(form.current.bank.value));
+        if (bank) {
+          setCurrency(bank.bank.country.currency.symbol)
+        }
+        setOptions({
+          ...options,
+          rate: false,
+          bank_account_ie: false,
+          payment_reference: false,
+        })
+      }
     }
-    else if(type.type === 'expense'){
-      setOptions({
-        ...options,
-        bank_account_ie: true
-      })
-    }
-    else{
-      setOptions({
-        ...options,
-        bank_account_ie: false
-      })
+  }
+  const handleChange = (e)=>{
+    const bank = banks.find(el => el.id === e.value);
+    setCurrency(bank.bank.country.currency.symbol)
+  }
+  const handleChangeNeutral = (e) =>{
+    if (!options.bank_account_ie) {
+      const bank = banks.find(el => el.id === e.value);
+      setCurrency(bank.bank.country.currency.symbol)
     }
   }
   return (
@@ -111,7 +164,9 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
             <div className='row'>
               <div className='d-flex flex-column'>
                 <span className='ModalTopTitle'>Crear Reporte</span>
-                <span className='ModalTopSubTitle'>Reporte</span>
+                <span className='ModalTopSubTitle'>En esta pestaña puedes crear un reporte nuevo. Los tipos de reporte se dividen en Ingreso, egreso o neutral. Las de tipo ingreso o egreso agregan el campo "Cuenta de operacion" el cual implica a que cuenta se debitaran o agregaran los fondos de la operacion y la moneda en que se basará la tasa y el monto. 
+                Di marcas el movimiento como duplicado la operación se realizará 2 veces. Ejemplo si haces un movimiento de tipo egreso de $5. A la cuenta se debitaran $10.
+                </span>
               </div>
             </div>
           </div>
@@ -123,75 +178,71 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
             <div className='row'>
               <div className='col'>
                 <label htmlFor='type' className='form-label'>Tipo de reporte</label>
-                <select onChange={handleType} className='form-control' name='type' id=''>
-                  <option value=''>Seleccione un tipo de reporte...</option>
-                  {
-                  reportTypes.length > 0
-                    ? reportTypes.map((e) =>
-                      <option key={e.id} value={e.id}>{e.name}</option>
-                    )
-                    : null
-                }
-                </select>
+                <Select
+                  onChange={handleType}
+                  options={reportTypes}
+                  name='type'
+                />
               </div>
 
               <div className='col'>
                 <label htmlFor='' className='form-label'>Monto <span className='Required'>*</span></label>
-                <input required placeholder='000.000,00' onChange={(e) => setAmount(e.target.value)} onBlur={(e) => useMask(e, setAmount)} value={amount} type='text' name='amount' className='form-control' />
+                <div className="input-group">
+                  <div className="input-group-text">{currency}</div>
+                  <DecimalInput name={"amount"}/>
+                </div>
               </div>
 
             </div>
             <div className='row mt-3'>
               {
                 options.rate
-                ? <div className='col-4'>
+                &&
+                <div className='col-4'>
                   <label htmlFor='rate' className='form-label'>Tasa del día <span className='Required'>*</span></label>
-                  <input required placeholder='123.456,78' name='rate' onChange={(e) => setTasa(e.target.value)} onBlur={(e) => useMask(e, setTasa)} value={tasa} type='text' className='form-control' />
+                  <div className="input-group">
+                    <div className="input-group-text">{currency}</div>
+                  <DecimalInput name={"rate"}/>
                 </div>
-                : null
+                </div>
               } 
-              <div className='col-4'>
-                <label htmlFor='payment_reference' className='form-label'>Referencia de pago</label>
-                <input type='text' className='form-control' name='payment_reference' />
-              </div>
               {
-              options.bank_account_ie
-                ?<div className='col-4'>
+                options.payment_reference && 
+                <div className='col-4'>
+                  <label htmlFor='payment_reference' className='form-label'>Referencia de pago</label>
+                  <input type='text' className='form-control' name='payment_reference' placeholder='E.j: 091052507122' />
+                </div>
+              }
+              {
+                options.bank_account_ie
+                &&<div className='col-4'>
                   <SearchSelect
-                    nameRadio={'bank-448797'}
+                    onChange={handleChange}
                     nameSearch={'bank_account_ie'}
                     handleSearch={handleSearchBank}
-                    label={'Cuenta'}
-                    data={banks}
-                    form={form}
-                    hasDescription={true}
-                    description={banksDesc}
+                    label={'Cuenta de operación'}
+                    description={['bank.name', 'identifier']}
+
                   />
                 </div>
-                : null
               }
             </div>
             <div className='row mt-3'>
               <div className='col-4'>
                 <SearchSelect 
                   handleSearch={handleSearchStore} 
-                  nameRadio='stores' 
                   nameSearch='store' 
                   label='Local' 
-                  data={stores}
-                  form={form}
+                  description={['name']}
                 />
               </div>
               <div className='col-4'>
                 <SearchSelect
-                  nameRadio={'bank-48897'}
+                  onChange={handleChangeNeutral}
                   nameSearch={'bank'}
                   handleSearch={handleSearchBank}
                   label={'Cuenta'}
-                  data={banks}
-                  form={form}
-                  hasDescription={true}
-                  description={banksDesc}
+                  description={['bank.name', 'identifier']}
                 />
               </div>
               <div className='col-4 mt-4'>

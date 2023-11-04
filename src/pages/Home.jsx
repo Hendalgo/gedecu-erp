@@ -74,11 +74,11 @@ const Home = () => {
                           <div className='row pt-4'>
                             <Title title='Balances' icon='/chart-histogram.svg' description='Balances' />
                           </div>
-                          <div className='pt-4 row'>
+                          <div className='pt-4 d-flex' style={{overflowX: 'scroll'}}>
                             {
                               countriesTotal.length > 0
                                 ?countriesTotal.map((e, index) =>
-                                <div key={index} className={`col-${Math.floor((12 / countriesTotal.length))}`}>
+                                <div key={index} className={`col me-4`}>
                                   <Card country={`${e.country_name} ${e.shortcode}`} currency={e.symbol} total={e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })} img='/fi-br-money.png' percent={e.growth_percentage} />
                                 </div>
                               )
@@ -169,7 +169,7 @@ const Home = () => {
                             ? reports.map(e => {
                               let currency
                               if (e.bank_income) {
-                                currency = e.bank_income.country.currency.symbol
+                                currency = e.bank_income.bank.country.currency.symbol
                               } else {
                                 currency = e.bank_account.bank.country.currency.symbol
                               }

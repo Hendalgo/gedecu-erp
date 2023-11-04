@@ -44,3 +44,31 @@ export const getReportTypes = async (query) => {
     return error.response
   }
 }
+export const createReportTypes = async(data)=>{
+  try {
+    const request = await API_INSTANCE.post(REPORTS_TYPE_URL, data)
+
+    return request
+  } catch (error) {
+    return error.response
+  }
+}
+export const deleteReportTypes = async(id)=>{
+  try {
+    const request = await API_INSTANCE.delete(`${REPORTS_TYPE_URL}/${id}`)
+
+    return request
+  } catch (error) {
+    return error.response
+  }
+}
+
+export const updateReportTypes = async(id,data)=>{
+  try {
+    const request = await API_INSTANCE.put(`${REPORTS_TYPE_URL}/${id}`, data)
+
+    return request
+  } catch (error) {
+    return error.response
+  }
+}

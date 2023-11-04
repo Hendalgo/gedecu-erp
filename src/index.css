@@ -126,9 +126,11 @@ h6{
   line-height: 120%; /* 28.8px */
 }
 .ModalTopSubTitle{
-  color: var(--body-text-body-color, #212529);
+  color: var(--primary-neutral-ligth-400, #E0DCEA);
+  margin-top: 4px;
+  text-wrap: balance;
   font-family: Inter;
-  font-size: 15px;
+  font-size: 10px;
   font-style: normal;
   font-weight: 400;
   line-height: 150%; /* 22.5px */

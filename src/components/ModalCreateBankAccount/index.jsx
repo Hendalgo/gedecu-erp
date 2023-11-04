@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createBank, getBanks, getCountriesCount } from '../../helpers/banks'
+import { getBanks, getCountriesCount } from '../../helpers/banks'
 import SearchSelect from '../SearchSelect'
 import { createBankAccount } from '../../helpers/banksAccounts'
 
 const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState();
-  const [banks, setBanks] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
@@ -19,7 +18,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
       const request = await createBankAccount({
         name: formData.name.value,
         identifier: formData.identifier.value,
-        bank: formData.bank.id
+        bank: formData.bank.value
       });
 
       switch (request.status) {
@@ -44,8 +43,13 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
       setAlertType('danger')
     }
   }
-  const handleSearch = (e)=>{
-    getBanks(`search=${e.target.value}`).then(r => setBanks(r.data));
+  const handleSearch = async (e)=>{
+    try {
+      const banks = await getBanks(`search=${e}`);
+      return banks.data;
+    } catch (error) {
+      
+    }
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -77,13 +81,11 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
             <div className="row">
               <div className='col'>
                 <SearchSelect
-                  nameRadio={'banks'}
-                  nameSearch={'bank'}
-                  label={'Banco'}
-                  data={banks}
-                  handleSearch={handleSearch}
-                  form={form}
-                />
+                    nameSearch={'bank'}
+                    label={'Banco'}
+                    handleSearch={handleSearch}
+                    description={['name', 'country.name']}
+                  />
               </div>
             </div>
           </div>

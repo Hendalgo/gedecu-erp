@@ -100,7 +100,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
                       <label htmlFor='role'>Rol</label>
-                      <select required className='form-select' name='role' id=''>
+                      <select required className='form-select' name='role' id='role'>
                         {
                   roles
                     ? roles.map((e) => {
@@ -112,7 +112,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                     </div>
                     <div>
                       <label htmlFor='country'>País</label>
-                      <select required className='form-select' name='country' id=''>
+                      <select required className='form-select' name='country' id='country'>
                         {
                   countries
                     ? countries.map(e => {

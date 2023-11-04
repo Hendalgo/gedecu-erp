@@ -4,6 +4,7 @@ import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
 import { useUUID } from '../../hooks/useUUID'
 import { updateStore } from '../../helpers/stores'
+import SearchSelect from '../SearchSelect'
 
 const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
   const [countries, setCountries] = useState()
@@ -18,10 +19,10 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
   const handleStore = async () => {
     try {
       const request = await updateStore(store.id, {
-        name: store.name,
-        location: store.location,
+        name: form.current.name.value,
+        location: form.current.location.value,
         country_id: form.current.country.value,
-        user_id: form.current.search.id
+        user_id: form.current.user.value
       })
 
       switch (request.status) {
@@ -48,13 +49,14 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
     }
   }
 
-  const handleSearch = (e) => {
-    getUsers(`search=${e.target.value}`).then(r => setUsers(r.data))
-  }
-  const handleSelect = (e) => {
-    form.current.search.id = e.id
-    form.current.search.value = e.name
-    setDisplay('hidden')
+  
+  const handleSearch = async(e) => {
+    try {
+      const users = await getUsers(`search=${e}`);
+      return users.data;
+    } catch (error) {
+      
+    }
   }
   return (
     store
@@ -72,66 +74,46 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className='container'>
-            <div className='row'>
-              <div className='d-flex'>
-                <form className='FormContainer' action='' ref={form}>
-                  <div className='d-flex mb-3'>
-                    <div className='me-4'>
-                      <label htmlFor='name'>Nombre</label>
-                      <input required className='form-control' type='text' name='name' value={store.name} onChange={(e) => setStore({ ...store, name: e.target.value })} />
-                    </div>
-                    <div>
-                      <label htmlFor='location'>Dirección</label>
-                      <input required className='form-control' type='text' name='location' value={store.location} onChange={(e) => setStore({ ...store, location: e.target.value })} />
-                    </div>
-                  </div>
-                  <div className='d-flex mb-3'>
-                    <div>
-                      <label htmlFor='country_id'>País</label>
-                      <select required className='form-select' name='country' id=''>
-                        {
-                    countries
-                      ? countries.map(e => {
-                        return <option key={e.id} defaultValue={e.id === store.country.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                      })
-                      : null
-                  }
-                      </select>
-                    </div>
-                    <div className='ms-3'>
-                      <search role='search'>
-                        <label htmlFor='country_id'>Usuario</label>
-                        <input autoComplete='off' id={store.user.id} onChange={handleSearch} defaultValue={store.user.name} onBlur={() => setTimeout(() => setDisplay('hidden'), 100)} onFocus={() => setDisplay('visible')} className='form-control' type='search' name='search' />
-                        <fieldset className='UserSearch' style={{ visibility: display }}>
-                          {
-                    Array.isArray(users)
-                      ? users.map((e) => {
-                        const uuid = useUUID()
-                        return (
-                          <div key={e.id}>
-                            <label htmlFor={uuid}>
-                              <span className='SearchResultName'>
-                                {e.name}
-                              </span>
-                              <span className='SearchResultDescription'>
-                                {e.email}
-                              </span>
-                            </label>
-                            <input onClick={() => handleSelect(e)} type='radio' name='user_id' value={e.id} id={uuid} />
-                          </div>
-                        )
-                      })
-                      : null
-                  }
-                        </fieldset>
-                      </search>
-                    </div>
-                  </div>
-                </form>
-              </div>
+        <form className='container' action='' ref={form}>
+          <div className='row mb-3'>
+            <div className=' col '>
+              <label htmlFor='name' className='form-label'>Nombre</label>
+              <input defaultValue={store.name} required className='form-control' type='text' name='name' />
+            </div>
+            <div className='col'>
+              <label htmlFor='location'  className='form-label'>Dirección</label>
+              <input defaultValue={store.location} required className='form-control' type='text' name='location' />
             </div>
           </div>
+          <div className='row'>
+            <div className='col'>
+              <label htmlFor='country_id'  className='form-label'>País</label>
+              <select required className='form-select' name='country' id=''>
+                {
+                  countries
+                    ? countries.map(e => {
+                      return <option key={e.id} defaultValue={e.id === store.country.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                    })
+                    : null
+                }
+              </select>
+            </div>
+            <div className='col '>
+              <SearchSelect
+                label={"Usuario"}
+                nameSearch={"user"}
+                handleSearch={handleSearch}
+                description={['name', "email"]}
+                defaultValue={
+                  {
+                    label: `${store.user.name} - ${store.user.email} -`,
+                    value: store.user.id
+                  }
+                }
+              />
+            </div>
+          </div>
+        </form>
         </Modal.Body>
         <Modal.Footer>
           {

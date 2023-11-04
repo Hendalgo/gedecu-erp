@@ -15,12 +15,12 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
       const request = await updateBankAccount(bankAccount.id,{
         name: formData.name.value,
         identifier: formData.identifier.value,
-        bank: formData.bank.id
+        bank: formData.bank.value
       });
 
       switch (request.status) {
         case 201:
-          setErrorMessage('Banco creado con éxito')
+          setErrorMessage('Banco editado con éxito')
           setAlertType('success')
 
           window.location.reload()
@@ -31,17 +31,22 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
           break
 
         default:
-          setErrorMessage('Error en la creación del banco')
+          setErrorMessage('Error en la edición del banco')
           setAlertType('danger')
           break
       }
     } catch (error) {
-      setErrorMessage('Error en la creación del banco')
+      setErrorMessage('Error en la edición del banco')
       setAlertType('danger')
     }
   }
-  const handleSearch = (e)=>{
-    getBanks(`search=${e.target.value}`).then(r => setBanks(r.data));
+  const handleSearch = async (e)=>{
+    try {
+      const banks = await getBanks(`search=${e}`);
+      return banks.data;
+    } catch (error) {
+      
+    }
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -50,8 +55,8 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
           <div className='container'>
             <div className='row'>
               <div className='d-flex flex-column'>
-                <span className='ModalTopTitle'>Crear nueva cuenta bancaria</span>
-                <span className='ModalTopSubTitle'>Esta pestaña le permite crear una nueva cuenta bancaria o de alguna otra plataforma monetaria.</span>
+                <span className='ModalTopTitle'>Editar nueva cuenta bancaria</span>
+                <span className='ModalTopSubTitle'>Esta pestaña le permite Editar una nueva cuenta bancaria o de alguna otra plataforma monetaria.</span>
               </div>
             </div>
           </div>
@@ -76,15 +81,13 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
               <div className="row">
                 <div className='col'>
                   <SearchSelect
-                    nameRadio={'banks'}
                     nameSearch={'bank'}
                     label={'Banco'}
-                    data={banks}
                     handleSearch={handleSearch}
-                    form={form}
+                    description={['name', 'country.name']}
                     defaultValue={{
-                      name: bankAccount.bank.name,
-                      id: bankAccount.bank.id
+                      label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
+                      value: bankAccount.bank.id
                     }}
                   />
                 </div>
@@ -102,7 +105,7 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
             </Alert>
             : null
         }
-        <button onClick={handleBankAccount} className='btn btn-primary'>Crear banco</button>
+        <button onClick={handleBankAccount} className='btn btn-primary'>Editar banco</button>
       </Modal.Footer>
     </Modal>
   )

@@ -1,10 +1,11 @@
-import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE } from "./Routes"
+import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, REPORTS_TYPE_ROUTE } from "./Routes"
 
 export const AdminMenus = [
   {
     title: 'Escritorio',
     src: 'home-blue-icon',
-    link: DASHBOARD_INDEX_ROUTE
+    link: DASHBOARD_INDEX_ROUTE,
+    isActive: false
   },
   {
     title: 'Reportes',
@@ -18,13 +19,19 @@ export const AdminMenus = [
       {
         name: 'Inconsistencias',
         link: 'reports/' + REPORTS_MISS_ROUTE
+      },
+      {
+        name: 'Tipos de reportes',
+        link: 'reports/' + REPORTS_TYPE_ROUTE
       }
-    ]
+    ],
+    isActive: false
   },
   {
     title: 'Locales',
     src: 'map-marker-home',
-    link: 'stores'
+    link: 'stores',
+    isActive: false
   },
   {
     title: 'Bancos ',
@@ -35,17 +42,20 @@ export const AdminMenus = [
         name: 'Cuentas de banco',
         link: 'banks/'+ BANK_ACCOUNTS_ROUTE
       }
-    ]
+    ],
+    isActive: false
   },
   {
     title: 'Usuarios',
     src: 'user',
-    link: 'users'
+    link: 'users',
+    isActive: false
   },
   {
     title: 'Países',
     src: 'world',
-    link: 'countries'
+    link: 'countries',
+    isActive: false
   }
 ]
 
@@ -53,7 +63,8 @@ export  const NormalUserMenu = [
   {
     title: 'Escritorio',
     src: 'home-blue-icon',
-    link: DASHBOARD_INDEX_ROUTE
+    link: DASHBOARD_INDEX_ROUTE,
+    isActive: false
   },
   {
     title: 'Reportes',
@@ -64,6 +75,7 @@ export  const NormalUserMenu = [
         name: 'Duplicados',
         link: 'reports/' + REPORTS_DUPLICATE_ROUTE
       }
-    ]
+    ],
+    isActive: false
   }
 ]

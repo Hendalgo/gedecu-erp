@@ -27,7 +27,7 @@ export const ReportsIndex = () => {
   const form = useRef()
 
   useEffect(() => {
-    getReportTypes().then(r => setReportType(r))
+    getReportTypes(`paginated=no`).then(r => setReportType(r))
     getReports('order=created_at&order_by=desc').then(r => setReports(r))
   }, [])
   const handleChange = (offset) => {
@@ -94,7 +94,8 @@ export const ReportsIndex = () => {
                         <th scope='col'>Realizado por:</th>
                         <th scope='col'>Fecha</th>
                         <th scope='col'>Motivo</th>
-                        <th scope='col'>Método de pago</th>
+                        <th scope='col'>Local</th>
+                        <th scope='col'>Banco</th>
                         <th scope='col'>Monto</th>
                       </tr>
                     </thead>
@@ -104,7 +105,7 @@ export const ReportsIndex = () => {
                     const color = JSON.parse(e.type.config).styles
                     let currency
                     if (e.bank_income) {
-                      currency = e.bank_income.country.currency.symbol
+                      currency = e.bank_income.bank.country.currency.symbol
                     } else {
                       currency = e.bank_account.bank.country.currency.symbol
                     }
@@ -127,7 +128,8 @@ export const ReportsIndex = () => {
                         <td>
                           <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
                         </td>
-                        <td>{e.bank_account.bank.name}</td>
+                        <td>{e.store.name}</td>
+                        <td>{e.bank_income? e.bank_income.bank.name: e.bank_account.bank.name}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
 
                       </tr>
