@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
-import { useUUID } from '../../hooks/useUUID'
 import { updateStore } from '../../helpers/stores'
 import SearchSelect from '../SearchSelect'
+import Select from 'react-select'
 
-const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
+const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [countries, setCountries] = useState()
   const [errorMessage, setErrorMessage] = useState()
   const [users, setUsers] = useState([])
@@ -15,6 +15,14 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
   const form = useRef()
   useEffect(() => {
     getCountriesCount().then(r => setCountries(r))
+    getUsers(`paginated=no`).then(r =>{
+      setUsers(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.email}`,
+          value: e.id
+        }
+      }))
+    }); 
   }, [])
   const handleStore = async () => {
     try {
@@ -77,17 +85,17 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
         <form className='container' action='' ref={form}>
           <div className='row mb-3'>
             <div className=' col '>
-              <label htmlFor='name' className='form-label'>Nombre</label>
+              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
               <input defaultValue={store.name} required className='form-control' type='text' name='name' />
             </div>
             <div className='col'>
-              <label htmlFor='location'  className='form-label'>Dirección</label>
+              <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
               <input defaultValue={store.location} required className='form-control' type='text' name='location' />
             </div>
           </div>
           <div className='row'>
             <div className='col'>
-              <label htmlFor='country_id'  className='form-label'>País</label>
+              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
               <select required className='form-select' name='country' id=''>
                 {
                   countries
@@ -99,14 +107,15 @@ const ModalEditStore = ({ modalShow, setModalShow, store, setStore }) => {
               </select>
             </div>
             <div className='col '>
-              <SearchSelect
-                label={"Usuario"}
-                nameSearch={"user"}
-                handleSearch={handleSearch}
-                description={['name', "email"]}
+            <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span></label>
+              <Select
+                name={"user"}
+                placeholder="Seleccione un manejador"
+                noOptionsMessage={()=> "No hay coincidencias"}
+                options={users}
                 defaultValue={
                   {
-                    label: `${store.user.name} - ${store.user.email} -`,
+                    label: `${store.user.name} - ${store.user.email}`,
                     value: store.user.id
                   }
                 }

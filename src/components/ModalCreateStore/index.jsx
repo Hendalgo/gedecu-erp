@@ -3,15 +3,24 @@ import { Alert, Modal } from 'react-bootstrap'
 import { getUsers } from '../../helpers/users'
 import { getCountriesCount } from '../../helpers/banks'
 import { createStore } from '../../helpers/stores'
-import SearchSelect from '../SearchSelect'
+import Select from 'react-select'
 
 const ModalCreateStore = ({ modalShow, setModalShow }) => {
-  const [countries, setCountries] = useState()
+  const [countries, setCountries] = useState();
+  const [users, setUsers] = useState();
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
   useEffect(() => {
     getCountriesCount().then(r => setCountries(r))
+    getUsers(`paginated=no`).then(r =>{
+      setUsers(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.email}`,
+          value: e.id
+        }
+      }))
+    }); 
   }, [])
   const handleStore = async () => {
     try {
@@ -45,14 +54,6 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
       setAlertType('danger')
     }
   }
-  const handleSearch = async(e) => {
-    try {
-      const users = await getUsers(`search=${e}`);
-      return users.data;
-    } catch (error) {
-      
-    }
-  }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -71,17 +72,17 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
         <form className='container' action='' ref={form}>
           <div className='row mb-3'>
             <div className=' col '>
-              <label htmlFor='name' className='form-label'>Nombre</label>
+              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
               <input required className='form-control' type='text' name='name' />
             </div>
             <div className='col'>
-              <label htmlFor='location'  className='form-label'>Dirección</label>
+              <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
               <input required className='form-control' type='text' name='location' />
             </div>
           </div>
           <div className='row'>
             <div className='col'>
-              <label htmlFor='country_id'  className='form-label'>País</label>
+              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
               <select required className='form-select' name='country_id' id=''>
                 {
               countries
@@ -93,11 +94,12 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
               </select>
             </div>
             <div className='col '>
-              <SearchSelect
-                label={"Usuario"}
-                nameSearch={"user"}
-                handleSearch={handleSearch}
-                description={['name', "email"]}
+              <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span></label>
+              <Select
+                placeholder="Seleccione un manejador"
+                noOptionsMessage={()=> "No hay coincidencias"}
+                name='user'
+                options={users}
               />
             </div>
           </div>

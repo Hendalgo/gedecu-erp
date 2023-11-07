@@ -33,3 +33,11 @@ export const updateUser = async (id, formData) => {
     return error.response
   }
 }
+export const deleteUser = async (id) => {
+  try {
+    const request = await API_INSTANCE.delete(USER_URL + '/' + id)
+    return request
+  } catch (error) {
+    return error.response
+  }
+}

@@ -3,20 +3,15 @@ import { Modal, Alert} from 'react-bootstrap'
 import { createReport, getReportTypes } from '../../helpers/reports'
 import { getStores } from '../../helpers/stores'
 import { useUnmask } from '../../hooks/useUnmask'
-import SearchSelect from '../SearchSelect'
 import { getBankAccounts } from '../../helpers/banksAccounts'
 import DecimalInput from '../DecimalInput'
 import Select from 'react-select';
 
 const ModalCreateReport = ({ modalShow, setModalShow }) => {
   const form = useRef()
-  const typeData = {
-    income: 'Ingreso',
-    expense: 'Egreso',
-    neutro: 'Neutro'
-  }
   const [currency, setCurrency] = useState('');
   const [banks, setBanks] = useState([]);
+  const [stores, setStores] = useState([]);
   const [errorMessage, setErrorMessage] = useState(false)
   const [reportTypes, setReportTypes] = useState([])
   const [alertType, setAlertType] = useState('danger')
@@ -92,25 +87,24 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
         ])
       }
     });
+    getStores(`paginated=no`).then(r =>{
+      setStores(r.map( e=> {
+        return{
+          label: e.name,
+          value: e.id
+        }
+      }))
+    }); 
+    getBankAccounts(`paginated=no`).then(r =>{
+      setBanks(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.identifier}`,
+          value: e.id,
+          currency: e.bank.country.currency.symbol
+        }
+      }))
+    }); 
   }, [])
-
-  const handleSearchBank = async (e) => {
-    try {
-      const banks = await getBankAccounts(`search=${e}`);
-      setBanks(banks.data);
-      return banks.data;
-    } catch (error) {
-      
-    }
-  }
-  const handleSearchStore = async(e) => {
-    try {
-      const stores = await getStores(`search=${e}`);
-      return stores.data
-    } catch (error) {
-      
-    }
-  }
   const handleType = (e) => {
     const type =  reportTypes.map( el => el.options).flat().find(el => el.value === e.value);
     if (type) {
@@ -147,13 +141,13 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
     }
   }
   const handleChange = (e)=>{
-    const bank = banks.find(el => el.id === e.value);
-    setCurrency(bank.bank.country.currency.symbol)
+    const bank = banks.find(el => el.value === e.value);
+    setCurrency(bank.currency)
   }
   const handleChangeNeutral = (e) =>{
     if (!options.bank_account_ie) {
-      const bank = banks.find(el => el.id === e.value);
-      setCurrency(bank.bank.country.currency.symbol)
+      const bank = banks.find(el => el.value === e.value);
+      setCurrency(bank.currency)
     }
   }
   return (
@@ -177,7 +171,7 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
           <div className='container'>
             <div className='row'>
               <div className='col'>
-                <label htmlFor='type' className='form-label'>Tipo de reporte</label>
+                <label htmlFor='type' className='form-label'>Tipo de reporte <span className='Required'>*</span></label>
                 <Select
                   onChange={handleType}
                   options={reportTypes}
@@ -199,7 +193,7 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
                 options.rate
                 &&
                 <div className='col-4'>
-                  <label htmlFor='rate' className='form-label'>Tasa del día <span className='Required'>*</span></label>
+                  <label htmlFor='rate' className='form-label'>Tasa del día</label>
                   <div className="input-group">
                     <div className="input-group-text">{currency}</div>
                   <DecimalInput name={"rate"}/>
@@ -216,33 +210,35 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
               {
                 options.bank_account_ie
                 &&<div className='col-4'>
-                  <SearchSelect
+                  <label htmlFor="bank" className='form-label'>Cuenta <span className='Required'>*</span></label>
+                  <Select
                     onChange={handleChange}
-                    nameSearch={'bank_account_ie'}
-                    handleSearch={handleSearchBank}
-                    label={'Cuenta de operación'}
-                    description={['bank.name', 'identifier']}
-
+                    placeholder="Seleccione una cuenta"
+                    noOptionsMessage={()=> "No hay coincidencias"}
+                    name='bank_account_ie'
+                    options={banks}
                   />
                 </div>
               }
             </div>
             <div className='row mt-3'>
               <div className='col-4'>
-                <SearchSelect 
-                  handleSearch={handleSearchStore} 
-                  nameSearch='store' 
-                  label='Local' 
-                  description={['name']}
+                <label htmlFor="store" className='form-label'>Local <span className='Required'>*</span></label>
+                <Select
+                  placeholder="Seleccione un local"
+                  noOptionsMessage={()=> "No hay coincidencias"}
+                  name='store'
+                  options={stores}
                 />
               </div>
               <div className='col-4'>
-                <SearchSelect
+                <label htmlFor="bank" className='form-label'>Cuenta <span className='Required'>*</span></label>
+                <Select
                   onChange={handleChangeNeutral}
-                  nameSearch={'bank'}
-                  handleSearch={handleSearchBank}
-                  label={'Cuenta'}
-                  description={['bank.name', 'identifier']}
+                  placeholder="Seleccione una cuenta"
+                  noOptionsMessage={()=> "No hay coincidencias"}
+                  name='bank'
+                  options={banks}
                 />
               </div>
               <div className='col-4 mt-4'>

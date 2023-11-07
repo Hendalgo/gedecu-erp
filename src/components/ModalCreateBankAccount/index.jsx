@@ -1,16 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { getBanks, getCountriesCount } from '../../helpers/banks'
+import { getBanks } from '../../helpers/banks'
 import SearchSelect from '../SearchSelect'
 import { createBankAccount } from '../../helpers/banksAccounts'
+import Select from 'react-select'
 
 const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
-  const [countries, setCountries] = useState();
   const [alertType, setAlertType] = useState('danger')
+  const [banks, setBanks] = useState([]);
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
+    getBanks(`paginated=no`).then(r =>{
+      setBanks(r.map( e=> {
+        return{
+          label: `${e.name}`,
+          value: e.id
+        }
+      }))
+    }); 
   }, [])
   const handleBankAccount = async () => {
     try {
@@ -70,22 +78,23 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre</label>
+                <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' name='name' id='name' />
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Identificador</label>
+                <label htmlFor='identifier'  className='form-label'>Identificador <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' name='identifier' />
               </div>
             </div>
             <div className="row">
               <div className='col'>
-                <SearchSelect
-                    nameSearch={'bank'}
-                    label={'Banco'}
-                    handleSearch={handleSearch}
-                    description={['name', 'country.name']}
-                  />
+                <label htmlFor="bank" className='form-label'>Banco <span className='Required'>*</span></label>
+                <Select
+                  placeholder="Seleccione un banco"
+                  noOptionsMessage={()=> "No hay coincidencias"}
+                  name='bank'
+                  options={banks}
+                />
               </div>
             </div>
           </div>

@@ -3,12 +3,23 @@ import { Alert, Modal } from 'react-bootstrap'
 import { getBanks} from '../../helpers/banks'
 import SearchSelect from '../SearchSelect'
 import { updateBankAccount } from '../../helpers/banksAccounts'
-
+import { useEffect } from 'react'
+import Select from 'react-select'
 const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
   const [banks, setBanks] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
+  useEffect(() => {
+    getBanks(`paginated=no`).then(r =>{
+      setBanks(r.map( e=> {
+        return{
+          label: `${e.name}`,
+          value: e.id
+        }
+      }))
+    }); 
+  }, [])
   const handleBankAccount = async () => {
     try {
       const formData = form.current;
@@ -80,11 +91,12 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
               </div>
               <div className="row">
                 <div className='col'>
-                  <SearchSelect
-                    nameSearch={'bank'}
-                    label={'Banco'}
-                    handleSearch={handleSearch}
-                    description={['name', 'country.name']}
+                  <label htmlFor="bank" className='form-label'>Banco <span className='Required'>*</span></label>
+                  <Select
+                    placeholder="Seleccione un banco"
+                    noOptionsMessage={()=> "No hay coincidencias"}
+                    name='bank'
+                    options={banks}
                     defaultValue={{
                       label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
                       value: bankAccount.bank.id
