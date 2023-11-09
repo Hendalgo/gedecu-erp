@@ -85,17 +85,17 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
         <form className='container' action='' ref={form}>
           <div className='row mb-3'>
             <div className=' col '>
-              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
+              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span> <span className='Required'>*</span></label>
               <input defaultValue={store.name} required className='form-control' type='text' name='name' />
             </div>
             <div className='col'>
-              <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
+              <label htmlFor='location'  className='form-label'>Dirección  <span className='Required'>*</span><span className='Required'>*</span></label>
               <input defaultValue={store.location} required className='form-control' type='text' name='location' />
             </div>
           </div>
           <div className='row'>
             <div className='col'>
-              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
+              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span> <span className='Required'>*</span></label>
               <select required className='form-select' name='country' id=''>
                 {
                   countries
@@ -107,7 +107,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
               </select>
             </div>
             <div className='col '>
-            <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span></label>
+            <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span> <span className='Required'>*</span></label>
               <Select
                 name={"user"}
                 placeholder="Seleccione un manejador"

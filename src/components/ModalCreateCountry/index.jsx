@@ -52,11 +52,11 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre del país</label>
+                <label htmlFor='name' className='form-label'>Nombre del país <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' name='country_name' placeholder='Venezuela'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código del país</label>
+                <label htmlFor='identifier'  className='form-label'>Código del país <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
               </div>
             </div>

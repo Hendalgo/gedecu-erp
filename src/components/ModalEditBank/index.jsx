@@ -70,11 +70,11 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
               <div className='container'>
                 <div className="row">
                   <div className='col'>
-                    <label htmlFor='name'>Nombre</label>
+                    <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
                     <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' name='name' value={bank.name} />
                   </div>
                   <div className='col'>
-                    <label htmlFor='country'>País</label>
+                    <label htmlFor='country'>País <span className='Required'>*</span></label>
                     <select required className='form-select' name='country' id=''>
                       {
                         countries

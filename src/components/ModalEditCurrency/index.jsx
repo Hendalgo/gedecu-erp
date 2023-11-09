@@ -56,15 +56,15 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre de la moneda</label>
+                <label htmlFor='name' className='form-label'>Nombre de la moneda <span className='Required'>*</span></label>
                 <input defaultValue={currency.name} required className='form-control' type='text' name='name' placeholder='Dólar estadounidense'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código de la moneda</label>
+                <label htmlFor='identifier'  className='form-label'>Código de la moneda <span className='Required'>*</span></label>
                 <input defaultValue={currency.shortcode} required className='form-control' type='text' name='shortcode' placeholder='USD'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda</label>
+                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda <span className='Required'>*</span></label>
                 <input defaultValue={currency.symbol} required className='form-control' type='text' name='symbol' placeholder='$'/>
               </div>
             </div>

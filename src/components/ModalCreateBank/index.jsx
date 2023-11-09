@@ -67,11 +67,11 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
           <div className='container'>
             <div className="row">
               <div className='col me-4'>
-                <label htmlFor='name'>Nombre</label>
+                <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' name='name' />
               </div>
               <div className='col'>
-                <label htmlFor='country'>País</label>
+                <label htmlFor='country'>País <span className='Required'>*</span></label>
                 <select required className='form-select' name='country' id=''>
                   {
                     countries

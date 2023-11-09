@@ -81,16 +81,16 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                 <form className='FormContainer' action='' ref={form}>
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
-                      <label htmlFor='name'>Nombre</label>
+                      <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
                       <input required onChange={(e) => setUser({ ...user, name: e.target.value })} className='form-control' type='text' name='name' value={user.name} />
                     </div>
                     <div>
-                      <label htmlFor='email'>Email</label>
+                      <label htmlFor='email'>Email <span className='Required'>*</span></label>
                       <input readOnly onChange={(e) => setUser({ ...user, email: e.target.value })} className='form-control' type='email' name='email' value={user.email} />
                     </div>
                   </div>
                   <div className='mb-3'>
-                    <label htmlFor='password'>Contraseña</label>
+                    <label htmlFor='password'>Contraseña </label>
                     <input required name='password' onChange={(e) => setUser({ ...user, password: e.target.value })} className='form-control' type='password' />
                   </div>
                   <div className='mb-3'>
@@ -99,7 +99,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                   </div>
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
-                      <label htmlFor='role'>Rol</label>
+                      <label htmlFor='role'>Rol <span className='Required'>*</span></label>
                       <select required className='form-select' name='role' id='role'>
                         {
                   roles
@@ -111,7 +111,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                       </select>
                     </div>
                     <div>
-                      <label htmlFor='country'>País</label>
+                      <label htmlFor='country'>País <span className='Required'>*</span></label>
                       <select required className='form-select' name='country' id='country'>
                         {
                   countries

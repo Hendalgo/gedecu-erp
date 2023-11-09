@@ -58,11 +58,11 @@ const ModalEditReportType = ({ modalShow, setModalShow, data }) => {
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre</label>
+                <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
                 <input defaultValue={data.name} required className='form-control' type='text' name='name' id='name' placeholder='E.j: Tranferencia enviada' />
               </div>
               <div className='col'>
-                <label htmlFor="type" className='form-label' >Tipo</label>
+                <label htmlFor="type" className='form-label' >Tipo <span className='Required'>*</span></label>
                 <Select
                   placeholder="Selecciona un tipo"
                   name='type'

@@ -61,25 +61,25 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
               <form className='FormContainer' action='' ref={form}>
                 <div className='d-flex mb-3'>
                   <div className='me-4'>
-                    <label htmlFor='name'>Nombre</label>
+                    <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
                     <input required className='form-control' type='text' name='name' />
                   </div>
                   <div>
-                    <label htmlFor='email'>Email</label>
+                    <label htmlFor='email'>Email <span className='Required'>*</span></label>
                     <input required className='form-control' type='email' name='email' />
                   </div>
                 </div>
                 <div className='mb-3'>
-                  <label htmlFor='password'>Contraseña</label>
+                  <label htmlFor='password'>Contraseña <span className='Required'>*</span></label>
                   <input required name='password' className='form-control' type='password' />
                 </div>
                 <div className='mb-3'>
-                  <label htmlFor='confirm-password'>Confirmar Contraseña</label>
+                  <label htmlFor='confirm-password'>Confirmar Contraseña <span className='Required'>*</span></label>
                   <input required name='password_confirmation' className='form-control' type='password' />
                 </div>
                 <div className='d-flex mb-3'>
                   <div className='me-4'>
-                    <label htmlFor='role'>Rol</label>
+                    <label htmlFor='role'>Rol <span className='Required'>*</span></label>
                     <select required className='form-select' name='role' >
                       {
                     roles
@@ -91,7 +91,7 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor='country'>País</label>
+                    <label htmlFor='country'>País <span className='Required'>*</span></label>
                     <select required className='form-select' name='country' >
                       {
                     countries

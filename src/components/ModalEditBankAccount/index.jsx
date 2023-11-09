@@ -81,11 +81,11 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
             <div className="container">
               <div className='row mb-3'>
                 <div className='col'>
-                  <label htmlFor='name' className='form-label'>Nombre</label>
+                  <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
                   <input defaultValue={bankAccount.name} required className='form-control' type='text' name='name' id='name' />
                 </div>
                 <div className='col'>
-                  <label htmlFor='identifier'  className='form-label'>Identificador</label>
+                  <label htmlFor='identifier'  className='form-label'>Identificador <span className='Required'>*</span></label>
                   <input defaultValue={bankAccount.identifier} required className='form-control' type='text' name='identifier' />
                 </div>
               </div>
