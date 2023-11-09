@@ -12,10 +12,7 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
       const formData = new FormData(form.current)
       const request = await updateCountry(country.id_country, {
         country_name: formData.get("country_name"),
-        currency_name: formData.get("currency_name"),
-        currency_shortcode: formData.get("currency_shortcode"),
-        country_shortcode: formData.get("country_shortcode"),
-        currency_symbol: formData.get("currency_symbol")
+        country_shortcode: formData.get("country_shortcode")
       });
 
       switch (request.status) {
@@ -68,20 +65,6 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
               <div className='col'>
                 <label htmlFor='identifier'  className='form-label'>Código del país</label>
                 <input defaultValue={country.shortcode} required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
-              </div>
-            </div>
-            <div className="row">
-              <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre de la moneda</label>
-                <input defaultValue={country.currency_name} required className='form-control' type='text' name='currency_name'  placeholder='Bolivar digital' />
-              </div>
-              <div className='col-md-auto'>
-                <label htmlFor='identifier'  className='form-label'>Código de la moneda</label>
-                <input defaultValue={country.currency_shortcode} required className='form-control' type='text' name='currency_shortcode' placeholder='VES'/>
-              </div>
-              <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda</label>
-                <input defaultValue={country.symbol} required className='form-control' type='text' name='currency_symbol' />
               </div>
             </div>
           </div>

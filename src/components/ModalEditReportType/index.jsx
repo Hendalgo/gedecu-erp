@@ -64,7 +64,7 @@ const ModalEditReportType = ({ modalShow, setModalShow, data }) => {
               <div className='col'>
                 <label htmlFor="type" className='form-label' >Tipo</label>
                 <Select
-                placeholder="Selecciona un tipo"
+                  placeholder="Selecciona un tipo"
                   name='type'
                     options={[{
                       label: 'Ingreso',
@@ -75,8 +75,14 @@ const ModalEditReportType = ({ modalShow, setModalShow, data }) => {
                     },{
                       label: 'Neutro',
                       value: 'neutro',
-                    }]}
-                  />
+                  }]}
+                  defaultValue={
+                    {
+                      label: data.type === 'income'? 'Ingreso': data.type === 'expense'? 'Egreso':'Neutro',
+                      value: data.type
+                    }
+                  }
+                />
               </div>
             </div>
             <div className="row">

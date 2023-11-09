@@ -2,14 +2,24 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { createUser, getUsersRoles } from '../../helpers/users'
 import { createBank, getCountriesCount } from '../../helpers/banks'
-
+import { getCurrencies } from '../../helpers/currencies'
+import Select from 'react-select'
 const ModalCreateBank = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [currencies, setCurrencies] = useState([])
   const form = useRef()
   useEffect(() => {
     getCountriesCount().then(r => setCountries(r))
+    getCurrencies('paginated=no').then(r =>{
+      setCurrencies(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.symbol}`,
+          value: e.id
+        }
+      }))
+    });
   }, [])
   const handleUser = async () => {
     try {
@@ -53,32 +63,39 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className='container'>
-          <div className='row'>
-            <div className='d-flex'>
-              <form className='FormContainer' action='' ref={form}>
-                <div className='d-flex mb-3'>
-                  <div className='me-4'>
-                    <label htmlFor='name'>Nombre</label>
-                    <input required className='form-control' type='text' name='name' />
-                  </div>
-                  <div>
-                    <label htmlFor='country_id'>País</label>
-                    <select required className='form-select' name='country_id' id=''>
-                      {
-                        countries
-                          ? countries.map(e => {
-                            return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                          })
-                          : null
-                      }
-                    </select>
-                  </div>
-                </div>
-              </form>
+        <form className='FormContainer' action='' ref={form}>
+          <div className='container'>
+            <div className="row">
+              <div className='col me-4'>
+                <label htmlFor='name'>Nombre</label>
+                <input required className='form-control' type='text' name='name' />
+              </div>
+              <div className='col'>
+                <label htmlFor='country'>País</label>
+                <select required className='form-select' name='country' id=''>
+                  {
+                    countries
+                      ? countries.map(e => {
+                        return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                      })
+                      : null
+                  }
+                </select>
+              </div>
+            </div>
+            <div className="row mt-3">
+              <div className='col'>
+                <label htmlFor="bank" className='form-label'>Moneda <span className='Required'>*</span></label>
+                <Select
+                  placeholder="Seleccione una moneda"
+                  noOptionsMessage={()=> "No hay coincidencias"}
+                  name='currency'
+                  options={currencies}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </form>
       </Modal.Body>
       <Modal.Footer>
         {

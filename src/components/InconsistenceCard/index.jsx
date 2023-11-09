@@ -11,8 +11,8 @@ const InconsistenceCard = ({ report, showModal, checkReport }) => {
       <Card.Body>
         <Card.Title className='mb-2 mt-2 d-flex justify-content-between'>
           <div className='d-flex flex-column'>
-            <span className='mb-2'>{report.store.name}</span>
-            <span className='mb-2 text-muted' style={{ fontSize: 12 }}>Realizado por: {report.user.name}</span>
+            <span className='mb-2' >{report.user.name}</span>
+            {report.store &&<span className='mb-2 text-muted' style={{ fontSize: 12 }}>Local: {report.store.name}</span>}
             <span className='fs-6 fw-normal'>{useFormatDate(report.created_at)}</span>
           </div>
           <div className='d-flex flex-column align-items-end'>
@@ -29,7 +29,7 @@ const InconsistenceCard = ({ report, showModal, checkReport }) => {
       <Card.Footer className='bg-white'>
         <Card.Text className='d-flex justify-content-between align-items-center'>
           <span>{report.bank_account.bank.name}</span>
-          <span className='fw-medium fs-4'>{report.bank_account.bank.country.currency.symbol} {report.amount.toLocaleString('de-DE', { minimunfractions: 2 })}</span>
+          <span className='fw-medium fs-4 d-flex'>{report.bank_account.bank.currency.symbol} {report.amount.toLocaleString('de-DE', { minimunfractions: 2 })}</span>
           {
             !report.inconsistence_check
               ? <CheckButton action={checkReport} id={report.id} />

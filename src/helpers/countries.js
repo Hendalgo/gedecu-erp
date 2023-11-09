@@ -4,7 +4,6 @@ export const getCountriesTotal = async () => {
     const request = await API_INSTANCE.get(BANKS_TOTAL_URL)
     return request.data[0]
   } catch (error) {
-    console.log(error)
     return []
   }
 }

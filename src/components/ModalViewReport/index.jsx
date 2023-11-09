@@ -11,54 +11,26 @@ const ModalViewReport = ({ modalShow, setModalShow, report }) => {
       let data = {
       }
       const meta_data = JSON.parse(report.meta_data)
-      report.bank_income
-        ? (() => {
-            try {
-              const bank_income = report.bank_income
-              const styles = JSON.parse(report.type.config).styles
-              data['Cuenta de operacion'] = <span style={{ fontWeight: 'bold', padding: 4, textWrap: 'nowrap' }}>{bank_income.name} - {bank_income.identifier}</span>
-              data['Banco de operacion:'] = report.bank_income.bank.name;
-              data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${bank_income.bank.country.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
-              meta_data.rate ?data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_income.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>:null;
-              data = {
+      const styles = JSON.parse(report.type.config).styles
+      data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.currency.shortcode} ${report.bank_account.bank.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
+      meta_data.rate ? data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span> : null
+      data = {
 
-                'Tipo de reporte': <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.type.name}</span>,
-                ...data,
-                "Cuenta": <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank_account.name} - {report.bank_account.identifier}</span>,
-                Banco: <span>{report.bank_account.bank.name}</span>,
-                Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
-              }
-              report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
-              data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'
-              data.Local = report.store.name
-              data['Reporte Realizado por'] = report.user.name
-              data.Notas = report.notes
-              setInfo(data)
-            } catch (error) {
-              console.error(error)
-            }
-          })()
-        : (() => {
-            const styles = JSON.parse(report.type.config).styles
-            data.Monto = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.country.currency.symbol} ${report.amount.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span>
-            meta_data.rate ? data.Tasa = <span style={{ textWrap: 'nowrap' }}>{`${report.bank_account.bank.country.currency.symbol} ${meta_data.rate.toLocaleString('de-DE', { minumunfractions: 2 })}`}</span> : null
-            data = {
-
-              'Tipo de reporte': <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.type.name}</span>,
-              ...data,
-              Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank_account.bank.name}</span>, 
-              "Cuenta de:" : report.bank_account.name,
-              "Identificador" : report.bank_account.bank_id,
-              Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
-            }
-            
-            report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
-            data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'
-            data.Local = report.store.name
-            data['Reporte Realizado por'] = report.user.name
-            data.Notas = report.notes
-            setInfo(data)
-          })()
+        'Tipo de reporte': <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.type.name}</span>,
+        ...data,
+        Banco: <span style={{ backgroundColor: styles.backgroundColor, color: styles.color, border: `1px solid ${styles.borderColor}`, borderRadius: 4, padding: 4, textWrap: 'nowrap' }}>{report.bank_account.bank.name}</span>, 
+        "Cuenta de:" : report.bank_account.name,
+        "Identificador" : report.bank_account.identifier,
+        Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
+      }
+      report.bank? data['Banco solicitado'] = report.bank.name : null;
+      report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
+      data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'
+      report.store? data.Local = report.store.name : null
+      data['Reporte Realizado por'] = report.user.name
+      data.Notas = report.notes
+      setInfo(data)
+          
     }
   }, [report])
   return (
@@ -84,7 +56,7 @@ const ModalViewReport = ({ modalShow, setModalShow, report }) => {
                   <div key={key} className='col mb-4'>
                     <div className='d-flex flex-column'>
                       <span className='ModalBodyTitle mb-1' style={{ textWrap: 'nowrap' }}>{key}</span>
-                      <span className='ModalBodyContent'>{info[key]}</span>
+                      <span className='ModalBodyContent' style={key !== 'Notas'? { textWrap: 'nowrap' }: {textWrap: 'wrap'}}>{info[key]}</span>
                     </div>
                   </div>
               ))}

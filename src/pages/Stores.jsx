@@ -10,10 +10,16 @@ import ModalEditStore from '../components/ModalEditStore'
 import { useCheckRole } from '../hooks/useCheckRole'
 import ModalConfirmation from '../components/ModalConfirmation'
 import { Navigate } from 'react-router-dom'
+import AlertMessage from '../components/AlertMessage'
 
 const Stores = () => {
   const { session } = useContext(SessionContext)
   const [store, setStore] = useState()
+  const [alert, setAlert] = useState({
+    show: false,
+    variant: 'danger',
+    text: 'Error al realizar la acción'
+  });
   const [modalShow, setModalShow] = useState(false)
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const [offset, setOffset] = useState(1)
@@ -43,9 +49,23 @@ const Stores = () => {
     }
   }
   const handleDelete = (e)=>{
-    deleteStore(e.id).then( 
-      getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setStores(r))
-    ).catch();
+    deleteStore(e.id).then( e=>{
+      if (e.status === 201) {
+        getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setStores(r))
+        setAlert({
+          text: "Local eliminado con éxito.",
+          variant: "success",
+          show: true
+        })
+        return;
+      }
+      setAlert({
+        text: "Error al intentar eliminar el local",
+        variant: "danger",
+        show: true
+      })
+    })
+    .catch()
   }
   return (
     <div className='container-fluid'>
@@ -69,7 +89,7 @@ const Stores = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' quantity={stores.last_page} itemsTotal={stores.total} handleChange={handleChange} />
+                    <PaginationTable text='locales' offset={offset} quantity={stores.last_page} itemsTotal={stores.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -145,6 +165,7 @@ const Stores = () => {
         }
       <div className=''>
         <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
+        <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Local"} action={()=>handleDelete(store)}/>
       </div>

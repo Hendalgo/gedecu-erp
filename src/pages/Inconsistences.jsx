@@ -18,7 +18,7 @@ const Inconsistences = () => {
 
   const [offsetE, setOffsetE] = useState(1)
   const [modalCreateShow, setModalCreateShow] = useState()
-  const [reports, setReports] = useState()
+  const [reports, setReports] = useState(false)
   const [reportModal, setReportModal] = useState()
 
   if (!useCheckRole(session)) {
@@ -63,9 +63,8 @@ const Inconsistences = () => {
     setOffset(1)
     setOffsetE(1)
     e.preventDefault()
-    if (formDate.current.date.value) {
-      getInconsistences(`date=${formDate.current.date.value}${form.current.filter_type.value === 'yes' ? '&reviewed=yes' : ''}`).then(r => setReports(r)).catch(e => console.error(e))
-    }
+    getInconsistences(`date=${formDate.current.date.value}${form.current.filter_type.value === 'yes' ? '&reviewed=yes' : ''}`).then(r => setReports(r)).catch(e => console.error(e))
+
   }
   return (
     <div className='container'>
@@ -95,7 +94,7 @@ const Inconsistences = () => {
           }
           {
             reports
-              ? <PaginationTable itemOffset={offset} quantity={reports.income.last_page} itemsTotal={reports.income.total} handleChange={(offset) => handleChange(offset, 'income')} />
+              ? <PaginationTable offset={offset} itemOffset={offset} quantity={reports.income.last_page} itemsTotal={reports.income.total} handleChange={(offset) => handleChange(offset, 'income')} />
               : null
           }
         </div>
@@ -109,7 +108,7 @@ const Inconsistences = () => {
           }
           {
             reports
-              ? <PaginationTable itemOffset={offsetE} quantity={reports.expense.last_page} itemsTotal={reports.expense.total} handleChange={(offset) => handleChange(offset, 'expense')} />
+              ? <PaginationTable offset={offsetE} itemOffset={offsetE} quantity={reports.expense.last_page} itemsTotal={reports.expense.total} handleChange={(offset) => handleChange(offset, 'expense')} />
               : null
           }
         </div>

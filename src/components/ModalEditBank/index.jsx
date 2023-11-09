@@ -1,22 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getCountriesCount, updateBank } from '../../helpers/banks'
-import { useMaskStaless } from '../../hooks/useMask'
-import { useUnmask } from '../../hooks/useUnmask'
+import { getCurrencies } from '../../helpers/currencies'
+import Select from 'react-select'
 
 const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [currencies, setCurrencies] = useState([])
   const form = useRef()
   useEffect(() => {
     getCountriesCount().then(r => setCountries(r))
+    getCurrencies('paginated=no').then(r =>{
+      setCurrencies(r.map( e=> {
+        return{
+          label: `${bank.currency.name} - ${bank.currency.symbol}`,
+          value: e.id
+        }
+      }))
+    });
   }, [])
   const handleUser = async () => {
     try {
       const request = await updateBank(bank.id, {
         name: bank.name,
-        country_id: form.current.country.value
+        country: form.current.country.value,
+        currency: form.current.currency.value
       })
       switch (request.status) {
         case 201:
@@ -56,32 +66,43 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className='container'>
-            <div className='row'>
-              <div className='d-flex'>
-                <form className='FormContainer' action='' ref={form}>
-                  <div className='d-flex mb-3'>
-                    <div className='me-4'>
-                      <label htmlFor='name'>Nombre</label>
-                      <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' name='name' value={bank.name} />
-                    </div>
-                    <div>
-                      <label htmlFor='country'>País</label>
-                      <select required className='form-select' name='country' id=''>
-                        {
-                          countries
-                            ? countries.map(e => {
-                              return <option key={e.id} selected={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                            })
-                            : null
-                        }
-                      </select>
-                    </div>
+            <form className='FormContainer' action='' ref={form}>
+              <div className='container'>
+                <div className="row">
+                  <div className='col'>
+                    <label htmlFor='name'>Nombre</label>
+                    <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' name='name' value={bank.name} />
                   </div>
-                </form>
+                  <div className='col'>
+                    <label htmlFor='country'>País</label>
+                    <select required className='form-select' name='country' id=''>
+                      {
+                        countries
+                          ? countries.map(e => {
+                            return <option key={e.id} selected={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                          })
+                          : null
+                      }
+                    </select>
+                  </div>
+                </div>
+                <div className="row mt-3">
+                  <div className='col'>
+                    <label htmlFor="bank" className='form-label'>Moneda <span className='Required'>*</span></label>
+                    <Select
+                      placeholder="Seleccione una moneda"
+                      noOptionsMessage={()=> "No hay coincidencias"}
+                      name='currency'
+                      options={currencies}
+                      defaultValue={{
+                        label: `${bank.currency.name} - ${bank.currency.symbol}`,
+                        value: bank.currency.id
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </form>
         </Modal.Body>
         <Modal.Footer>
           {

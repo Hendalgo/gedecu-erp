@@ -72,7 +72,7 @@ const SideBarSmall = ({menus, setSession, children}) =>{
                     {Menu.title}
                   </NavLink>
                   : <Accordion>
-                    <Accordion.Item className={Menu.isActive ? "active" : ""}>
+                    <Accordion.Item eventKey={index} className={Menu.isActive ? "active" : ""}>
                       <Accordion.Header>
                         <NavLink
 

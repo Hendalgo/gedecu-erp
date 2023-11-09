@@ -6,19 +6,19 @@ import Welcome from '../components/Welcome'
 import TableLoader from '../components/Loaders/TableLoader'
 import { useCheckRole } from '../hooks/useCheckRole'
 import ModalConfirmation from '../components/ModalConfirmation'
-import { deleteReportTypes, getReportTypes } from '../helpers/reports'
-import ModalCreateReportType from '../components/ModalCreateReportType'
-import ModalEditReportType from '../components/ModalEditReportType'
+import { deleteCurrency, getCurrencies} from '../helpers/currencies'
+import ModalCreateCurrency from '../components/ModalCreateCurrency'
+import ModalEditCurrency from '../components/ModalEditCurrency'
 import AlertMessage from '../components/AlertMessage'
 
-const ReportTypes = () => {
+const Currencies = () => {
   const { session } = useContext(SessionContext)
-  const [type, setType] = useState()
+  const [currency, setCurrency] = useState()
   const [modalShow, setModalShow] = useState(false)
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const [offset, setOffset] = useState(1)
   const [modalEdit, setModalEdit] = useState(false)
-  const [types, setTypes] = useState([])
+  const [currencies, setCurrencies] = useState([])
   const form = useRef()
   const [alert, setAlert] = useState({
     show: false,
@@ -30,37 +30,36 @@ const ReportTypes = () => {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getReportTypes().then(r=> setTypes(r));
+    getCurrencies().then(r => setCurrencies(r));
   }, [])
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setTypes(r))
+    getCurrencies(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setCurrencies(r))
   }
   const handleEdit = (e) => {
-    setType(e)
+    setCurrency(e)
     setModalEdit(true)
   }
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getReportTypes(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setTypes(r))
+      getCurrencies(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setCurrencies(r))
     }
   }
   const handleDelete = (e)=>{
-    deleteReportTypes(e.id).then( e =>{
-      if (e.status === 201) {
-        getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setTypes(r))
+    deleteCurrency(e.id).then( r=>{
+      if (r.status === 201) {
+        getCurrencies(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setCurrencies(r))
         setAlert({
-          text: "Tipo eliminado con éxito.",
+          text: "Moneda eliminada con éxito.",
           variant: "success",
           show: true
         })
         return;
       }
-      
       setAlert({
-        text: "Error al intentar eliminar el tipo",
+        text: "Error al intentar eliminar la moneda",
         variant: "danger",
         show: true
       })
@@ -71,25 +70,25 @@ const ReportTypes = () => {
     <div className='container-fluid'>
       {
         useCheckRole(session)
-        ?<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' />
-        :<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' showButton= {false}/>
+        ?<Welcome text='Moneda' add={() => setModalShow(true)} textButton='Moneda' />
+        :<Welcome text='Moneda' add={() => setModalShow(true)} textButton='Moneda' showButton= {false}/>
       }
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
           <div className='col-8' />
-          <div className='col-4'><SearchBar text='Reporte' /></div>
+          <div className='col-4'><SearchBar text='Moneda' /></div>
         </form>
       </div>
       {
-        Array.isArray(types.data)
-          ? types.data.length > 0
+        Array.isArray(currencies.data)
+          ? currencies.data.length > 0
 
             ? <>
               <div className='row mt-4'>
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' offset={offset} quantity={types.last_page} itemsTotal={types.total} handleChange={handleChange} />
+                    <PaginationTable text='locales' quantity={currencies.last_page} itemsTotal={currencies.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -99,37 +98,23 @@ const ReportTypes = () => {
                     <thead>
                       <tr className='pt-4'>
                         <th scope='col'>Nombre</th>
-                        <th scope='col'>Descripción</th>
-                        <th scope='col'>Tipo</th>
-                        
-                        <th scope='col'>Nro° de reportes</th>
+                        <th scope='col'>Código</th>
+                        <th scope='col'>Símbolo</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
                     <tbody>
                       {
-                        types.data.map(e => {
-                          
-                    const color = JSON.parse(e.config).styles
-                    const type = ()=>{
-                      if (e.type === 'income') {
-                        return 'Ingreso'
-                      }
-                      else if(e.type === 'expense'){
-                        return 'Egreso'
-                      }
-                      return 'Neutro'
-                    }
+                        currencies.data.map(e => {
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.name}</span>
+                            <span>{e.name}</span>
                           </div>
                         </td>
-                        <td>{e.description}</td>
-                        <td>{type()}</td>
-                        <td>{e.count}</td>
+                        <td>{e.shortcode}</td>
+                        <td>{e.symbol}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -148,7 +133,7 @@ const ReportTypes = () => {
                                 </svg>
                               </button>
                               <button onClick={()=>{
-                                setType(e);
+                                setCurrency(e);
                                 setModalConfirmShow(true);
                               }} className="TableActionButtons ms-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -170,17 +155,17 @@ const ReportTypes = () => {
                 </div>
               </div>
             </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay tipos para mostrar</div>
+            : <div className='d-flex justify-content-center align-items-center'>No hay países para mostrar</div>
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateReportType modalShow={modalShow} setModalShow={setModalShow}/>
-        <ModalEditReportType modalShow={modalEdit} setModalShow={setModalEdit} data={type}/>
+        <ModalCreateCurrency modalShow={modalShow} setModalShow={setModalShow}/>
+        {currency && <ModalEditCurrency modalShow={modalEdit} setModalShow={setModalEdit} currency={currency}/>}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(type)}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"moneda"} action={()=>handleDelete(currency)}/>
       </div>
     </div>
   )
 }
 
-export default ReportTypes
+export default Currencies

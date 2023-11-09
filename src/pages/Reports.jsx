@@ -18,7 +18,8 @@ const Reports = () => {
 
 export const ReportsIndex = () => {
   const formDate = useRef()
-  const { session } = useContext(SessionContext)
+  const { session } = useContext(SessionContext);
+  const [offset, setOffset] = useState(1);
   const [report, setReport] = useState()
   const [reportType, setReportType] = useState([])
   const [modalShow, setModalShow] = useState(false)
@@ -31,6 +32,7 @@ export const ReportsIndex = () => {
     getReports('order=created_at&order_by=desc').then(r => setReports(r))
   }, [])
   const handleChange = (offset) => {
+    setOffset(offset.selected+1);
     getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
   const handleModal = (report) => {
@@ -38,21 +40,21 @@ export const ReportsIndex = () => {
     setModalShow(true)
   }
   const handleType = (e) => {
+    setOffset(1);
     const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
     getReports(`order=created_at${date}&order_by=desc${e ? `&type_id=${e}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
   const handleSearch = (e) => {
     e.preventDefault()
-    if (form.current.search !== '') {
-      const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
-      getReports(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}${date}`).then(r => setReports(r))
-    }
+    const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
+    getReports(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}${date}`).then(r => setReports(r))
+    setOffset(1);
   }
   const handleDate = (e) => {
     e.preventDefault()
-    if (formDate.current.date.value) {
-      getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e => console.error(e))
-    }
+    setOffset(1);
+    getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e => console.error(e))
+
   }
   return (
     <>
@@ -82,7 +84,7 @@ export const ReportsIndex = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
+                    <PaginationTable offset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -94,8 +96,8 @@ export const ReportsIndex = () => {
                         <th scope='col'>Realizado por:</th>
                         <th scope='col'>Fecha</th>
                         <th scope='col'>Motivo</th>
-                        <th scope='col'>Local</th>
                         <th scope='col'>Banco</th>
+                        <th scope='col'>Cuenta</th>
                         <th scope='col'>Monto</th>
                       </tr>
                     </thead>
@@ -103,12 +105,8 @@ export const ReportsIndex = () => {
                       {
                   reports.data.map(e => {
                     const color = JSON.parse(e.type.config).styles
-                    let currency
-                    if (e.bank_income) {
-                      currency = e.bank_income.bank.country.currency.symbol
-                    } else {
-                      currency = e.bank_account.bank.country.currency.symbol
-                    }
+                    let currency = e.bank_account.bank.currency.symbol
+                    
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
@@ -128,8 +126,8 @@ export const ReportsIndex = () => {
                         <td>
                           <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
                         </td>
-                        <td>{e.store.name}</td>
-                        <td>{e.bank_income? e.bank_income.bank.name: e.bank_account.bank.name}</td>
+                        <td>{e.bank_account.bank.name}</td>
+                        <td>{e.bank_account.name} - {e.bank_account.identifier}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
 
                       </tr>

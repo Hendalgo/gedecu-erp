@@ -11,12 +11,18 @@ import { Navigate } from 'react-router-dom'
 import { useCheckRole } from '../hooks/useCheckRole'
 import { SessionContext } from '../context/SessionContext'
 import ModalConfirmation from '../components/ModalConfirmation'
+import AlertMessage from '../components/AlertMessage'
 
 const Users = () => {
 
   const { session } = useContext(SessionContext)
   const [editUser, setEditUser] = useState({})
-  const [userRoles, setUserRoles] = useState()
+  const [userRoles, setUserRoles] = useState();
+  const [alert, setAlert] = useState({
+    show: false,
+    variant: 'danger',
+    text: 'Error al realizar la acción'
+  });
   const [modalShow, setModalShow] = useState(false)
   const [modalEditShow, setModalEditShow] = useState(false)
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
@@ -51,9 +57,24 @@ const Users = () => {
     setEditUser(user)
   }
   const handleDelete = (e)=>{
-    deleteUser(e.id).then( 
-      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setUsers(r))
-    ).catch();
+    deleteUser(e.id).then( e=>{
+      if (e.status === 401) {
+        setAlert({
+          text: "Error al intentar eliminar el usuario",
+          variant: "danger",
+          show: true
+        })
+        return;
+      }
+      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setUsers(r));
+      setAlert({
+        text: "Usuario eliminado con éxito.",
+        variant: "success",
+        show: true
+      })
+    })
+    .catch(e =>{
+    });
   }
   return (
     <div className='container-fluid'>
@@ -73,7 +94,7 @@ const Users = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='bancos' quantity={users.last_page} itemsTotal={users.total} handleChange={handleChange} />
+                    <PaginationTable offset={offset} text='usuarios' quantity={users.last_page} itemsTotal={users.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -143,6 +164,7 @@ const Users = () => {
         }
       <div className=''>
         <ModalCreateUser modalShow={modalShow} setModalShow={setModalShow} />
+        <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"usuario"} action={()=>handleDelete(editUser)}/>
       </div>

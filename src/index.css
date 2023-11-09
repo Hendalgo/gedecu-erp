@@ -204,3 +204,8 @@ h6{
 thead th{
   color: #052C65 !important;
 }
+.AlertContainer{
+  position: fixed !important;
+  top: 20px;
+  right: 10px;
+}

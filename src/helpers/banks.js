@@ -32,6 +32,14 @@ export const updateBank = async (id, formData) => {
     return error.response
   }
 }
+export const deleteBank = async (id)=>{
+  try {
+    const request = await API_INSTANCE.delete(BANKS_URL+"/"+id);
+    return request;
+  } catch (error) {
+    return error.response;
+  }
+}
 
 export const getCountriesCount = async () => {
   try {

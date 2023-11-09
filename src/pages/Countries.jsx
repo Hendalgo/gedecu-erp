@@ -9,8 +9,14 @@ import ModalConfirmation from '../components/ModalConfirmation'
 import { deleteCountry, getCountries} from '../helpers/countries'
 import ModalCreateCountry from '../components/ModalCreateCountry'
 import ModalEditCountry from '../components/ModalEditCountry'
+import { Outlet } from 'react-router-dom'
+import AlertMessage from '../components/AlertMessage'
 
 const Countries = () => {
+  return <Outlet />
+}
+
+export const CountriesIndex = () => {
   const { session } = useContext(SessionContext)
   const [country, setCountry] = useState()
   const [modalShow, setModalShow] = useState(false)
@@ -18,6 +24,11 @@ const Countries = () => {
   const [offset, setOffset] = useState(1)
   const [modalEdit, setModalEdit] = useState(false)
   const [countries, setCountries] = useState([])
+  const [alert, setAlert] = useState({
+    show: false,
+    variant: 'danger',
+    text: 'Error al realizar la acción'
+  });
   const form = useRef()
 
   if (!useCheckRole(session)) {
@@ -42,9 +53,24 @@ const Countries = () => {
     }
   }
   const handleDelete = (e)=>{
-    deleteCountry(e.id_country).then( 
-      getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setCountries(r))
-    ).catch();
+    deleteCountry(e.id_country).then( e=>{
+      if (e.status === 201) {
+        getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setCountries(r))
+        setAlert({
+          text: "País eliminado con éxito.",
+          variant: "success",
+          show: true
+        })
+        return
+      }
+      
+      setAlert({
+        text: "Error al intentar eliminar el País",
+        variant: "danger",
+        show: true
+      })
+    })
+    .catch();
   }
   return (
     <div className='container-fluid'>
@@ -68,7 +94,7 @@ const Countries = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' quantity={countries.last_page} itemsTotal={countries.total} handleChange={handleChange} />
+                    <PaginationTable text='países' quantity={countries.last_page} itemsTotal={countries.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -79,8 +105,6 @@ const Countries = () => {
                       <tr className='pt-4'>
                         <th scope='col'>País</th>
                         <th scope='col'>Código</th>
-                        <th scope='col'>Moneda</th>
-                        <th scope='col'>Balance</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
@@ -95,8 +119,6 @@ const Countries = () => {
                           </div>
                         </td>
                         <td>{e.shortcode}</td>
-                        <td>{e.currency_name} - {e.currency_shortcode}</td>
-                        <td>{e.symbol} {e.total.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -143,6 +165,7 @@ const Countries = () => {
       <div className=''>
         <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>
         <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>
+        <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(country)}/>
       </div>
     </div>

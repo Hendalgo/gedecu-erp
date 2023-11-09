@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createCountry } from '../../helpers/countries'
+import { createCurrency } from '../../helpers/currencies'
 
-const ModalCreateCountry = ({ modalShow, setModalShow }) => {
+const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
 
-  const handleCountry = async () => {
+  const handleCurrency = async () => {
     try {
-      const request = await createCountry(form.current);
+      const request = await createCurrency(form.current);
 
       switch (request.status) {
         case 201:
-          setErrorMessage('País creado con éxito')
+          setErrorMessage('Moneda creada con éxito')
           setAlertType('success')
 
           window.location.reload()
@@ -24,12 +24,12 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
           break
 
         default:
-          setErrorMessage('Error en la creación del país')
+          setErrorMessage('Error en la creación de la moneda')
           setAlertType('danger')
           break
       }
     } catch (error) {
-      setErrorMessage('Error en la creación del país')
+      setErrorMessage('Error en la creación de la moneda')
       setAlertType('danger')
     }
   }
@@ -40,8 +40,8 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
           <div className='container'>
             <div className='row'>
               <div className='d-flex flex-column'>
-                <span className='ModalTopTitle'>Crear un nuevo país</span>
-                <span className='ModalTopSubTitle'>Esta pestaña le permite crear un nuevo país con su respectiva moneda.</span>
+                <span className='ModalTopTitle'>Crear una nueva moneda</span>
+                <span className='ModalTopSubTitle'>Esta pestaña le permite crear una nueva moneda la cual asociar puede asociar a multiples bancos</span>
               </div>
             </div>
           </div>
@@ -52,12 +52,16 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre del país</label>
-                <input required className='form-control' type='text' name='country_name' placeholder='Venezuela'/>
+                <label htmlFor='name' className='form-label'>Nombre de la moneda</label>
+                <input required className='form-control' type='text' name='name' placeholder='Dólar estadounidense'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código del país</label>
-                <input required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
+                <label htmlFor='identifier'  className='form-label'>Código de la moneda</label>
+                <input required className='form-control' type='text' name='shortcode' placeholder='USD'/>
+              </div>
+              <div className='col'>
+                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda</label>
+                <input required className='form-control' type='text' name='symbol' placeholder='$'/>
               </div>
             </div>
           </div>
@@ -71,10 +75,10 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCountry} className='btn btn-primary'>Crear país</button>
+        <button onClick={handleCurrency} className='btn btn-primary'>Crear moneda</button>
       </Modal.Footer>
     </Modal>
   )
 }
 
-export default ModalCreateCountry
+export default ModalCreateCurrency

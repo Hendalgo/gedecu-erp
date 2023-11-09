@@ -34,7 +34,7 @@ const DuplicateReports = () => {
   const form = useRef()
   const formDate = useRef()
   useEffect(() => {
-    getReports('order=created_at&order_by=desc&duplicated=yes').then(r => setReports(r))
+    getReports(`order=created_at&order_by=desc&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r))
   }, [])
   const handleChange = (offset) => {
     setOffset(offset.selected + 1)
@@ -110,7 +110,7 @@ const DuplicateReports = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable itemOffset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
+                    <PaginationTable offset={offset} itemOffset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -119,11 +119,11 @@ const DuplicateReports = () => {
                   <table className='table TableP table-borderless align-middle'>
                     <thead className=''>
                       <tr className='pt-4'>
-                        <th scope='col'>Realizado por</th>
+                        <th scope='col'>Realizado por:</th>
                         <th scope='col'>Fecha</th>
                         <th scope='col'>Motivo</th>
-                        <th scope='col'>Local</th>
                         <th scope='col'>Banco</th>
+                        <th scope='col'>Cuenta</th>
                         <th scope='col'>Monto</th>
                         {
                           useCheckRole(session)
@@ -136,12 +136,8 @@ const DuplicateReports = () => {
                       {
                   reports.data.map(e => {
                     const color = JSON.parse(e.type.config).styles
-                    let currency
-                    if (e.bank_income) {
-                      currency = e.bank_income.bank.country.currency.symbol
-                    } else {
-                      currency = e.bank_account.bank.country.currency.symbol
-                    }
+                    let currency = e.bank_account.bank.currency.symbol
+                    
                     return (
                       <tr key={e.id}>
                         <td scope='row'>
@@ -159,10 +155,10 @@ const DuplicateReports = () => {
                         </td>
                         <td>{useFormatDate(e.created_at)}</td>
                         <td>
-                          <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
+                          <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px',textWrap: 'nowrap' }}>{e.type.name}</span>
                         </td>
-                        <td>{e.store.name}</td>
-                        <td>{e.bank_income? e.bank_income.bank.name: e.bank_account.bank.name}</td>
+                        <td>{e.bank_account.bank.name}</td>
+                        <td>{e.bank_account.name} - {e.bank_account.identifier}</td>
                         <td>{currency} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         {
                           useCheckRole(session)

@@ -10,6 +10,8 @@ import PaginationTable from '../components/PaginationTable';
 import ModalCreateBankAccount from '../components/ModalCreateBankAccount';
 import ModalEditBankAccount from '../components/ModalEditBankAccount';
 import ModalConfirmation from '../components/ModalConfirmation';
+import AlertMessage from '../components/AlertMessage'
+
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
   const [modalShow, setModalShow] = useState(false)
@@ -17,7 +19,11 @@ const BankAccounts = () => {
   const [banks, setBanks] = useState([]);
   const [offset, setOffset] = useState(1)
   const [bankAccount, setBankAccount] = useState();
-  
+  const [alert, setAlert] = useState({
+    show: false,
+    variant: 'danger',
+    text: 'Error al realizar la acción'
+  });
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const form = useRef()
   if (!useCheckRole(session)) {
@@ -46,9 +52,22 @@ const BankAccounts = () => {
     setBankAccount(e)
   }
   const handleDelete = (e)=>{
-    deleteBankAccount(e.id).then( 
-      getBankAccounts(`order=created_at&order_by=desc&page=${offset}&search=${form.current.search.value}`).then( r=> setBanks(r))
-    ).catch();
+    deleteBankAccount(e.id).then( e=>{
+      if (e.status === 201) {
+        getBankAccounts(`order=created_at&order_by=desc&page=${offset}&search=${form.current.search.value}`).then( r=> setBanks(r))
+        setAlert({
+          text: "Cuenta eliminada con éxito.",
+          variant: "success",
+          show: true
+        })
+        return
+      }
+      setAlert({
+        text: "Error al intentar eliminar la cuenta",
+        variant: "danger",
+        show: true
+      })
+    }).catch();
   }
   return (
     <div className="container-fluid">
@@ -99,7 +118,7 @@ const BankAccounts = () => {
                         <td>{e.name}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
-                        <td>{e.bank.country.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        <td>{e.bank.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -141,6 +160,7 @@ const BankAccounts = () => {
       }
       <div className=''>
         <ModalCreateBankAccount setModalShow={setModalShow} modalShow={modalShow} />
+        <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalEditBankAccount setModalShow={setModalEditShow} modalShow={modalEditShow} bankAccount ={bankAccount}/>
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Cuenta de banco"} action={()=>handleDelete(bankAccount)}/>
       </div>

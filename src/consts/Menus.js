@@ -1,4 +1,4 @@
-import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, REPORTS_TYPE_ROUTE } from "./Routes"
+import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, REPORTS_TYPE_ROUTE, CURRENCIES_ROUTE } from "./Routes"
 
 export const AdminMenus = [
   {
@@ -55,6 +55,12 @@ export const AdminMenus = [
     title: 'Países',
     src: 'world',
     link: 'countries',
+    others: [
+      {
+        name: 'Monedas',
+        link: 'countries/'+ CURRENCIES_ROUTE
+      }
+    ],
     isActive: false
   }
 ]
