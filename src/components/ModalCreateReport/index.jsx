@@ -41,7 +41,7 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
       formData.rate ? data.rate = useUnmask(formData.rate.value) : null
       formData.payment_reference ? data.payment_reference = formData.payment_reference.value : null
       formData.store.value ? data.store = formData.store.value : null
-      formData.bank ? data.bank = formData.bank.value : null
+      formData.bank && (formData.bank.value !== '') ? data.bank = formData.bank.value : null
       const request = await createReport(data)
 
       switch (request.status) {

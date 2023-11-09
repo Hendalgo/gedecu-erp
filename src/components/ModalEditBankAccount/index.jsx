@@ -1,20 +1,30 @@
 import React, { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getBanks} from '../../helpers/banks'
-import SearchSelect from '../SearchSelect'
 import { updateBankAccount } from '../../helpers/banksAccounts'
 import { useEffect } from 'react'
 import Select from 'react-select'
+import { getUsers } from '../../helpers/users'
+
 const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
   const [banks, setBanks] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [users, setUsers] = useState();
   const form = useRef();
   useEffect(() => {
     getBanks(`paginated=no`).then(r =>{
       setBanks(r.map( e=> {
         return{
           label: `${e.name}`,
+          value: e.id
+        }
+      }))
+    });  
+    getUsers(`paginated=no`).then(r =>{
+      setUsers(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.email}`,
           value: e.id
         }
       }))
@@ -26,7 +36,8 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
       const request = await updateBankAccount(bankAccount.id,{
         name: formData.name.value,
         identifier: formData.identifier.value,
-        bank: formData.bank.value
+        bank: formData.bank.value,
+        user: formData.user.value
       });
 
       switch (request.status) {
@@ -101,6 +112,21 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
                       label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
                       value: bankAccount.bank.id
                     }}
+                  />
+                </div>
+                <div className="col">
+                  <label htmlFor="store" className='form-label'>Encargado <span className='Required'>*</span></label>
+                  <Select
+                    placeholder="Seleccione un manejador"
+                    noOptionsMessage={()=> "No hay coincidencias"}
+                    name='user'
+                    options={users}
+                    defaultValue={
+                      {
+                        label: `${bankAccount.user.name} - ${bankAccount.user.email} -`,
+                        value: bankAccount.user.id
+                      }
+                    }
                   />
                 </div>
               </div>

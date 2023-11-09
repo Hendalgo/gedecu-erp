@@ -1,20 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getBanks } from '../../helpers/banks'
-import SearchSelect from '../SearchSelect'
 import { createBankAccount } from '../../helpers/banksAccounts'
 import Select from 'react-select'
+import { getUsers } from '../../helpers/users'
 
 const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState('danger')
   const [banks, setBanks] = useState([]);
   const [errorMessage, setErrorMessage] = useState()
+  const [users, setUsers] = useState();
   const form = useRef()
   useEffect(() => {
     getBanks(`paginated=no`).then(r =>{
       setBanks(r.map( e=> {
         return{
           label: `${e.name}`,
+          value: e.id
+        }
+      }))
+    }); 
+    getUsers(`paginated=no`).then(r =>{
+      setUsers(r.map( e=> {
+        return{
+          label: `${e.name} - ${e.email}`,
           value: e.id
         }
       }))
@@ -26,7 +35,8 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
       const request = await createBankAccount({
         name: formData.name.value,
         identifier: formData.identifier.value,
-        bank: formData.bank.value
+        bank: formData.bank.value,
+        user: formData.user.value
       });
 
       switch (request.status) {
@@ -49,14 +59,6 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
     } catch (error) {
       setErrorMessage('Error en la creación del banco')
       setAlertType('danger')
-    }
-  }
-  const handleSearch = async (e)=>{
-    try {
-      const banks = await getBanks(`search=${e}`);
-      return banks.data;
-    } catch (error) {
-      
     }
   }
   return (
@@ -94,6 +96,15 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
                   noOptionsMessage={()=> "No hay coincidencias"}
                   name='bank'
                   options={banks}
+                />
+              </div>
+              <div className="col">
+                <label htmlFor="store" className='form-label'>Encargado <span className='Required'>*</span></label>
+                <Select
+                  placeholder="Seleccione un manejador"
+                  noOptionsMessage={()=> "No hay coincidencias"}
+                  name='user'
+                  options={users}
                 />
               </div>
             </div>

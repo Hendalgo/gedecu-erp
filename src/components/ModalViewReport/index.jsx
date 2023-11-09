@@ -23,6 +23,7 @@ const ModalViewReport = ({ modalShow, setModalShow, report }) => {
         "Identificador" : report.bank_account.identifier,
         Duplicado: <span>{report.duplicated ? 'Sí' : 'No'}</span>
       }
+      report.account_manager? data['Encargado de la cuenta'] = report.account_manager.name: null;
       report.bank? data['Banco solicitado'] = report.bank.name : null;
       report.duplicated_status ? report.duplicated_status === 'done' ? data['Estado de corrección'] = 'Dinero Devuelto' : data['Estado de corrección'] = 'Cancelado' : data['Estado de corrección'] = 'Sin revisar'
       data['I. chequeada'] = report.inconsistence_checked ? 'Sí' : 'No'

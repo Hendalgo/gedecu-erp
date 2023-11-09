@@ -97,8 +97,9 @@ const BankAccounts = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Cuenta</th>
-                        <th scope='col'>Nombre</th>
+                        <th scope='col'>ID</th>
+                        <th scope='col'>Encargado</th>
+                        <th scope='col'>Propietario</th>
                         <th scope='col'>Banco</th>
                         <th scope='col'>País</th>
                         <th scope='col'>Monto</th>
@@ -115,6 +116,7 @@ const BankAccounts = () => {
                             <span>{e.identifier}</span>
                           </div>
                         </td>
+                        <th>{e.user.name}</th>
                         <td>{e.name}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
