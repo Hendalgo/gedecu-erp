@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const API_INSTANCE = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: 'https://gedecu.xn--lissexpertespaa-crb.com/api',
   headers: {
     'X-Request-Width': 'XMLHttpRequest',
     Authorization: `Bearer ${localStorage.getItem('token')}`
