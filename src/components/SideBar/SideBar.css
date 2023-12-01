@@ -5,7 +5,8 @@
   background-color: var(--primary-neutral-white);
   height: 100vh;
   max-height: 100vh;
-  overflow-y: hidden;
+  overflow-y: auto;
+  /* overflow-y: hidden; */
   padding: 20px 32px;
 }
 .AppContainer{

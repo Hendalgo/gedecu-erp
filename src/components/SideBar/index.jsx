@@ -174,7 +174,7 @@ const SideBarBig = ({menus, setSession, children})=>{
                       {Menu.title}
                     </NavLink>
                     : <Accordion>
-                      <Accordion.Item className={Menu.isActive ? "active" : ""}>
+                      <Accordion.Item className={Menu.isActive ? "active" : ""} eventKey={index}>
                         <Accordion.Header>
                           <NavLink
 
