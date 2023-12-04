@@ -17,6 +17,7 @@ import BankAccounts from './pages/BankAccounts'
 import Countries, { CountriesIndex } from './pages/Countries'
 import ReportTypes from './pages/ReportTypes'
 import Currencies from './pages/Currencies'
+import BankAccountsDetail from './pages/BankAccountsDetail'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -51,6 +52,7 @@ function App () {
               <Route path={`${BANKS_ROUTE}`} element={<Banks/>}>
                 <Route index element={<BanksIndex/>}/>
                 <Route path={`${BANK_ACCOUNTS_ROUTE}`} element={<BankAccounts/>}/>
+                <Route path={`${BANK_ACCOUNTS_ROUTE}/create`} element={<BankAccountsDetail/>}/>
               </Route>
               <Route path={`${USERS_ROUTE}`} element={<Users />} />
               <Route path={`${COUNTRIES_ROUTE}`} element={<Countries/>} >
