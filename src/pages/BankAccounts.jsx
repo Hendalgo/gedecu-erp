@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import Welcome from '../components/Welcome'
 import SearchBar from '../components/SearchBar';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { SessionContext } from '../context/SessionContext';
 import { useCheckRole } from '../hooks/useCheckRole';
 import TableLoader from '../components/Loaders/TableLoader';
@@ -11,6 +11,7 @@ import ModalCreateBankAccount from '../components/ModalCreateBankAccount';
 import ModalEditBankAccount from '../components/ModalEditBankAccount';
 import ModalConfirmation from '../components/ModalConfirmation';
 import AlertMessage from '../components/AlertMessage'
+import { BANKS_ROUTE, BANK_ACCOUNTS_ROUTE, DASHBOARD_ROUTE } from '../consts/Routes';
 
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
@@ -25,7 +26,9 @@ const BankAccounts = () => {
     text: 'Error al realizar la acción'
   });
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
+  const navigate = useNavigate();
   const form = useRef()
+
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
   }
@@ -71,7 +74,7 @@ const BankAccounts = () => {
   }
   return (
     <div className="container-fluid">
-      <Welcome text={'Cuentas de banco'} textButton={'Cuenta'}  add={()=> setModalShow(true)}/>
+      <Welcome text={'Cuentas de banco'} textButton={'Cuenta'}  add={() => navigate(`/${DASHBOARD_ROUTE}/${BANKS_ROUTE}/${BANK_ACCOUNTS_ROUTE}/create`, { replace: false, })}/>
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
           <div className='col-8'></div>
