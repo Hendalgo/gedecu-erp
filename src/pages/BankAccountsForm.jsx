@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { getBanks } from "../helpers/banks";
 import { getUsers } from "../helpers/users";
-import { createBankAccount } from "../helpers/banksAccounts";
+import { createBankAccount, getBankAccount, updateBankAccount } from "../helpers/banksAccounts";
 import { Alert } from "react-bootstrap";
-import { redirect, useNavigate, useParams } from "react-router-dom";
+import { redirect, useLocation, useParams } from "react-router-dom";
 
 class BankAccount {
   constructor({
-    name = "", identifier = "", bank = "", user = ""
+    name = "Antonio Sotillo", identifier = "123456789", bank = "1", user = "2"
   }) {
     this.name = name;
     this.identifier = identifier;
@@ -20,11 +20,13 @@ class BankAccount {
 const BankAccountsForm = () => {
   const [banks, setBanks] = useState([]);
   const [users, setUsers] = useState([]);
-  const [bankAccount, setBankAccount] = useState(new BankAccount());
+  const [bankAccount, setBankAccount] = useState(new BankAccount({}));
   const [errorMessage, setErrorMessage] = useState("");
   const [alertType, setAlertType] = useState("danger");
   const params = useParams();
-  const navigate = useNavigate();
+  const { id } = params;
+  const location = useLocation();
+  const isEditPage = location.pathname.includes("edit");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,31 +37,24 @@ const BankAccountsForm = () => {
   
         if (users) setUsers(users.map(({ name, email, id }) => ({ label: name.concat(" - ", email), value: id })));
 
-        const { id } = params;
-        console.log("Id:", id)
-        if (!id) console.log("No hay Id")
-        // if (!id) redirect(`/`);
+        if (isEditPage) {
+          const { message } = await getBankAccount(id);
+
+          console.log(message)
+        }
+
       } catch (error) {
-        console.error(error)
+        setErrorMessage(error.message);
+        setAlertType("danger");
       }
     }
 
     fetchData();
-  }, [params]);
+  }, [id, isEditPage]);
 
   const handleNameBlur = (target) => target.value = target.value.trim();
 
   const handleIdentifier = (target) => target.value = target.value.replace(/\D/gi, '');
-
-  const handleDataChange = ({ name = "", id = "", value = "" }) => {
-    console.log(name, id, value)
-    setBankAccount((prev) => {
-      const newBankAccount = new BankAccount({ ...prev });
-      console.log(newBankAccount)
-      // newBankAccount[name] = value;
-      // return newBankAccount;
-    })
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,52 +63,54 @@ const BankAccountsForm = () => {
       let response;
 
       const data = new FormData(e.target);
+      data.forEach((value, key) => console.log(key, value))
 
-      const { id } = params;
-
-      if (id) {
-        response = null;
+      if (isEditPage) {
+      //   response = updateBankAccount(id, data);
+        setErrorMessage("La cuenta de banco fue actualizada exitosamente.");
       } else {
-        response = await createBankAccount(data);
+      //   response = createBankAccount(data);
+        setErrorMessage("La cuenta de banco fue creada exitosamente.");
       }
+      setAlertType("success");
+      redirect(``);
 
-      switch (response.status) {
-        case 201:
-          setErrorMessage('Banco creado con éxito')
-          setAlertType('success')
-          navigate(``);
-          break
-        case 422:
-          setErrorMessage(response.data.message)
-          setAlertType('danger')
-          break
+      // switch (response.status) {
+      //   case 201:
+      //     setErrorMessage('Banco creado con éxito')
+      //     setAlertType('success')
+      //     navigate(``);
+      //     break
 
-        default:
-          setErrorMessage('Error en la creación del banco')
-          setAlertType('danger')
-          break
-      }
+      //   case 422:
+      //     setErrorMessage(response.data.message)
+      //     setAlertType('danger')
+      //     break
+
+      //   default:
+      //     setErrorMessage('Error en la creación del banco')
+      //     setAlertType('danger')
+      //     break
+      // }
     } catch (error) {
       setErrorMessage(error.message);
       setAlertType("danger");
     }
   }
 
-  const handleReset = () => setBankAccount(new BankAccount({}));
-
   return (
     <>
       <section>
-        <form method="" action="" onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form method="" action="" onSubmit={handleSubmit} autoComplete="off">
           <div className="container">
             <div className="row mb-3">
               <div className="col">
                 <label htmlFor="name" className="form-label">Nombre <span className="Required">*</span></label>
-                <input type="text" id="name" name="name" className="form-control" value={bankAccount.name} onChange={({ target }) => handleDataChange(target)} onBlur={({ target }) => { handleNameBlur(target); handleDataChange(target) }} required />
+                <input type="text" id="name" name="name" className="form-control" defaultValue={bankAccount.name} onBlur={({ target }) => { handleNameBlur(target); }} required />
               </div>
               <div className="col">
                 <label htmlFor="identifier" className="form-label">Identificador <span className="Required">*</span></label>
-                <input type="text" id="identifier" name="identifier" className="form-control" maxLength={20} required value={bankAccount.identifier} onChange={({ target }) => { handleIdentifier(target); handleDataChange(target) }} />
+                <input type="text" id="identifier" name="identifier" className="form-control" maxLength={20} defaultValue={bankAccount.identifier} onChange={({ target }) => { handleIdentifier(target); }} required />
               </div>
             </div>
             <div className="row mb-3">
@@ -123,7 +120,7 @@ const BankAccountsForm = () => {
               </div>
               <div className="col">
                 <label htmlFor="user" className="form-label">Encargado <span className="Required">*</span></label>
-                <Select id="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} options={users} />
+                <Select id="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} options={users} defaultValue={bankAccount.user} />
               </div>
             </div>
             <div className="row text-center">

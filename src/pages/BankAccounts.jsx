@@ -12,12 +12,15 @@ import ModalEditBankAccount from '../components/ModalEditBankAccount';
 import ModalConfirmation from '../components/ModalConfirmation';
 import AlertMessage from '../components/AlertMessage'
 import { BANKS_ROUTE, BANK_ACCOUNTS_ROUTE, DASHBOARD_ROUTE } from '../consts/Routes';
+import FilterTableButtons from '../components/FilterTableButtons';
+import { getBanks } from '../helpers/banks';
 
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
   const [modalShow, setModalShow] = useState(false)
   const [modalEditShow, setModalEditShow] = useState(false)
   const [banks, setBanks] = useState([]);
+  const [filterBanks, setFilterBanks] = useState([]);
   const [offset, setOffset] = useState(1)
   const [bankAccount, setBankAccount] = useState();
   const [alert, setAlert] = useState({
@@ -32,12 +35,22 @@ const BankAccounts = () => {
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
   }
+
   useEffect(()=>{
-    getBankAccounts(``)
-    .then(r=>{
-      setBanks(r);
-    });
+    Promise.all([
+      getBankAccounts(``),
+      getBanks(`paginated=no`),
+    ])
+    .then(([ bankAccounts, banks ]) => {
+      if (bankAccounts) setBanks(bankAccounts);
+
+      if (banks) setFilterBanks(banks);
+    })
+    .catch((error) => {
+      setAlert((prev) => ({ ...prev, show: true, variant: "danger", text: error.message }));
+    })
   }, [])
+
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
@@ -69,12 +82,23 @@ const BankAccounts = () => {
       })
     }).catch();
   }
+
+  const handleBankFiltering = (bankId) => {
+    getBankAccounts(`${bankId ? `bank=${bankId}` : ''}`)
+    .then((response) => {
+      setBanks(response);
+    })
+    .catch();
+  }
+
   return (
     <div className="container-fluid">
       <Welcome text={'Cuentas de banco'} textButton={'Cuenta'}  add={() => navigate(`/${DASHBOARD_ROUTE}/${BANKS_ROUTE}/${BANK_ACCOUNTS_ROUTE}/create`, { replace: false, })}/>
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8'></div>
+          <div className='col-8'>
+            <FilterTableButtons data={filterBanks} callback={handleBankFiltering} />
+          </div>
           <div className='col-4'><SearchBar text='Cuentas' /></div>
         </form>
       </div>

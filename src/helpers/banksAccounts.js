@@ -8,6 +8,11 @@ export const getBankAccounts = async (querys)=>{
     return error.response
   }
 }
+
+export const getBankAccount = async (id)=>{
+  throw new Error(`Prueba de error con el id ${id}`);
+}
+
 export const createBankAccount = async(form)=>{
   try {
     const request = await API_INSTANCE.post(BANK_ACCOUNTS_URL, form)
