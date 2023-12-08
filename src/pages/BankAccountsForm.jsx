@@ -2,25 +2,16 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { getBanks } from "../helpers/banks";
 import { getUsers } from "../helpers/users";
+import { getCurrencies } from "../helpers/currencies";
 import { createBankAccount, getBankAccount, updateBankAccount } from "../helpers/banksAccounts";
 import { Alert } from "react-bootstrap";
 import { redirect, useLocation, useParams } from "react-router-dom";
 
-class BankAccount {
-  constructor({
-    name = "Antonio Sotillo", identifier = "123456789", bank = "1", user = "2"
-  }) {
-    this.name = name;
-    this.identifier = identifier;
-    this.bank = bank;
-    this.user = user;
-  }
-}
-
 const BankAccountsForm = () => {
   const [banks, setBanks] = useState([]);
   const [users, setUsers] = useState([]);
-  const [bankAccount, setBankAccount] = useState(new BankAccount({}));
+  const [currencies, setCurrencies] = useState([]);
+  const [bankAccount, setBankAccount] = useState({ name: "Antonio", identifier: "12345678", bank: 1, user: 9, });
   const [errorMessage, setErrorMessage] = useState("");
   const [alertType, setAlertType] = useState("danger");
   const params = useParams();
@@ -31,21 +22,23 @@ const BankAccountsForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [banks, users] = await Promise.all([ getBanks("paginated=no"), getUsers("paginated=no"), ]);
+        const [banks, users, currencies] = await Promise.all([ getBanks("paginated=no"), getUsers("paginated=no"), getCurrencies("paginated=no"), ]);
 
         if (banks) setBanks(banks.map(({ name, id }) => ({ label: name, value: id })));
   
         if (users) setUsers(users.map(({ name, email, id }) => ({ label: name.concat(" - ", email), value: id })));
 
-        if (isEditPage) {
-          const { message } = await getBankAccount(id);
+        if (currencies) setCurrencies(currencies.map(({ id, shortcode, name }) => ({ label: name.concat(' (', shortcode, ')'), value: id })));
 
-          console.log(message)
+        if (isEditPage) {
+          const bankAccountResponse = await getBankAccount(id);
+          console.log(bankAccountResponse)
         }
 
       } catch (error) {
-        setErrorMessage(error.message);
-        setAlertType("danger");
+        console.error(error)
+        // setErrorMessage(error.response.message);
+        // setAlertType("danger");
       }
     }
 
@@ -55,6 +48,11 @@ const BankAccountsForm = () => {
   const handleNameBlur = (target) => target.value = target.value.trim();
 
   const handleIdentifier = (target) => target.value = target.value.replace(/\D/gi, '');
+
+  const handleAmountChange = ({ target, type }) => {
+    // console.log(parseFloat(target.value))
+    // target.value = new Number(parseFloat(target.value)).toLocaleString("es-VE", { maximumFractionDigits: 2, minimumFractionDigits: 0, useGrouping: type == "blur" });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,34 +64,22 @@ const BankAccountsForm = () => {
       data.forEach((value, key) => console.log(key, value))
 
       if (isEditPage) {
-      //   response = updateBankAccount(id, data);
+        response = await updateBankAccount(id, data);
         setErrorMessage("La cuenta de banco fue actualizada exitosamente.");
       } else {
-      //   response = createBankAccount(data);
+        response = await createBankAccount(data);
+        console.log(response)
         setErrorMessage("La cuenta de banco fue creada exitosamente.");
       }
+
       setAlertType("success");
       redirect(``);
+    } catch ({ response }) {
+      const { data } = response;
 
-      // switch (response.status) {
-      //   case 201:
-      //     setErrorMessage('Banco creado con éxito')
-      //     setAlertType('success')
-      //     navigate(``);
-      //     break
+      const errorsString = Object.values(data.errors).flat().join(". ");
 
-      //   case 422:
-      //     setErrorMessage(response.data.message)
-      //     setAlertType('danger')
-      //     break
-
-      //   default:
-      //     setErrorMessage('Error en la creación del banco')
-      //     setAlertType('danger')
-      //     break
-      // }
-    } catch (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(errorsString);
       setAlertType("danger");
     }
   }
@@ -102,7 +88,7 @@ const BankAccountsForm = () => {
     <>
       <section>
         <form method="" action="" onSubmit={handleSubmit} autoComplete="off">
-          <div className="container">
+          <div className="container p-4">
             <div className="row mb-3">
               <div className="col">
                 <label htmlFor="name" className="form-label">Nombre <span className="Required">*</span></label>
@@ -116,11 +102,21 @@ const BankAccountsForm = () => {
             <div className="row mb-3">
               <div className="col">
                 <label htmlFor="bank" className="form-label">Banco <span className="Required">*</span></label>
-                <Select id="bank" name="bank" placeholder="Seleccione un banco" noOptionsMessage={() => "No hay coincidencias"} options={banks} />
+                <Select id="bank" name="bank" placeholder="Seleccione un banco" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={banks} />
               </div>
               <div className="col">
                 <label htmlFor="user" className="form-label">Encargado <span className="Required">*</span></label>
-                <Select id="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} options={users} defaultValue={bankAccount.user} />
+                <Select id="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={users} />
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col">
+                <label htmlFor="currency" className="form-label">Moneda <span className="Required">*</span></label>
+                <Select id="currency" name="currency" placeholder="Seleccione una moneda" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={currencies} />
+              </div>
+              <div className="col">
+                <label htmlFor="amount" className="form-label">Monto inicial <span className="Required">*</span></label>
+                <input type="text" id="amount" name="amount" placeholder="" className="form-control" onChange={handleAmountChange} onBlur={handleAmountChange} readOnly={isEditPage} required />
               </div>
             </div>
             <div className="row text-center">
@@ -132,7 +128,9 @@ const BankAccountsForm = () => {
                   }
                 </Alert>
               }
-              <input type="submit" className="btn btn-primary" value="Crear" />
+              <div className="col">
+                <input type="submit" className="btn btn-primary w-auto" value="Crear" />
+              </div>
             </div>
           </div>
         </form>

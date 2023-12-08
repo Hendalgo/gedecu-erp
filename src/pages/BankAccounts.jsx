@@ -88,7 +88,9 @@ const BankAccounts = () => {
     .then((response) => {
       setBanks(response);
     })
-    .catch();
+    .catch((error) => {
+      setBanks((prev) => ({ ...prev, data: [] }));
+    });
   }
 
   return (
