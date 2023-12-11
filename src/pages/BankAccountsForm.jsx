@@ -5,15 +5,18 @@ import { getUsers } from "../helpers/users";
 import { getCurrencies } from "../helpers/currencies";
 import { createBankAccount, getBankAccount, updateBankAccount } from "../helpers/banksAccounts";
 import { Alert } from "react-bootstrap";
-import { redirect, useLocation, useParams } from "react-router-dom";
+import { Link, redirect, useLocation, useParams } from "react-router-dom";
+import { DASHBOARD_ROUTE, BANKS_ROUTE, BANK_ACCOUNTS_ROUTE } from "../consts/Routes";
 
 const BankAccountsForm = () => {
   const [banks, setBanks] = useState([]);
   const [users, setUsers] = useState([]);
   const [currencies, setCurrencies] = useState([]);
-  const [bankAccount, setBankAccount] = useState({ name: "Antonio", identifier: "12345678", bank: 1, user: 9, });
+  const [bankAccount, setBankAccount] = useState({ name: "", identifier: "", bank: "", user: "", });
   const [errorMessage, setErrorMessage] = useState("");
   const [alertType, setAlertType] = useState("danger");
+  const [amount, setAmount] = useState("");
+  const [currencyShortCode, setCurrencyShortCode] = useState("");
   const params = useParams();
   const { id } = params;
   const location = useLocation();
@@ -49,10 +52,20 @@ const BankAccountsForm = () => {
 
   const handleIdentifier = (target) => target.value = target.value.replace(/\D/gi, '');
 
-  const handleAmountChange = ({ target, type }) => {
-    // console.log(parseFloat(target.value))
-    // target.value = new Number(parseFloat(target.value)).toLocaleString("es-VE", { maximumFractionDigits: 2, minimumFractionDigits: 0, useGrouping: type == "blur" });
+  const handleCurrencyChange = ({ label }) => {
+    const shortCode = label.split('(').pop().replace(')', '');
+    
+    setCurrencyShortCode(shortCode);
   }
+
+  const handleAmountChange = ({ target, }) => {
+    const { value } = target;
+
+    if (value.match(/^\d+\.?\d{0,2}$/) || !value.trim()) setAmount(target.value);
+    else setAmount(prev => prev);
+  }
+
+  const handleAmountFocus = ({ target }) => target.select();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,8 +97,18 @@ const BankAccountsForm = () => {
     }
   }
 
+  const formattedAmount = new Number(amount).toLocaleString("es-VE", {
+    style: "decimal",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+    useGrouping: true,
+  });
+
   return (
     <>
+    <section className="container p-4 pb-0 text-end">
+      <Link className="btn btn-secondary" to={`/${DASHBOARD_ROUTE}/${BANKS_ROUTE}/${BANK_ACCOUNTS_ROUTE}`}>Regresar</Link>
+    </section>
       <section>
         <form method="" action="" onSubmit={handleSubmit} autoComplete="off">
           <div className="container p-4">
@@ -102,21 +125,24 @@ const BankAccountsForm = () => {
             <div className="row mb-3">
               <div className="col">
                 <label htmlFor="bank" className="form-label">Banco <span className="Required">*</span></label>
-                <Select id="bank" name="bank" placeholder="Seleccione un banco" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={banks} />
+                <Select inputId="bank" name="bank" placeholder="Seleccione un banco" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={banks} />
               </div>
               <div className="col">
                 <label htmlFor="user" className="form-label">Encargado <span className="Required">*</span></label>
-                <Select id="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={users} />
+                <Select inputId="user" name="user" placeholder="Seleccione un manejador" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={users} />
               </div>
             </div>
             <div className="row mb-3">
               <div className="col">
                 <label htmlFor="currency" className="form-label">Moneda <span className="Required">*</span></label>
-                <Select id="currency" name="currency" placeholder="Seleccione una moneda" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={currencies} />
+                <Select inputId="currency" name="currency" placeholder="Seleccione una moneda" noOptionsMessage={() => "No hay coincidencias"} defaultValue={null} options={currencies} onChange={handleCurrencyChange} />
               </div>
               <div className="col">
                 <label htmlFor="amount" className="form-label">Monto inicial <span className="Required">*</span></label>
-                <input type="text" id="amount" name="amount" placeholder="" className="form-control" onChange={handleAmountChange} onBlur={handleAmountChange} readOnly={isEditPage} required />
+                <input type="text" id="amount" name="amount" placeholder="" className="form-control" pattern="\d" title="Monto inicial de la cuenta de banco" value={amount} onChange={handleAmountChange} onFocus={handleAmountFocus} readOnly={isEditPage} required />
+                <small>
+                  { currencyShortCode } { formattedAmount }
+                </small>
               </div>
             </div>
             <div className="row text-center">
