@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-const DecimalInput = ({ defaultValue = '0,00', name }) => {
+const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => null }) => {
   const [value, setValue] = useState(defaultValue);
   const inputRef = useRef();
 
@@ -15,6 +15,7 @@ const DecimalInput = ({ defaultValue = '0,00', name }) => {
     const decimalPart = value.slice(-2);
     let integerPart = value.slice(0, -2);
     integerPart = parseInt(integerPart, 10).toString(); // Elimina los ceros a la izquierda
+    onChange(new Number(`${integerPart}.${decimalPart}`));
     integerPart = formatNumber(integerPart);
     setValue(`${integerPart},${decimalPart}`);
   };
@@ -25,6 +26,7 @@ const DecimalInput = ({ defaultValue = '0,00', name }) => {
 
   return (
     <input
+      id={id}
       name={name}
       className='form-control'
       ref={inputRef}

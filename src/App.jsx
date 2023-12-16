@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
 import './index.css'
@@ -17,6 +17,7 @@ import BankAccounts from './pages/BankAccounts'
 import Countries, { CountriesIndex } from './pages/Countries'
 import ReportTypes from './pages/ReportTypes'
 import Currencies from './pages/Currencies'
+import ReportForm from './pages/ReportForm'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -43,6 +44,7 @@ function App () {
               <Route path={`${DASHBOARD_INDEX_ROUTE}`} element={<Home />} />
               <Route path={`${REPORTS_ROUTE}`} element={<Reports />}>
                 <Route index element={<ReportsIndex />} />
+                <Route path={`create`} element={<ReportForm />} />
                 <Route path={`${REPORTS_DUPLICATE_ROUTE}`} element={<DuplicateReports />} />
                 <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
                 <Route path={`${REPORTS_TYPE_ROUTE}`} element={<ReportTypes />} />
