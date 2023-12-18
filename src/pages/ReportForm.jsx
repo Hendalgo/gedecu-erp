@@ -13,11 +13,26 @@ import CreditReportForm from "../components/reports/outcome/CreditReportForm";
 import OtherReportForm from "../components/reports/outcome/OtherReportForm";
 import TypeOneWalletReportForm from "../components/reports/income/TypeOneWalletReportForm";
 import TypeOneDraftReportForm from "../components/reports/income/TypeOneDraftReportForm";
+import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTwoWalletAccountReportForm";
+import TypeTwoCashReportForm from "../components/reports/income/TypeTwoCashReportForm";
+import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoHelpReportForm";
+import TypeTwoHelpReportForm from "../components/reports/income/TypeTwoHelpReportForm";
+import TypeTwoTransferReportForm from "../components/reports/income/TypeTwoTransferReportForm";
+import TypeTwoCashDeliveryReportForm from "../components/reports/outcome/TypeTwoCashDeliveryReportForm";
+import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepositReportForm";
+import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
+import { Alert } from "react-bootstrap";
 
 const componentsDictionary = new Map();
 componentsDictionary.set(1, <SupplierReportForm />)
 componentsDictionary.set(2, <ReceivedHelpReportForm />)
 componentsDictionary.set(3, <IncomeWalletReportForm />)
+componentsDictionary.set(101, <TypeOneWalletReportForm />)
+componentsDictionary.set(102, <TypeOneDraftReportForm />)
+componentsDictionary.set(103, <TypeTwoCashReportForm />)
+componentsDictionary.set(104, <TypeTwoIncomeTransferenceReportForm />)
+componentsDictionary.set(105, <TypeTwoHelpReportForm />)
+componentsDictionary.set(106, <TypeTwoTransferReportForm />)
 componentsDictionary.set(5, <StoreReportForm />)
 componentsDictionary.set(6, <OutcomeWalletReportForm />)
 componentsDictionary.set(7, <SendedHelpReportForm />)
@@ -26,19 +41,26 @@ componentsDictionary.set(9, <RefillReportForm />)
 componentsDictionary.set(10, <TaxReportForm />)
 componentsDictionary.set(11, <CreditReportForm />)
 componentsDictionary.set(12, <OtherReportForm />)
-componentsDictionary.set(101, <TypeOneWalletReportForm />)
-componentsDictionary.set(102, <TypeOneDraftReportForm />)
-componentsDictionary.set(107, "<TypeTwoWalletAccountReportForm />")
-componentsDictionary.set(103, "<TypeTwoCashReportForm />")
-componentsDictionary.set(104, "<TypeTwoTransferenceReportForm />")
-componentsDictionary.set(105, "<TypeTwoHelpReportForm />")
-componentsDictionary.set(106, "<TypeTwoTransferReportForm />")
-componentsDictionary.set(108, "<TypeTwoCashDeliveryReportForm />")
-componentsDictionary.set(109, "<TypeTwoDepositReportForm />")
-componentsDictionary.set(110, "<TypeTwoTransferenceReportForm />")
-componentsDictionary.set(111, "<TypeTwoTaxReportForm />")
-componentsDictionary.set(112, "<TypeTwoCreditReportForm />")
-componentsDictionary.set(113, "<TypeTwoPayrollReportForm />")
+componentsDictionary.set(107, <TypeTwoWalletAccountReportForm />)
+componentsDictionary.set(108, <TypeTwoCashDeliveryReportForm />)
+componentsDictionary.set(109, <TypeTwoDepositReportForm />)
+componentsDictionary.set(110, <TypeTwoOutcomeTransferenceReportForm />)
+componentsDictionary.set(111, <TaxReportForm />)
+componentsDictionary.set(112, <CreditReportForm />)
+componentsDictionary.set(113, <OtherReportForm />)
+
+const tableColumnsDictionary = new Map();
+tableColumnsDictionary.set("receiverAccount", "Cuenta receptora");
+tableColumnsDictionary.set("senderAccount", "Cuenta emisora");
+tableColumnsDictionary.set("amount", "Monto");
+tableColumnsDictionary.set("reference", "Referencia");
+tableColumnsDictionary.set("user", "Gestor");
+tableColumnsDictionary.set("transferencesQuantity", "N° de transferencias");
+tableColumnsDictionary.set("rate", "Tasas");
+tableColumnsDictionary.set("conversion", "Conversión");
+tableColumnsDictionary.set("account", "Cuenta bancaria");
+tableColumnsDictionary.set("store", "Local");
+tableColumnsDictionary.set("motive", "Motivo");
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
@@ -147,7 +169,7 @@ const reportTypes = [
                 value: 112
             },
             {
-                label: "Nómina R2",
+                label: "Otros R2",
                 value: 113
             },
         ]
@@ -156,18 +178,32 @@ const reportTypes = [
 
 const ReportForm = () => {
     const [reportType, setReportType] = useState(0);
+    const [error, setError] = useState({ show: false, message: "", variant: 'primary' });
+    const [tableHeaderColumns, setTableHeaderColumns] = useState([]);
+    const [tableData, setTableData] = useState([]);
+
     useEffect(() => {
         const fetchData = async () => {
-            // if (true) { // User de VZLA
-            //     // Buscar los tipos de reportes sueltos
-            //     // Asignar los valores al estado de tipo de reportes
+            try {
+                // throw new Error("This is a test error")
+                // if (true) { // User de VZLA
+                //     // Buscar los tipos de reportes sueltos
+                //     // Asignar los valores al estado de tipo de reportes
 
-            // } else { // User internacional
-            //     // Buscar los reportes (tipo 1 y tipo 2)
-            //     // Asignar los valores a un ref
-            //     // 
+                // } else { // User internacional
+                //     // Buscar los reportes (tipo 1 y tipo 2)
+                //     // Asignar los valores a un ref
+                //     // 
 
-            // }
+                // }
+        } catch (error) {
+                console.error(error)
+                setError({
+                    show: true,
+                    message: error.message,
+                    variant: "danger"
+                })
+            }
         }
         fetchData();
     }, [])
@@ -177,16 +213,39 @@ const ReportForm = () => {
     }
 
     const handleReportType = ({ value }) => {
+        setTableHeaderColumns([]);
+        setTableData([]);
         setReportType(value)
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const data = new FormData(e.target);
+
+        if (tableHeaderColumns.length === 0) {
+            const headers = [];
+
+            data.forEach((value, key) => {
+                headers.push(tableColumnsDictionary.get(key));
+            });
+
+            setTableHeaderColumns(headers);
+        }
+        
+    }
+
+    const postReport = () => {
+        alert("Save all reports");
     }
 
     return(
         <>
-            <section className="container p-4">
+            <section className="container p-2">
                 <p>Agrega un nuevo reporte +</p>
-                <div>
+                <div className="d-flex justify-content-between">
                     <h1>Nuevo Reporte</h1>
-                    <button type="button" className="btn btn-primary">Guardar +</button>
+                    <button type="button" className="btn btn-primary w-auto" onClick={postReport}>Guardar +</button>
                 </div>
             </section>
             <section className="container p-2">
@@ -214,13 +273,17 @@ const ReportForm = () => {
                         onChange={handleReportType}
                     />
                 </div>
-                <form method="" action="" className="" onSubmit={() => null}>
+                <form method="" action="" className="" onSubmit={handleSubmit} autoComplete="off">
                     {
                         componentsDictionary.has(reportType) && componentsDictionary.get(reportType)
                     }
                     <div className="row mt-3">
                         <div className="col text-center">
-                            Error Message
+                            <Alert variant={error.variant} show={error.show}>
+                                {
+                                    error.message
+                                }
+                            </Alert >
                         </div>
                     </div>
                     <div className="row mt-3">
@@ -229,6 +292,27 @@ const ReportForm = () => {
                         </div>
                     </div>
                 </form>
+            </section>
+            <section>
+                <table className="w-100 table">
+                    <thead>
+                        <tr>
+                            {
+                                tableHeaderColumns.map((header, index) => {
+                                    return <th key={index}>{ header }</th>
+                                })
+                            }
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            tableData.map((_, index) => {
+                                return <tr key={index}></tr>
+                            })
+                        }
+                    </tbody>
+                </table>
             </section>
         </>
     )

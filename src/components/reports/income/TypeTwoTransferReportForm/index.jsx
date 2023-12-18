@@ -1,26 +1,19 @@
-import Select from "react-select";
-import DecimalInput from "../../../DecimalInput";
 import { useEffect, useState } from "react";
 import { getBankAccounts } from "../../../../helpers/banksAccounts";
+import Select from "react-select";
+import DecimalInput from "../../../DecimalInput";
 
-const TransferReportForm = () => { // => Reporte de traspasos
-    const [senderAccounts, setSenderAccounts] = useState([]);
-    const [receiverAccounts, setReceiverAccounts] = useState([]);
+const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
+    const [bankAccounts, setBankAccounts] = useState([]);
+    // Usar ref para manejar el estado original de las cuentas de banco
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no"), ]);
 
-                if (banksAccountsResponse) {
-                    const senderAccounts = banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id }));
+                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id })));
 
-                    setSenderAccounts(senderAccounts);
-
-                    // setReceiverAccounts(banksAccountsResponse
-                    //     .filter(({ id }) => senderAccounts.every(({ value }) => value !== id))
-                    //     .map(() => {}));
-                }
             } catch (error) {
                 console.error(error)
             }
@@ -29,17 +22,23 @@ const TransferReportForm = () => { // => Reporte de traspasos
         fetchData();
     }, [])
 
+    const handleBankAccountChange = ({ value }, isSender = false) => {
+        console.log(isSender)
+        console.log(bankAccounts.filter(({ id }) => id !== value))
+    }
+
     return(
         <>
             <div className="row mb-3">
-            <div className="col">
+                <div className="col">
                     <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
                     <Select
                         inputId="senderAccount"
                         name="senderAccount"
-                        options={senderAccounts}
+                        options={bankAccounts}
                         placeholder="Selecciona la cuenta emisora"
                         noOptionsMessage={() => "No hay coincidencias"}
+                        onChange={(event) => handleBankAccountChange(event, true)}
                     />
                 </div>
                 <div className="col">
@@ -47,15 +46,16 @@ const TransferReportForm = () => { // => Reporte de traspasos
                     <Select
                         inputId="receiverAccount"
                         name="receiverAccount"
-                        options={receiverAccounts}
+                        options={bankAccounts}
                         placeholder="Selecciona la cuenta receptora"
                         noOptionsMessage={() => "No hay coincidencias"}
+                        onChange={(event) => handleBankAccountChange(event, false)}
                     />
                 </div>
             </div>
-            <div className="row mb-3">
+            <div className="row">
                 <div className="col-6">
-                    <label htmlFor="amount" className="form-label">Monto total <span className="Required">*</span></label>
+                    <label htmlFor="amount" className="form-label">Monto en COP <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
                 </div>
             </div>
@@ -63,4 +63,4 @@ const TransferReportForm = () => { // => Reporte de traspasos
     )
 }
 
-export default TransferReportForm;
+export default TypeTwoTransferReportForm;

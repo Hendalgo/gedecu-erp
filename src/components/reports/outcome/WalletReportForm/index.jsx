@@ -1,41 +1,18 @@
-import Select from "react-select";
 import DecimalInput from "../../../DecimalInput";
-import { useEffect, useState } from "react";
-import { getBankAccounts } from "../../../../helpers/banksAccounts";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import NumberInput from "../../../NumberInput";
 
 const OutcomeWalletReportForm = () => {
-    const [bankAccounts, setBankAccounts] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no"), ]);
-
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        fetchData();
-    }, [])
-
     return(
         <>
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
-                    <Select
-                        inputId="senderAccount"
-                        options={bankAccounts}
-                        placeholder="Selecciona la cuenta emisora"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <BankAccountsSelect id="senderAccount" name="senderAccount" placeholder="Selecciona la cuenta emisora" />
                 </div>
                 <div className="col">
-                    <label htmlFor="transferencesAmount" className="form-label">N de transferencias <span className="Required">*</span></label>
-                    <input type="number" id="transferencesAmount" name="transferencesAmount" min={1} className="form-control" />
+                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
                 </div>
             </div>
             <div className="row mb-3">

@@ -1,17 +1,20 @@
 import { useState } from "react";
 import DecimalInput from "../../../DecimalInput";
+import { Alert } from "react-bootstrap";
+import NumberInput from "../../../NumberInput";
 
 const TypeOneWalletReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
+    const [error, setError] = useState({ show: false, message: "", variant: "danger" });
 
     const handleAmountChange = (amount) => {
-        if (Number.isNaN(amount)) console.error("Valor inadecuado");
+        if (Number.isNaN(amount)) setError((prev) => ({ ...prev, show: true, message: "El valor ingresado es inadecuado." }));
         else setAmount(amount);
     }
 
     const handleRateChange = (rate) => {
-        if (Number.isNaN(rate)) console.error("Valor inadecuado");
+        if (Number.isNaN(rate)) setError((prev) => ({ ...prev, show: true, message: "El valor ingresado es inadecuado." }));
         else setRate(rate);        
     }
 
@@ -25,24 +28,36 @@ const TypeOneWalletReportForm = () => {
         <>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesAmount" className="form-label">N de transferencias <span className="Required">*</span></label>
-                    <input type="number" id="transferencesAmount" name="transferencesAmount" min={1} className="form-control" />
+                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en USD <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" defaultValue={amount} onChange={handleAmountChange} />
                 </div>
             </div>
-            <div className="row">
+            <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
                     <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversionAmount" className="form-label">Monto total en COP <span className="Required">*</span></label>
-                    <input type="text" id="conversionAmount" name="conversionAmount" value={conversionAmount} readOnly className="form-control" />
+                    <label htmlFor="conversion" className="form-label">Monto total en COP</label>
+                    <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
+            {
+                error.show &&
+                <div className="row">
+                    <div className="col">
+                        <Alert show={error.show} variant={error.variant}>
+                            {
+                                error.message
+                            }
+                        </Alert>
+                    </div>
+                </div>
+            }
         </>
     )
 }

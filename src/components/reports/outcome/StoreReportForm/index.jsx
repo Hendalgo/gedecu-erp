@@ -1,31 +1,12 @@
-import { useEffect, useState } from "react";
-import { getBankAccounts } from "../../../../helpers/banksAccounts";
-import Select from "react-select";
+import { useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import { getStores } from "../../../../helpers/stores";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import StoresSelect from "../../../StoresSelect";
+import NumberInput from "../../../NumberInput";
 
 const StoreReportForm = () => {
-    const [bankAccounts, setBankAccounts] = useState([]);
-    const [stores, setStores] = useState([]);
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [storesResponse, banksAccountsResponse] = await Promise.all([ getStores("paginated=no"), getBankAccounts("paginated=no"), ]);
-
-                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        fetchData();
-    }, [])
 
     const handleAmountChange = (amount) => {
         if (Number.isNaN(amount)) console.error("Ingrese un valor adecuado");
@@ -44,27 +25,17 @@ const StoreReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="store" className="form-label">Local <span className="Required">*</span></label>
-                    <Select
-                        inputId="store"
-                        options={stores}
-                        placeholder="Selecciona el local"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <StoresSelect id="store" name="store" />
                 </div>
                 <div className="col">
                     <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
-                    <Select
-                        inputId="senderAccount"
-                        options={bankAccounts}
-                        placeholder="Selecciona la cuenta emisora"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <BankAccountsSelect id="senderAccount" name="senderAccount" placeholder="Selecciona la cuenta emisora" />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesAmount" className="form-label">N de transferencias <span className="Required">*</span></label>
-                    <input type="number" id="transferencesAmount" name="transferencesAmount" min={1} className="form-control" />
+                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
@@ -77,8 +48,8 @@ const StoreReportForm = () => {
                     <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversionAmount" className="form-label">Monto total en VED <span className="Required">*</span></label>
-                    <input id="conversionAmount" name="conversionAmount" value={conversionAmount} readOnly className="form-control" />
+                    <label htmlFor="conversion" className="form-label">Monto total en VED</label>
+                    <input id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
         </>

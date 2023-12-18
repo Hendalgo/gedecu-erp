@@ -1,50 +1,18 @@
-import { useEffect, useState } from "react";
-import { getUsers } from "../../../../helpers/users";
-import { getBankAccounts } from "../../../../helpers/banksAccounts";
-import Select from "react-select";
 import DecimalInput from "../../../DecimalInput";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import UsersSelect from "../../../UsersSelect";
 
 const ReceivedHelpReportForm = () => {
-    const [bankAccounts, setBankAccounts] = useState([]);
-    const [users, setUsers] = useState([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [usersResponse, banksAccountsResponse] = await Promise.all([ getUsers("paginated=no"), getBankAccounts("paginated=no"), ]);
-
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-                if (usersResponse) setUsers(usersResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        fetchData();
-    }, [])
-
     return(
         <>
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user" className="form-label">Gestor <span className="Required">*</span></label>
-                    <Select
-                        inputId="user"
-                        options={users}
-                        placeholder="Selecciona el gestor"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <UsersSelect id="user" name="user" />
                 </div>
                 <div className="col">
-                    <label htmlFor="account" className="form-label">Cuenta receptora <span className="Required">*</span></label>
-                    <Select
-                        inputId="account"
-                        options={bankAccounts}
-                        placeholder="Selecciona la cuenta receptora"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <label htmlFor="receiverAccount" className="form-label">Cuenta receptora <span className="Required">*</span></label>
+                    <BankAccountsSelect id="receiverAccount" name="receiverAccount" placeholder="Selecciona la cuenta receptora" />
                 </div>
             </div>
             <div className="row">

@@ -1,44 +1,22 @@
-import { useEffect, useState } from "react";
-import { getBankAccounts } from "../../../../helpers/banksAccounts";
-import Select from "react-select";
 import DecimalInput from "../../../DecimalInput";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import NumberInput from "../../../NumberInput";
 
 const IncomeWalletReportForm = () => {
-    const [bankAccounts, setBankAccounts] = useState([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no"), ]);
-
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, id }) => ({ label: name, value: id })));
-
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        fetchData();
-    }, [])
-
     return(
         <>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="account" className="form-label">Cuenta receptora <span className="Required">*</span></label>
-                    <Select
-                        inputId="account"
-                        options={bankAccounts}
-                        placeholder="Selecciona la cuenta receptora"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                    />
+                    <label htmlFor="receiverAccount" className="form-label">Cuenta receptora <span className="Required">*</span></label>
+                    <BankAccountsSelect id="receiverAccount" name="receiverAccount" placeholder="Selecciona la cuenta receptora" />
                 </div>
                 <div className="col">
-                    <label htmlFor="transferencesAmount" className="form-label">N de transferencias <span className="Required">*</span></label>
-                    <input type="number" id="transferencesAmount" name="transferencesAmount" min={1} className="form-control" />
+                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
                 </div>
             </div>
             <div className="row">
-                <div className="col">
+                <div className="col-6">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
                 </div>

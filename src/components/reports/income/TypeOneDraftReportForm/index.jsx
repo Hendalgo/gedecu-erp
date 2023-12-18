@@ -1,22 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import Select from "react-select";
-import { getBankAccounts } from "../../../../helpers/banksAccounts";
-import { getUsers } from "../../../../helpers/users";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import UsersSelect from "../../../UsersSelect";
+import NumberInput from "../../../NumberInput";
 
 const TypeOneDraftReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const [ banksAccountsResponse, usersResponse ] = await Promise.all([ getBankAccounts("paginated=no&bank=1"), getUsers("paginated=no") ]);
-            if (banksAccountsResponse) null;
-            if (usersResponse) null;
-        }
-
-        fetchData();
-    }, [])
 
     const handleAmountChange = (amount) => {
         if (Number.isNaN(amount)) console.error("Valor inadecuado");
@@ -39,25 +29,17 @@ const TypeOneDraftReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="account" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <Select
-                        inputId="account"
-                        options={[]}
-                        placeholder="Selecciona la cuenta de banco"
-                    />
+                    <BankAccountsSelect id="account" name="account" query="&bank=2" />
                 </div>
                 <div className="col">
                     <label htmlFor="user" className="form-label">Gestor <span className="Required">*</span></label>
-                    <Select
-                        inputId="user"
-                        options={[]}
-                        placeholder="Selecciona el gestor"
-                    />
+                    <UsersSelect id="user" name="user" />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesAmount" className="form-label">N de transferencias <span className="Required">*</span></label>
-                    <input type="number" id="transferencesAmount" name="transferencesAmount" min={1} className="form-control" />
+                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
@@ -70,8 +52,8 @@ const TypeOneDraftReportForm = () => {
                     <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversionAmount" className="form-label">Monto total en VED <span className="Required">*</span></label>
-                    <input type="text" id="conversionAmount" name="conversionAmount" value={conversionAmount} readOnly className="form-control" />
+                    <label htmlFor="conversion" className="form-label">Monto total en VED</label>
+                    <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
         </>

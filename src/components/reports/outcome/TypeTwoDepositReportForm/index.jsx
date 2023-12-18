@@ -1,13 +1,13 @@
 import DecimalInput from "../../../DecimalInput";
-import BankAccountsSelect from "../../../BankAccountsSelect";
+import UsersSelect from "../../../UsersSelect";
 
-const RefillReportForm = () => { // => Reporte de recargas (considerar el nombre)
+const TypeTwoDepositReportForm = () => {
     return(
         <>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
-                    <BankAccountsSelect id="senderAccount" name="senderAccount" placeholder="Selecciona la cuenta emisora" />
+                    <label htmlFor="user" className="form-label">Gestor <span className="Required">*</span></label>
+                    <UsersSelect id="user" name="user" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
@@ -18,4 +18,4 @@ const RefillReportForm = () => { // => Reporte de recargas (considerar el nombre
     )
 }
 
-export default RefillReportForm;
+export default TypeTwoDepositReportForm;
