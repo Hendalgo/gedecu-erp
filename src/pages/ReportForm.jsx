@@ -15,13 +15,13 @@ import TypeOneWalletReportForm from "../components/reports/income/TypeOneWalletR
 import TypeOneDraftReportForm from "../components/reports/income/TypeOneDraftReportForm";
 import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTwoWalletAccountReportForm";
 import TypeTwoCashReportForm from "../components/reports/income/TypeTwoCashReportForm";
-import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoHelpReportForm";
 import TypeTwoHelpReportForm from "../components/reports/income/TypeTwoHelpReportForm";
 import TypeTwoTransferReportForm from "../components/reports/income/TypeTwoTransferReportForm";
 import TypeTwoCashDeliveryReportForm from "../components/reports/outcome/TypeTwoCashDeliveryReportForm";
 import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepositReportForm";
 import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
 import { Alert } from "react-bootstrap";
+import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoIncomeTransferenceReportForm";
 
 const componentsDictionary = new Map();
 componentsDictionary.set(1, <SupplierReportForm />)
@@ -61,6 +61,7 @@ tableColumnsDictionary.set("conversion", "Conversión");
 tableColumnsDictionary.set("account", "Cuenta bancaria");
 tableColumnsDictionary.set("store", "Local");
 tableColumnsDictionary.set("motive", "Motivo");
+tableColumnsDictionary.set("supplier", "Proveedor");
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },

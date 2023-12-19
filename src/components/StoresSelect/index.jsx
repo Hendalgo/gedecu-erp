@@ -31,7 +31,7 @@ const StoresSelect = ({
             name={name}
             options={stores}
             placeholder={placeholder}
-            noOptionsMessage={noOptionsMessage}
+            noOptionsMessage={() => noOptionsMessage}
         />
     )
 }

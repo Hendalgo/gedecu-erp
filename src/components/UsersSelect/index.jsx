@@ -6,14 +6,15 @@ const UsersSelect = ({
     id = "",
     name = "",
     placeholder = "Selecciona el gestor",
-    noOptionsMessage = "No hay coincidencias"
+    noOptionsMessage = "No hay coincidencias",
+    query = "",
 }) => {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [usersResponse,] = await Promise.all([ getUsers("paginated=no"), ]);
+                const [usersResponse,] = await Promise.all([ getUsers("paginated=no".concat(query)), ]);
 
                 if (usersResponse) setUsers(usersResponse.map(({ name, email, id }) => ({ label: name.concat(" (", email, ")"), value: id })));
 
@@ -31,7 +32,7 @@ const UsersSelect = ({
             name={name}
             options={users}
             placeholder={placeholder}
-            noOptionsMessage={noOptionsMessage}
+            noOptionsMessage={() => noOptionsMessage}
         />
     )
 }
