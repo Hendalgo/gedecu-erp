@@ -8,8 +8,7 @@ const SupplierReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="supplier" className="form-label">Proveedor <span className="Required">*</span></label>
-                    <UsersSelect id="supplier" name="supplier" placeholder="Selecciona al proveedor" query="" />
-                    {/* <UsersSelect id="supplier" name="supplier" placeholder="Selecciona al proveedor" query="&rol=1" /> */}
+                    <UsersSelect id="supplier" name="supplier" placeholder="Selecciona al proveedor" query="&role=3" />
                 </div>
                 <div className="col">
                     <label htmlFor="receiverAccount" className="form-label">Cuenta receptora <span className="Required">*</span></label>

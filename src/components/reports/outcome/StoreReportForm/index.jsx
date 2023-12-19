@@ -18,7 +18,11 @@ const StoreReportForm = () => {
         else setRate(rate);
     }
 
-    const conversionAmount = rate > 0 ? (amount * rate).toFixed(2) : 0;
+    const conversionAmount = rate > 0 ? (amount * rate).toLocaleString("es-VE", {
+        useGrouping: true,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }) : 0;
 
     return(
         <>
@@ -39,13 +43,13 @@ const StoreReportForm = () => {
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" defaultValue={amount} onChange={handleAmountChange} />
+                    <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa de cambio <span className="Required">*</span></label>
-                    <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
+                    <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
                     <label htmlFor="conversion" className="form-label">Monto total en VED</label>

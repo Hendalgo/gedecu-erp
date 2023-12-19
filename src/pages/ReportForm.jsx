@@ -22,6 +22,7 @@ import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepos
 import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
 import { Alert } from "react-bootstrap";
 import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoIncomeTransferenceReportForm";
+import TypeTwoIncomeWalletAccountReportForm from "../components/reports/income/TypeTwoIncomeWalletAccountReportForm";
 
 const componentsDictionary = new Map();
 componentsDictionary.set(1, <SupplierReportForm />)
@@ -29,6 +30,7 @@ componentsDictionary.set(2, <ReceivedHelpReportForm />)
 componentsDictionary.set(3, <IncomeWalletReportForm />)
 componentsDictionary.set(101, <TypeOneWalletReportForm />)
 componentsDictionary.set(102, <TypeOneDraftReportForm />)
+componentsDictionary.set(114, <TypeTwoIncomeWalletAccountReportForm />)
 componentsDictionary.set(103, <TypeTwoCashReportForm />)
 componentsDictionary.set(104, <TypeTwoIncomeTransferenceReportForm />)
 componentsDictionary.set(105, <TypeTwoHelpReportForm />)
@@ -56,12 +58,14 @@ tableColumnsDictionary.set("amount", "Monto");
 tableColumnsDictionary.set("reference", "Referencia");
 tableColumnsDictionary.set("user", "Gestor");
 tableColumnsDictionary.set("transferencesQuantity", "N° de transferencias");
-tableColumnsDictionary.set("rate", "Tasas");
+tableColumnsDictionary.set("rate", "Tasa");
 tableColumnsDictionary.set("conversion", "Conversión");
 tableColumnsDictionary.set("account", "Cuenta bancaria");
 tableColumnsDictionary.set("store", "Local");
 tableColumnsDictionary.set("motive", "Motivo");
 tableColumnsDictionary.set("supplier", "Proveedor");
+tableColumnsDictionary.set("bank", "Banco");
+tableColumnsDictionary.set("isDeliveryOrDeposit", "Depósito/Entrega");
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
@@ -91,6 +95,10 @@ const reportTypes = [
             {
                 label: "Giros R1",
                 value: 102
+            },
+            {
+                label: "Cuenta de billetera R2",
+                value: 114
             },
             {
                 label: "Efectivo R2",
@@ -233,7 +241,16 @@ const ReportForm = () => {
 
             setTableHeaderColumns(headers);
         }
-        
+
+        const newEntry = {};
+
+        data.forEach((value, key) => {
+            newEntry[key] = value;
+        });
+
+        setTableData((prev) => [ ...prev, newEntry ]);
+
+        e.target.reset();
     }
 
     const postReport = () => {
@@ -290,6 +307,7 @@ const ReportForm = () => {
                     <div className="row mt-3">
                         <div className="col text-end">
                             <input type="submit" value="Agregar" className="btn btn-outline-primary" />
+                            <button type="reset">Res</button>
                         </div>
                     </div>
                 </form>
@@ -308,8 +326,16 @@ const ReportForm = () => {
                     </thead>
                     <tbody>
                         {
-                            tableData.map((_, index) => {
-                                return <tr key={index}></tr>
+                            tableData.map((entry, index) => {
+                                return <tr key={index}>
+                                    {
+                                        Object.values(entry).map((value, childIndex) => {
+                                            return <td key={`childIndex-${childIndex}`}>
+                                                {value}
+                                            </td>
+                                        })
+                                    }
+                                </tr>
                             })
                         }
                     </tbody>

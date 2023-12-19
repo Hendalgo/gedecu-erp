@@ -1,8 +1,8 @@
 import { useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import BankAccountsSelect from "../../../BankAccountsSelect";
 import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
+import BanksSelect from "../../../BanksSelect";
 
 const TypeOneDraftReportForm = () => {
     const [amount, setAmount] = useState(0);
@@ -28,8 +28,8 @@ const TypeOneDraftReportForm = () => {
         <>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="account" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <BankAccountsSelect id="account" name="account" query="&bank=2" />
+                    <label htmlFor="bank" className="form-label">Banco <span className="Required">*</span></label>
+                    <BanksSelect id="bank" name="bank" query="&country=2" />
                 </div>
                 <div className="col">
                     <label htmlFor="user" className="form-label">Gestor <span className="Required">*</span></label>
@@ -43,13 +43,13 @@ const TypeOneDraftReportForm = () => {
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" defaultValue={amount} onChange={handleAmountChange} />
+                    <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
-                    <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
+                    <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
                     <label htmlFor="conversion" className="form-label">Monto total en VED</label>

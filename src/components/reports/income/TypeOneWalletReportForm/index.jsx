@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import { Alert } from "react-bootstrap";
 import NumberInput from "../../../NumberInput";
+import { me } from "../../../../helpers/me";
 
 const TypeOneWalletReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
+    const [currencyShortCode, setCurrencyShortCode] = useState("COP");
     const [error, setError] = useState({ show: false, message: "", variant: "danger" });
+
+    useEffect(() => {
+        me()
+        .then(({ data }) => {
+            setCurrencyShortCode(data.name);
+        })
+        .catch((error) => {
+            setError((prev) => ({ ...prev, show: true, message: error.message }));
+        });
+    }, []);
 
     const handleAmountChange = (amount) => {
         if (Number.isNaN(amount)) setError((prev) => ({ ...prev, show: true, message: "El valor ingresado es inadecuado." }));
@@ -33,16 +45,16 @@ const TypeOneWalletReportForm = () => {
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en USD <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" defaultValue={amount} onChange={handleAmountChange} />
+                    <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
-                    <DecimalInput id="rate" name="rate" defaultValue={rate} onChange={handleRateChange} />
+                    <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en COP</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en { currencyShortCode }</label>
                     <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>

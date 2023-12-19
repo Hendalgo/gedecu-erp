@@ -10,14 +10,26 @@ const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => n
 
   const handleInputChange = (e) => {
     let { value } = e.target;
-    value = value.replace(/,/g, '').replace(/\./g, '');
-    value = value.padStart(3, '0');
-    const decimalPart = value.slice(-2);
-    let integerPart = value.slice(0, -2);
-    integerPart = parseInt(integerPart, 10).toString(); // Elimina los ceros a la izquierda
-    onChange(new Number(`${integerPart}.${decimalPart}`));
-    integerPart = formatNumber(integerPart);
-    setValue(`${integerPart},${decimalPart}`);
+
+    value = value.replace(/[.,]/gi, '');
+
+    if (value.match(/\d/)) {
+      const number = new Number(value) / 100;
+
+      e.target.value = number.toLocaleString("es-VE", {
+        useGrouping: true,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    }
+    // value = value.replace(/,/g, '').replace(/\./g, '');
+    // value = value.padStart(3, '0');
+    // const decimalPart = value.slice(-2);
+    // let integerPart = value.slice(0, -2);
+    // integerPart = parseInt(integerPart, 10).toString(); // Elimina los ceros a la izquierda
+    // onChange(new Number(`${integerPart}.${decimalPart}`));
+    // integerPart = formatNumber(integerPart);
+    // setValue(`${integerPart},${decimalPart}`);
   };
 
   useEffect(() => {
@@ -31,8 +43,10 @@ const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => n
       className='form-control'
       ref={inputRef}
       type="text"
-      value={value}
-      onClick={(e) => e.target.setSelectionRange(value.length, value.length)}
+      // value={value}
+      defaultValue={defaultValue}
+      // onClick={(e) => e.target.setSelectionRange(value.length, value.length)}
+      onClick={({ target }) => target.setSelectionRange(target.value.length, target.value.length)}
       onChange={handleInputChange}
     />
   );
