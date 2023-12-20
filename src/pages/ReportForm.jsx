@@ -1,55 +1,9 @@
 import Select from "react-select";
-import SupplierReportForm from "../components/reports/income/SupplierReportForm";
 import { useEffect, useState } from "react";
-import StoreReportForm from "../components/reports/outcome/StoreReportForm";
-import OutcomeWalletReportForm from "../components/reports/outcome/WalletReportForm";
-import IncomeWalletReportForm from "../components/reports/income/WalletReportForm";
-import SendedHelpReportForm from "../components/reports/outcome/SendedHelpReportForm";
-import ReceivedHelpReportForm from "../components/reports/income/ReceivedHelpReportForm";
-import TransferReportForm from "../components/reports/outcome/TransferReportForm";
-import RefillReportForm from "../components/reports/outcome/RefillReportForm";
-import TaxReportForm from "../components/reports/outcome/TaxReportForm";
-import CreditReportForm from "../components/reports/outcome/CreditReportForm";
-import OtherReportForm from "../components/reports/outcome/OtherReportForm";
-import TypeOneWalletReportForm from "../components/reports/income/TypeOneWalletReportForm";
-import TypeOneDraftReportForm from "../components/reports/income/TypeOneDraftReportForm";
-import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTwoWalletAccountReportForm";
-import TypeTwoCashReportForm from "../components/reports/income/TypeTwoCashReportForm";
-import TypeTwoHelpReportForm from "../components/reports/income/TypeTwoHelpReportForm";
-import TypeTwoTransferReportForm from "../components/reports/income/TypeTwoTransferReportForm";
-import TypeTwoCashDeliveryReportForm from "../components/reports/outcome/TypeTwoCashDeliveryReportForm";
-import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepositReportForm";
-import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
 import { Alert } from "react-bootstrap";
-import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoIncomeTransferenceReportForm";
-import TypeTwoIncomeWalletAccountReportForm from "../components/reports/income/TypeTwoIncomeWalletAccountReportForm";
-
-const componentsDictionary = new Map();
-componentsDictionary.set(1, <SupplierReportForm />)
-componentsDictionary.set(2, <ReceivedHelpReportForm />)
-componentsDictionary.set(3, <IncomeWalletReportForm />)
-componentsDictionary.set(101, <TypeOneWalletReportForm />)
-componentsDictionary.set(102, <TypeOneDraftReportForm />)
-componentsDictionary.set(114, <TypeTwoIncomeWalletAccountReportForm />)
-componentsDictionary.set(103, <TypeTwoCashReportForm />)
-componentsDictionary.set(104, <TypeTwoIncomeTransferenceReportForm />)
-componentsDictionary.set(105, <TypeTwoHelpReportForm />)
-componentsDictionary.set(106, <TypeTwoTransferReportForm />)
-componentsDictionary.set(5, <StoreReportForm />)
-componentsDictionary.set(6, <OutcomeWalletReportForm />)
-componentsDictionary.set(7, <SendedHelpReportForm />)
-componentsDictionary.set(8, <TransferReportForm />)
-componentsDictionary.set(9, <RefillReportForm />)
-componentsDictionary.set(10, <TaxReportForm />)
-componentsDictionary.set(11, <CreditReportForm />)
-componentsDictionary.set(12, <OtherReportForm />)
-componentsDictionary.set(107, <TypeTwoWalletAccountReportForm />)
-componentsDictionary.set(108, <TypeTwoCashDeliveryReportForm />)
-componentsDictionary.set(109, <TypeTwoDepositReportForm />)
-componentsDictionary.set(110, <TypeTwoOutcomeTransferenceReportForm />)
-componentsDictionary.set(111, <TaxReportForm />)
-componentsDictionary.set(112, <CreditReportForm />)
-componentsDictionary.set(113, <OtherReportForm />)
+import { ReportTableContext } from "../context/ReportTableContext";
+import reportsColumnsMap from "../consts/ReportsColumnsMap";
+import componentsMap from "../consts/ReportsComponentsMap";
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
@@ -171,14 +125,13 @@ const reportTypes = [
 
 const ReportForm = () => {
     const [reportType, setReportType] = useState(0);
-    const [error, setError] = useState({ show: false, message: "", variant: 'primary' });
-    const [tableHeaderColumns, setTableHeaderColumns] = useState([]);
-    const [tableData, setTableData] = useState([]);
+    const [error, setError] = useState({ show: false, message: "", variant: 'danger' });
+    const [tableData, setTableData] = useState({ header: [], body: [] });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // throw new Error("This is a test error")
+                throw new Error("This is a test error")
                 // if (true) { // User de VZLA
                 //     // Buscar los tipos de reportes sueltos
                 //     // Asignar los valores al estado de tipo de reportes
@@ -206,13 +159,63 @@ const ReportForm = () => {
     }
 
     const handleReportType = ({ value }) => {
-        setTableHeaderColumns([]);
-        setTableData([]);
+        setTableData({ header: [], body: [] });
         setReportType(value)
     }
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        const data = new FormData(event.target);
+
+        if (tableData.header.length === 0) {
+            const columns = [];
+
+            for (let key of data.keys()) columns.push(reportsColumnsMap.get(key));
+
+            setTableData((prev) => ({...prev, header: columns}));
+        }
+
+        try {
+            const newEntry = {};
+            let errors = [];
+    
+            data.forEach((value, key) => {
+                if (!value || value.startsWith("0,0")) {
+                    errors.push(`El campo ${reportsColumnsMap.get(key)} posee un valor inadecuado`);
+                } else {
+                    newEntry[key] = value;
+                }
+            });
+    
+            if (errors.length > 1) throw new Error(errors.join());
+    
+            setTableData((prev) => ({...prev, body: [...prev.body, newEntry]}));
+    
+            event.target.reset();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleDelete = (index) => {
+        const newEntries = [...tableData.body];
+        let columns = [...tableData.header];
+
+        newEntries.splice(index, 1);
+
+        if (newEntries.length === 0) columns = [];
+
+        setTableData(({header: columns, body: newEntries}));
+    }
+
     const postReport = () => {
-        alert("Save all reports");
+        console.log(JSON.stringify(tableData.body))
+        // Validar reportes
+        // Crear data del reporte según tipo de reporte
+        // Mandar a servidor
+        // Validar respuesta
+        // Redireccionar
     }
 
     return(
@@ -221,7 +224,7 @@ const ReportForm = () => {
                 <p>Agrega un nuevo reporte +</p>
                 <div className="d-flex justify-content-between">
                     <h1>Nuevo Reporte</h1>
-                    <button type="button" className="btn btn-primary w-auto" onClick={postReport}>Guardar +</button>
+                    <button type="button" className="btn btn-primary w-auto" disabled={tableData.body.length === 0} onClick={postReport}>Guardar +</button>
                 </div>
             </section>
             <section className="container p-2">
@@ -249,9 +252,54 @@ const ReportForm = () => {
                         onChange={handleReportType}
                     />
                 </div>
+                <ReportTableContext.Provider value={{ handleSubmit, }}>
                     {
-                        componentsDictionary.has(reportType) && componentsDictionary.get(reportType)
+                        componentsMap.has(reportType) && componentsMap.get(reportType)
                     }
+                </ReportTableContext.Provider>
+                <Alert show={error.show} variant={error.variant} className="my-3">
+                    {
+                        error.message
+                    }
+                </Alert>
+            </section>
+            <section>
+                {
+                    (tableData && tableData.header.length > 0) &&
+                    <table className="table TableP table-striped">
+                        <thead>
+                            <tr>
+                                {
+                                    tableData.header.map((header, hIndex) => <th key={hIndex}>{header}</th>)
+                                }
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                tableData.body.map((entry, rowIndex) => {
+                                    return <tr key={rowIndex}>
+                                        {
+                                            Object.values(entry)
+                                            .concat("delete")
+                                            .map((value, cellIndex) => {
+                                                return <td key={cellIndex}>{value === "delete" ?
+                                                <button className="TableActionButtons" onClick={() => handleDelete(rowIndex)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M15.3332 3C15.3332 2.44772 14.8855 2 14.3332 2H11.8158C11.3946 0.804906 10.267 0.0040625 8.99985 0H6.99985C5.73269 0.0040625 4.6051 0.804906 4.18385 2H1.6665C1.11422 2 0.666504 2.44772 0.666504 3C0.666504 3.55228 1.11422 4 1.6665 4H1.99985V12.3333C1.99985 14.3584 3.64147 16 5.6665 16H10.3332C12.3582 16 13.9998 14.3584 13.9998 12.3333V4H14.3332C14.8855 4 15.3332 3.55228 15.3332 3ZM11.9998 12.3333C11.9998 13.2538 11.2537 14 10.3332 14H5.6665C4.74604 14 3.99985 13.2538 3.99985 12.3333V4H11.9998V12.3333Z" fill="#495057"/>
+                                                        <path d="M6.33301 12C6.88529 12 7.33301 11.5523 7.33301 11V7C7.33301 6.44772 6.88529 6 6.33301 6C5.78073 6 5.33301 6.44772 5.33301 7V11C5.33301 11.5523 5.78073 12 6.33301 12Z" fill="#495057"/>
+                                                        <path d="M9.6665 12C10.2188 12 10.6665 11.5523 10.6665 11V7C10.6665 6.44772 10.2188 6 9.6665 6C9.11422 6 8.6665 6.44772 8.6665 7V11C8.6665 11.5523 9.11422 12 9.6665 12Z" fill="#495057"/>
+                                                    </svg>
+                                                </button> :
+                                                value}</td>
+                                            })
+                                        }
+                                    </tr>
+                                })
+                            }
+                        </tbody>
+                    </table>
+                }
             </section>
         </>
     )

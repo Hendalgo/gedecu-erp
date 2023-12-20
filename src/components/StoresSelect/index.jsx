@@ -6,7 +6,10 @@ const StoresSelect = ({
     id = "",
     name = "",
     placeholder = "Selecciona el local",
-    noOptionsMessage = "No hay coincidencias"
+    noOptionsMessage = "No hay coincidencias",
+    query = "",
+    value = null,
+    onChange = () => null,
 }) => {
     const [stores, setStores] = useState([]);
 
@@ -31,7 +34,10 @@ const StoresSelect = ({
             name={name}
             options={stores}
             placeholder={placeholder}
+            value={value}
             noOptionsMessage={() => noOptionsMessage}
+            onChange={(value) => onChange(value)}
+            isClearable
         />
     )
 }

@@ -14,7 +14,7 @@ const NumberInput = ({
     return (
         <div className="input-group">
             <button type="button" className="btn btn-secondary z-0" onClick={handleClick}>+</button>
-            <input type="number" ref={input} id={id} name={name} defaultValue={0} min={1} className="form-control" />
+            <input type="number" ref={input} id={id} name={name} defaultValue={1} min={1} className="form-control" />
         </div>
     )
 }

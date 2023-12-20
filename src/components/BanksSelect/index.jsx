@@ -8,6 +8,8 @@ const BanksSelect = ({
     placeholder = "Selecciona el banco",
     noOptionsMessage = "No hay coincidencias",
     query = "",
+    value = null,
+    onChange = () => null,
 }) => {
     const [banks, setBanks] = useState([]);
 
@@ -19,7 +21,7 @@ const BanksSelect = ({
         }
 
         fetchData();
-    }, []);
+    }, [query]);
 
     return (
         <Select
@@ -27,7 +29,10 @@ const BanksSelect = ({
             name={name}
             options={banks}
             placeholder={placeholder}
+            value={value}
             noOptionsMessage={() => noOptionsMessage}
+            onChange={(value) => onChange(value)}
+            isClearable
         />
     )
 }
