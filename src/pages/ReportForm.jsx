@@ -51,22 +51,6 @@ componentsDictionary.set(111, <TaxReportForm />)
 componentsDictionary.set(112, <CreditReportForm />)
 componentsDictionary.set(113, <OtherReportForm />)
 
-const tableColumnsDictionary = new Map();
-tableColumnsDictionary.set("receiverAccount", "Cuenta receptora");
-tableColumnsDictionary.set("senderAccount", "Cuenta emisora");
-tableColumnsDictionary.set("amount", "Monto");
-tableColumnsDictionary.set("reference", "Referencia");
-tableColumnsDictionary.set("user", "Gestor");
-tableColumnsDictionary.set("transferencesQuantity", "N° de transferencias");
-tableColumnsDictionary.set("rate", "Tasa");
-tableColumnsDictionary.set("conversion", "Conversión");
-tableColumnsDictionary.set("account", "Cuenta bancaria");
-tableColumnsDictionary.set("store", "Local");
-tableColumnsDictionary.set("motive", "Motivo");
-tableColumnsDictionary.set("supplier", "Proveedor");
-tableColumnsDictionary.set("bank", "Banco");
-tableColumnsDictionary.set("isDeliveryOrDeposit", "Depósito/Entrega");
-
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
     { value: 2, label: "Reporte Tipo 2" },
@@ -227,32 +211,6 @@ const ReportForm = () => {
         setReportType(value)
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        const data = new FormData(e.target);
-
-        if (tableHeaderColumns.length === 0) {
-            const headers = [];
-
-            data.forEach((value, key) => {
-                headers.push(tableColumnsDictionary.get(key));
-            });
-
-            setTableHeaderColumns(headers);
-        }
-
-        const newEntry = {};
-
-        data.forEach((value, key) => {
-            newEntry[key] = value;
-        });
-
-        setTableData((prev) => [ ...prev, newEntry ]);
-
-        e.target.reset();
-    }
-
     const postReport = () => {
         alert("Save all reports");
     }
@@ -291,55 +249,9 @@ const ReportForm = () => {
                         onChange={handleReportType}
                     />
                 </div>
-                <form method="" action="" className="" onSubmit={handleSubmit} autoComplete="off">
                     {
                         componentsDictionary.has(reportType) && componentsDictionary.get(reportType)
                     }
-                    <div className="row mt-3">
-                        <div className="col text-center">
-                            <Alert variant={error.variant} show={error.show}>
-                                {
-                                    error.message
-                                }
-                            </Alert >
-                        </div>
-                    </div>
-                    <div className="row mt-3">
-                        <div className="col text-end">
-                            <input type="submit" value="Agregar" className="btn btn-outline-primary" />
-                            <button type="reset">Res</button>
-                        </div>
-                    </div>
-                </form>
-            </section>
-            <section>
-                <table className="w-100 table">
-                    <thead>
-                        <tr>
-                            {
-                                tableHeaderColumns.map((header, index) => {
-                                    return <th key={index}>{ header }</th>
-                                })
-                            }
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            tableData.map((entry, index) => {
-                                return <tr key={index}>
-                                    {
-                                        Object.values(entry).map((value, childIndex) => {
-                                            return <td key={`childIndex-${childIndex}`}>
-                                                {value}
-                                            </td>
-                                        })
-                                    }
-                                </tr>
-                            })
-                        }
-                    </tbody>
-                </table>
             </section>
         </>
     )

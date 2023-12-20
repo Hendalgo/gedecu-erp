@@ -8,6 +8,8 @@ const UsersSelect = ({
     placeholder = "Selecciona el gestor",
     noOptionsMessage = "No hay coincidencias",
     query = "",
+    value = null,
+    onChange = () => null,
 }) => {
     const [users, setUsers] = useState([]);
 
@@ -24,7 +26,7 @@ const UsersSelect = ({
         }
 
         fetchData();
-    }, [])
+    }, [query])
 
     return (
         <Select
@@ -32,7 +34,10 @@ const UsersSelect = ({
             name={name}
             options={users}
             placeholder={placeholder}
+            value={value}
             noOptionsMessage={() => noOptionsMessage}
+            onChange={(value) => onChange(value)}
+            isClearable
         />
     )
 }
