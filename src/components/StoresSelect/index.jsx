@@ -18,7 +18,7 @@ const StoresSelect = ({
             try {
                 const [storesResponse,] = await Promise.all([ getStores("paginated=no"), ]);
 
-                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: id })));
+                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: name })));
 
             } catch (error) {
                 console.error(error)

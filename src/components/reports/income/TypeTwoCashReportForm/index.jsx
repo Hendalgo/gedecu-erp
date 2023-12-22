@@ -10,7 +10,7 @@ const TypeTwoCashReportForm = () => {
         <form onSubmit={handleSubmit} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <FormCheck id="deposit" name="isDeliveryOrDeposit" value="Depósito" inline type="radio" label="Depósito" />
+                    <FormCheck defaultChecked id="deposit" name="isDeliveryOrDeposit" value="Depósito" inline type="radio" label="Depósito" />
                     <FormCheck id="delivery" name="isDeliveryOrDeposit" inline value="Entrega" type="radio" label="Entrega" />
                 </div>
             </div>

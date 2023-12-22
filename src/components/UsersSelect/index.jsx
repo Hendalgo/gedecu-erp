@@ -18,7 +18,10 @@ const UsersSelect = ({
             try {
                 const [usersResponse,] = await Promise.all([ getUsers("paginated=no".concat(query)), ]);
 
-                if (usersResponse) setUsers(usersResponse.map(({ name, email, id }) => ({ label: name.concat(" (", email, ")"), value: id })));
+                if (usersResponse) setUsers(usersResponse.map(({ name, email, id }) => {
+                    const label = name.concat(" (", email, ")");
+                    return { label: label, value: label };
+                }));
 
             } catch (error) {
                 console.error(error)

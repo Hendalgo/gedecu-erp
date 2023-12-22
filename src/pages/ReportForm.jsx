@@ -1,200 +1,139 @@
 import Select from "react-select";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Alert } from "react-bootstrap";
 import { ReportTableContext } from "../context/ReportTableContext";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import componentsMap from "../consts/ReportsComponentsMap";
+import ModalConfirmation from "../components/ModalConfirmation";
+import { getReportTypes } from "../helpers/reports";
+import { SessionContext } from "../context/SessionContext";
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
     { value: 2, label: "Reporte Tipo 2" },
 ]
 
-const reportTypes = [
-    {
-        label: "Ingreso",
-        options: [
-            {
-                label: "Proveedor",
-                value: 1
-            },
-            {
-                label: "Ayuda recibida",
-                value: 2
-            },
-            {
-                label: "Billetera",
-                value: 3
-            },
-            {
-                label: "Billetera R1",
-                value: 101
-            },
-            {
-                label: "Giros R1",
-                value: 102
-            },
-            {
-                label: "Cuenta de billetera R2",
-                value: 114
-            },
-            {
-                label: "Efectivo R2",
-                value: 103
-            },
-            {
-                label: "Transferencia R2",
-                value: 104
-            },
-            {
-                label: "Ayuda R2",
-                value: 105
-            },
-            {
-                label: "Traspaso R2",
-                value: 106
-            },
-        ]
-    },
-    {
-        label: "Egreso",
-        options: [
-            {
-                label: "Local",
-                value: 5
-            },
-            {
-                label: "Billetera",
-                value: 6
-            },
-            {
-                label: "Ayuda realizada",
-                value: 7
-            },
-            {
-                label: "Traspasos",
-                value: 8
-            },
-            {
-                label: "Recargas",
-                value: 9
-            },
-            {
-                label: "Comisiones",
-                value: 10
-            },
-            {
-                label: "Créditos",
-                value: 11
-            },
-            {
-                label: "Otros",
-                value: 12
-            },
-            {
-                label: "Cuenta de billetera R2",
-                value: 107
-            },
-            {
-                label: "Entrega efectivo R2",
-                value: 108
-            },
-            {
-                label: "Depósitos R2",
-                value: 109
-            },
-            {
-                label: "Transferencias R2",
-                value: 110
-            },
-            {
-                label: "Comisiones R2",
-                value: 111
-            },
-            {
-                label: "Créditos R2",
-                value: 112
-            },
-            {
-                label: "Otros R2",
-                value: 113
-            },
-        ]
-    }
-]
-
 const ReportForm = () => {
-    const [reportType, setReportType] = useState(0);
-    const [error, setError] = useState({ show: false, message: "", variant: 'danger' });
-    const [tableData, setTableData] = useState({ header: [], body: [] });
+    const [reportType, setReportType] = useState(null);
+    const [reportTypes, setReportTypes] = useState([]);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [error, setError] = useState({ show: false, message: [], variant: 'danger' });
+    const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
+    const reportTypeAux = useRef(null);
+    const { session } = useContext(SessionContext);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                throw new Error("This is a test error")
-                // if (true) { // User de VZLA
-                //     // Buscar los tipos de reportes sueltos
-                //     // Asignar los valores al estado de tipo de reportes
 
-                // } else { // User internacional
-                //     // Buscar los reportes (tipo 1 y tipo 2)
-                //     // Asignar los valores a un ref
-                //     // 
+                if (session.country_id === 2) { // Venezuela
+                    const reportTypesResponse = await getReportTypes("paginated=no");
 
-                // }
-        } catch (error) {
-                console.error(error)
+                    if (reportTypesResponse) {
+                        const incomeReports = []; const outcomeReports = [];
+
+                        reportTypesResponse.forEach((reportType) => {
+                            if (reportType.type === "income") incomeReports.push({ value: reportType.id, label: reportType.name });
+                            if (reportType.type === "expense") outcomeReports.push({ value: reportType.id, label: reportType.name });
+                        });
+
+                        setReportTypes([
+                            { label: "INGRESO", options: incomeReports },
+                            { label: "EGRESO", options: outcomeReports },
+                        ])
+                    }
+                } else {
+                    console.log()
+                }
+            } catch (error) {
                 setError({
                     show: true,
-                    message: error.message,
+                    message: [error.message],
                     variant: "danger"
                 })
             }
         }
+
         fetchData();
-    }, [])
+    }, [session.country_id])
 
     const handleReport = ({ value }) => {
         console.log(value)
     }
 
-    const handleReportType = ({ value }) => {
-        setTableData({ header: [], body: [] });
-        setReportType(value)
+    const handleReportType = (option) => {
+        if (option.value !== reportType?.value) {
+            if (tableData.body.length > 0) {
+                reportTypeAux.current = option;
+                setShowConfirmation(true);
+            } else {
+                setReportType(option);
+            }
+
+            clearError();
+        }
+    }
+
+    const handleReportChangeConfirm = () => {
+        setReportType(reportTypeAux.current);
+        clearTableData();
+    }
+
+    const clearError = () => {
+        setError({ show: false, message: [], variant: "danger", });
+    }
+
+    const clearTableData = () => {
+        setTableData({ header: [], body: [], })
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        clearError();
 
         const data = new FormData(event.target);
 
-        if (tableData.header.length === 0) {
-            const columns = [];
-
-            for (let key of data.keys()) columns.push(reportsColumnsMap.get(key));
-
-            setTableData((prev) => ({...prev, header: columns}));
-        }
-
         try {
             const newEntry = {};
+            let footAmount = 0;
+            let headColumns = [...tableData.header];
             let errors = [];
     
             data.forEach((value, key) => {
-                if (!value || value.startsWith("0,0")) {
-                    errors.push(`El campo ${reportsColumnsMap.get(key)} posee un valor inadecuado`);
+                if (!value || value == "0,00" || value == 0) {
+                    errors.push(`El campo ${reportsColumnsMap.get(key)} posee un valor inadecuado.`);
                 } else {
-                    newEntry[key] = value;
+                    if (key === "amount") {
+                        footAmount = new Number(value.replace(/[.,]/gi, '')) / 100;
+                    }
+                    newEntry[key] = value.trim();
                 }
             });
     
-            if (errors.length > 1) throw new Error(errors.join());
-    
-            setTableData((prev) => ({...prev, body: [...prev.body, newEntry]}));
+            if (errors.length > 0) throw new Error(errors.join(";"));
+
+            if ([8, 106].includes(reportType)) { // Traspasos
+                const senderAccount = data.get("senderAccount");
+                const receiverAccount = data.get("receiverAccount");
+
+                if (senderAccount.toLowerCase() === receiverAccount.toLowerCase()) {
+                    throw new Error("Las cuentas bancarias deben ser diferentes.");
+                }
+            }
+
+            if (tableData.header.length === 0) {
+                for (let key of data.keys()) headColumns.push(reportsColumnsMap.get(key));
+            }
+
+            setTableData((prev) => ({ header: headColumns, body: [...prev.body, newEntry], footer: prev.footer + footAmount }));
     
             event.target.reset();
         } catch (error) {
-            console.error(error);
+            setError({
+                message: error.message.split(';'),
+                show: true,
+                variant: "danger",
+            })
         }
     }
 
@@ -210,8 +149,16 @@ const ReportForm = () => {
     }
 
     const postReport = () => {
-        console.log(JSON.stringify(tableData.body))
-        // Validar reportes
+        setError({
+            show: true,
+            message: [JSON.stringify({
+                id: 0,
+                reportType: reportType.value,
+                table: tableData.body,
+                totalAmount: tableData.footer,
+            })],
+            variant: "success"
+        })
         // Crear data del reporte según tipo de reporte
         // Mandar a servidor
         // Validar respuesta
@@ -220,18 +167,20 @@ const ReportForm = () => {
 
     return(
         <>
-            <section className="container p-2">
-                <p>Agrega un nuevo reporte +</p>
-                <div className="d-flex justify-content-between">
-                    <h1>Nuevo Reporte</h1>
-                    <button type="button" className="btn btn-primary w-auto" disabled={tableData.body.length === 0} onClick={postReport}>Guardar +</button>
+            <section className="container p-2 mb-4">
+                <div className="WelcomeContainer pb-2">
+                    <h6 className="welcome">Agregar un nuevo reporte <span className="text-dark fs-5 fw-bold">+</span></h6>
+                    <div className="d-flex align-items-center justify-content-between">
+                        <h4>Nuevo Reporte</h4>
+                        <button type="button" className="btn btn-primary w-auto" disabled={tableData.body.length === 0} onClick={postReport}>Guardar +</button>
+                    </div>
                 </div>
             </section>
-            <section className="container p-2">
-                <div className="row align-items-center">
+            <section className="container card border border-0 rounded p-4 pb-2 mb-4">
+                <div className="WelcomeContainer row align-items-center pb-2">
                     <div className="col-4">
-                        <h2>Tipo de reporte</h2>
-                        <p>Selecciona el tipo de reporte para continuar</p>
+                        <h5 style={{ color: "#052C65" }}>Tipo de reporte</h5>
+                        <h6 className="welcome">Selecciona el tipo de reporte para continuar</h6>
                     </div>
                     <Select
                         inputId="reportTypes"
@@ -239,7 +188,7 @@ const ReportForm = () => {
                         options={reports}
                         placeholder="Reporte"
                         noOptionsMessage={() => "No hay resultados."}
-                        className="col-4"
+                        className={`${session.country_id !== 2 ? '' : 'invisible'} col-4`}
                         onChange={handleReport}
                     />
                     <Select
@@ -247,20 +196,25 @@ const ReportForm = () => {
                         name="reports"
                         options={reportTypes}
                         placeholder="Tipo de reporte"
+                        value={reportType}
                         noOptionsMessage={() => "No hay resultados."}
                         className="col-4"
                         onChange={handleReportType}
                     />
                 </div>
                 <ReportTableContext.Provider value={{ handleSubmit, }}>
-                    {
-                        componentsMap.has(reportType) && componentsMap.get(reportType)
-                    }
+                    <div className="py-4">
+                        {
+                            reportType && componentsMap.has(reportType.value) && componentsMap.get(reportType.value)
+                        }
+                    </div>
                 </ReportTableContext.Provider>
-                <Alert show={error.show} variant={error.variant} className="my-3">
-                    {
-                        error.message
-                    }
+                <Alert show={error.show} variant={error.variant}>
+                    <ul>
+                        {
+                            error.message.map((error, index) => <li key={index}>{error}</li>)
+                        }
+                    </ul>
                 </Alert>
             </section>
             <section>
@@ -298,9 +252,23 @@ const ReportForm = () => {
                                 })
                             }
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                    {
+                                        tableData.footer > 0 &&
+                                        <td colSpan={tableData.header.length + 1} className="text-end"><strong>Monto total: {tableData.footer.toLocaleString("es-VE")}</strong></td>
+                                    }
+                            </tr>
+                        </tfoot>
                     </table>
                 }
             </section>
+            <ModalConfirmation
+            show={showConfirmation}
+            setModalShow={setShowConfirmation}
+            action={handleReportChangeConfirm}
+            warning="Si cambia el reporte, se perderán todos los registros creados. ¿Está seguro?"
+            confirmButtonLabel="Confirmar" />
         </>
     )
 }

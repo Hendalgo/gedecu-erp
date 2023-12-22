@@ -21,7 +21,7 @@ import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTw
 import OutcomeWalletReportForm from "../components/reports/outcome/WalletReportForm";
 
 const componentsMap = new Map();
-componentsMap.set(1, <SupplierReportForm />)
+componentsMap.set(1, <SupplierReportForm />);
 componentsMap.set(2, <ReceivedHelpReportForm />)
 componentsMap.set(3, <IncomeWalletReportForm />)
 componentsMap.set(101, <TypeOneWalletReportForm />)

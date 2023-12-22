@@ -18,7 +18,10 @@ const BankAccountsSelect = ({
             try {
                 const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no".concat(query)), ]);
 
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, id }) => ({ label: name.concat(" - ", identifier), value: id })));
+                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, id }) => {
+                    const label = name.concat(" - ", identifier);
+                    return { label: label, value: label };
+                }));
 
             } catch (error) {
                 console.error(error)

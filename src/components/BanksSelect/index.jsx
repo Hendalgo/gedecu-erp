@@ -17,7 +17,7 @@ const BanksSelect = ({
         const fetchData = async () => {
             const banksResponse = await getBanks("paginated=no".concat(query));
 
-            if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: id })))
+            if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: name })))
         }
 
         fetchData();
