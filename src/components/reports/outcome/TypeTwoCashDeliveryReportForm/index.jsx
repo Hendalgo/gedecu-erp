@@ -5,18 +5,43 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 
 const TypeTwoCashDeliveryReportForm = () => {
     const [user, setUser] = useState(null);
-    const { handleSubmit } = useContext(ReportTableContext);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (!user) errors.push("El campo Gestor es obligatorio.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            formData.append("user", user.label);
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
+    }
 
     const handleReset = () => {
         setUser(null);
     }
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="user" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user" name="user" value={user} onChange={setUser} />
+                    <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
+                    <UsersSelect id="user_id" name="user_id" value={user} onChange={setUser} />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>

@@ -5,18 +5,44 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 
 const OtherReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
-    const { handleSubmit } = useContext(ReportTableContext);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (!bankAccount) errors.push("El campo Cuenta es obligatorio.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            if (!formData.get("motive").trim()) errors.push("El campo Motivo es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            formData.append("account", bankAccount.label);
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
+    }
 
     const handleReset = () => {
         setBankAccount(null);
     }
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="account" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <BankAccountsSelect id="account" name="account" value={bankAccount} onChange={setBankAccount} />
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect id="account_id" name="account_id" value={bankAccount} onChange={setBankAccount} />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>

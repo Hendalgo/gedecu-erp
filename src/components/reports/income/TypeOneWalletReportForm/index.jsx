@@ -1,26 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import { Alert } from "react-bootstrap";
 import NumberInput from "../../../NumberInput";
-import { me } from "../../../../helpers/me";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { SessionContext } from "../../../../context/SessionContext";
+import { Form } from "react-bootstrap";
 
 const TypeOneWalletReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
-    const [currencyShortCode, setCurrencyShortCode] = useState("COP");
-    const [error, setError] = useState({ show: false, message: "", variant: "danger" });
-    const { handleSubmit } = useContext(ReportTableContext);
-
-    useEffect(() => {
-        me()
-        .then(({ data }) => {
-            setCurrencyShortCode(data.name);
-        })
-        .catch((error) => {
-            setError((prev) => ({ ...prev, show: true, message: error.message }));
-        });
-    }, []);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     const handleAmountChange = (amount) => {
         if (Number.isNaN(amount)) setError((prev) => ({ ...prev, show: true, message: "El valor ingresado es inadecuado." }));
@@ -30,6 +19,30 @@ const TypeOneWalletReportForm = () => {
     const handleRateChange = (rate) => {
         if (Number.isNaN(rate)) setError((prev) => ({ ...prev, show: true, message: "El valor ingresado es inadecuado." }));
         else setRate(rate);        
+    }
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (formData.get("transferences") == 0) errors.push("El campo N° de transferencias es obligatorio.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            if (formData.get("rate") === "0,00") errors.push("El campo Tasa es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
     }
 
     const handleReset = () => {
@@ -44,11 +57,13 @@ const TypeOneWalletReportForm = () => {
     }) : 0;
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
+            <input type="hidden" id="country_id" name="country_id" value={country?.value || session.country_id} />
+            <input type="hidden" id="currency_id" name="currency_id" value={0} />
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
+                    <label htmlFor="transferences_quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences_quantity" name="transferences_quantity" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en USD <span className="Required">*</span></label>
@@ -61,22 +76,15 @@ const TypeOneWalletReportForm = () => {
                     <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en { currencyShortCode }</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en { country?.value || session.country_id }</label>
                     <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
-            {
-                error.show &&
-                <div className="row mb-3">
-                    <div className="col">
-                        <Alert show={error.show} variant={error.variant}>
-                            {
-                                error.message
-                            }
-                        </Alert>
-                    </div>
+            <div className="row mb-3">
+                <div className="col">
+                    <Form.Check type="checkbox" id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
-            }
+            </div>
             <div className="row text-end">
                 <div className="col">
                     <button type="submit" className="btn btn-outline-primary">Agregar</button>

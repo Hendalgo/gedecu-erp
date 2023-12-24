@@ -18,7 +18,7 @@ const StoresSelect = ({
             try {
                 const [storesResponse,] = await Promise.all([ getStores("paginated=no"), ]);
 
-                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: name })));
+                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: id })));
 
             } catch (error) {
                 console.error(error)
@@ -29,16 +29,19 @@ const StoresSelect = ({
     }, [])
 
     return (
-        <Select
-            inputId={id}
-            name={name}
-            options={stores}
-            placeholder={placeholder}
-            value={value}
-            noOptionsMessage={() => noOptionsMessage}
-            onChange={(value) => onChange(value)}
-            isClearable
-        />
+        <>
+            <input type="hidden" id={id} name={name} value={value?.label || ""} />
+            <Select
+                inputId={`${id}_id`}
+                name={`${name}_id`}
+                options={stores}
+                placeholder={placeholder}
+                value={value}
+                noOptionsMessage={() => noOptionsMessage}
+                onChange={(value) => onChange(value)}
+                isClearable
+            />
+        </>
     )
 }
 

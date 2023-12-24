@@ -1,25 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
-import { me } from "../../../../helpers/me";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
-    const [currencyShortCode, setCurrencyShortCode] = useState("COP");
-    const { handleSubmit } = useContext(ReportTableContext);
-
-    useEffect(() => {
-        me()
-        .then(({ data }) => {
-            setCurrencyShortCode(data.name);
-        })
-        .catch((error) => {
-            console.error(error)
-            // setError((prev) => ({ ...prev, show: true, message: error.message }));
-        });
-    }, []);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     const handleAmountChange = (amount) => {
         setAmount(amount);
@@ -27,6 +16,29 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
 
     const handleRateChange = (rate) => {
         setRate(rate)
+    }
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            if (formData.get("rate") === "0,00") errors.push("El campo Tasa es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
     }
 
     const handleReset = () => {
@@ -41,11 +53,11 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
     }) : 0;
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferencesQuantity" name="transferencesQuantity"/>
+                    <label htmlFor="transferences" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences" name="transferences"/>
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
@@ -58,7 +70,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                     <DecimalInput id="rate" name="rate" onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en { currencyShortCode }</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en { session.name }</label>
                     <input type="text" id="conversion" name="conversion" value={conversion} readOnly className="form-control" />
                 </div>
             </div>

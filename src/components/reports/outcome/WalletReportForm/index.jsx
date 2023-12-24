@@ -6,22 +6,48 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 
 const OutcomeWalletReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
-    const { handleSubmit } = useContext(ReportTableContext);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (!bankAccount) errors.push("El campo Cuenta es obligatorio.");
+            if (formData.get("transferences") == "0") errors.push("El campo N° de transferencias es obligatorio.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Referencia es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            formData.append("account", bankAccount.label);
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
+    }
 
     const handleReset = () => {
         setBankAccount(null);
     }
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
-                    <BankAccountsSelect id="senderAccount" name="senderAccount" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta emisora" />
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect id="account_id" name="account_id" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta emisora" />
                 </div>
                 <div className="col">
-                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
+                    <label htmlFor="transferences" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences" name="transferences" />
                 </div>
             </div>
             <div className="row mb-3">

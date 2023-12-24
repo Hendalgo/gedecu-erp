@@ -5,7 +5,7 @@ reportsColumnsMap.set("senderAccount", "Cuenta emisora");
 reportsColumnsMap.set("amount", "Monto");
 reportsColumnsMap.set("reference", "Referencia");
 reportsColumnsMap.set("user", "Gestor");
-reportsColumnsMap.set("transferencesQuantity", "N° de transferencias");
+reportsColumnsMap.set("transferences", "N° de transferencias");
 reportsColumnsMap.set("rate", "Tasa");
 reportsColumnsMap.set("conversion", "Conversión");
 reportsColumnsMap.set("account", "Cuenta bancaria");
@@ -14,5 +14,6 @@ reportsColumnsMap.set("motive", "Motivo");
 reportsColumnsMap.set("supplier", "Proveedor");
 reportsColumnsMap.set("bank", "Banco");
 reportsColumnsMap.set("isDeliveryOrDeposit", "Depósito/Entrega");
+reportsColumnsMap.set("isDuplicated", "Duplicado");
 
 export default reportsColumnsMap;

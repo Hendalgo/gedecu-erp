@@ -4,22 +4,48 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import StoresSelect from "../../../StoresSelect";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { Form } from "react-bootstrap";
 
 const StoreReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
     const [store, setStore] = useState(null);
     const [bankAccount, setBankAccount] = useState(null);
-    const { handleSubmit } = useContext(ReportTableContext);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
 
     const handleAmountChange = (amount) => {
-        if (Number.isNaN(amount)) console.error("Ingrese un valor adecuado");
+        if (Number.isNaN(amount)) setError({ show: true, message: ["Valor inadecuado."], variant: "danger" });
         else setAmount(amount);
     }
 
     const handleRateChange = (rate) => {
-        if (Number.isNaN(rate)) console.error("Ingrese un valor adecuado");
+        if (Number.isNaN(amount)) setError({ show: true, message: ["Valor inadecuado."], variant: "danger" });
         else setRate(rate);
+    }
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (!store) errors.push("El campo Local es obligatorio.");
+            if (!bankAccount) errors.push("El campo Cuenta es obligatorio.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            if (formData.get("rate") === "0,00") errors.push("El campo Tasa es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
     }
 
     const handleReset = () => {
@@ -36,21 +62,21 @@ const StoreReportForm = () => {
     }) : 0;
 
     return(
-        <form onSubmit={handleSubmit} onReset={handleReset} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="store" className="form-label">Local <span className="Required">*</span></label>
+                    <label htmlFor="store_id" className="form-label">Local <span className="Required">*</span></label>
                     <StoresSelect id="store" name="store" value={store} onChange={setStore} />
                 </div>
                 <div className="col">
-                    <label htmlFor="senderAccount" className="form-label">Cuenta emisora <span className="Required">*</span></label>
-                    <BankAccountsSelect id="senderAccount" name="senderAccount" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta emisora" />
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect id="account" name="account" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta emisora" />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferencesQuantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferencesQuantity" name="transferencesQuantity" />
+                    <label htmlFor="transferences_quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences_quantity" name="transferences_quantity" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
@@ -65,6 +91,11 @@ const StoreReportForm = () => {
                 <div className="col">
                     <label htmlFor="conversion" className="form-label">Monto total en VED</label>
                     <input id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
+                </div>
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check type="checkbox" id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

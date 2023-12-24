@@ -17,23 +17,26 @@ const BanksSelect = ({
         const fetchData = async () => {
             const banksResponse = await getBanks("paginated=no".concat(query));
 
-            if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: name })))
+            if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: id })));
         }
 
         fetchData();
     }, [query]);
 
     return (
-        <Select
-            inputId={id}
-            name={name}
-            options={banks}
-            placeholder={placeholder}
-            value={value}
-            noOptionsMessage={() => noOptionsMessage}
-            onChange={(value) => onChange(value)}
-            isClearable
-        />
+        <>
+            <input type="hidden" id={id} name={name} value={value?.label || ""} />
+            <Select
+                inputId={`${id}_id`}
+                name={`${name}_id`}
+                options={banks}
+                placeholder={placeholder}
+                value={value}
+                noOptionsMessage={() => noOptionsMessage}
+                onChange={(value) => onChange(value)}
+                isClearable
+            />
+        </>
     )
 }
 

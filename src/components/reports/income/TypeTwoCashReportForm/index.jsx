@@ -4,10 +4,33 @@ import { useContext } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 
 const TypeTwoCashReportForm = () => {
-    const { handleSubmit } = useContext(ReportTableContext);
+    const { handleSubmit, setError } = useContext(ReportTableContext);
+
+    const handleLocalSubmit = (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        let errors = [];
+
+        try {
+            if (!formData.has("isDeliveryOrDeposit")) errors.push("Debe indicar si el movimiento es Depósito o Entrega.");
+            if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
+            
+            if (errors.length > 0) throw new Error(errors.join(";"));
+            
+            handleSubmit(formData);
+            
+            e.target.reset();
+        } catch (error) {
+            setError({
+                show: true,
+                message: error.message.split(";"),
+                variant: "danger",
+            });
+        }
+    }
 
     return(
-        <form onSubmit={handleSubmit} autoComplete="off">
+        <form onSubmit={handleLocalSubmit} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
                     <FormCheck defaultChecked id="deposit" name="isDeliveryOrDeposit" value="Depósito" inline type="radio" label="Depósito" />

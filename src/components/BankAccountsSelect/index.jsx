@@ -20,7 +20,7 @@ const BankAccountsSelect = ({
 
                 if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, id }) => {
                     const label = name.concat(" - ", identifier);
-                    return { label: label, value: label };
+                    return { label: label, value: id };
                 }));
 
             } catch (error) {
@@ -32,16 +32,19 @@ const BankAccountsSelect = ({
     }, [query])
 
     return (
-        <Select
-            inputId={id}
-            name={name}
-            options={bankAccounts}
-            value={value}
-            onChange={(value) => onChange(value)}
-            placeholder={placeholder}
-            noOptionsMessage={() => noOptionsMessage}
-            isClearable
-        />
+        <>
+            <input type="hidden" id={id} name={name} value={value?.label || ""} />
+            <Select
+                inputId={`${id}_id`}
+                name={`${name}_id`}
+                options={bankAccounts}
+                value={value}
+                onChange={(value) => onChange(value)}
+                placeholder={placeholder}
+                noOptionsMessage={() => noOptionsMessage}
+                isClearable
+            />
+        </>
     )
 }
 

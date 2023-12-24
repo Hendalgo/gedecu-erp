@@ -20,7 +20,7 @@ const UsersSelect = ({
 
                 if (usersResponse) setUsers(usersResponse.map(({ name, email, id }) => {
                     const label = name.concat(" (", email, ")");
-                    return { label: label, value: label };
+                    return { label: label, value: id };
                 }));
 
             } catch (error) {
@@ -32,16 +32,19 @@ const UsersSelect = ({
     }, [query])
 
     return (
-        <Select
-            inputId={id}
-            name={name}
-            options={users}
-            placeholder={placeholder}
-            value={value}
-            noOptionsMessage={() => noOptionsMessage}
-            onChange={(value) => onChange(value)}
-            isClearable
-        />
+        <>
+            <input type="hidden" id={id} name={name} value={value?.label || ""} />
+            <Select
+                inputId={`${id}_id`}
+                name={`${name}_id`}
+                options={users}
+                placeholder={placeholder}
+                value={value}
+                noOptionsMessage={() => noOptionsMessage}
+                onChange={(value) => onChange(value)}
+                isClearable
+            />
+        </>
     )
 }
 

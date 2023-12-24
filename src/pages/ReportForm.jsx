@@ -7,6 +7,7 @@ import componentsMap from "../consts/ReportsComponentsMap";
 import ModalConfirmation from "../components/ModalConfirmation";
 import { getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
+import { getCountries } from "../helpers/countries";
 
 const reports = [
     { value: 1, label: "Reporte Tipo 1" },
@@ -14,33 +15,59 @@ const reports = [
 ]
 
 const ReportForm = () => {
+    const [countries, setCountries] = useState([]);
+    const countriesRef = useRef([]);
+    const [country, setCountry] = useState(null);
+    const countryAux = useRef(null);
     const [reportType, setReportType] = useState(null);
     const [reportTypes, setReportTypes] = useState([]);
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showReportConfirmation, setShowReportConfirmation] = useState(false);
+    const [showCountryConfirmation, setShowCountryConfirmation] = useState(false);
     const [error, setError] = useState({ show: false, message: [], variant: 'danger' });
     const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
     const reportTypeAux = useRef(null);
+    const vzlaReportTypes = useRef([]);
+    const subreports = useRef([]);
     const { session } = useContext(SessionContext);
+
+    const showCountries = [1,].includes(session.role_id);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                if (showCountries) {
+                    const countriesResponse = await getCountries("paginated=no");
+
+                    if (countriesResponse && countriesResponse.data) {
+                        countriesRef.current = countriesResponse.data;
+
+                        const countriesOptions = countriesRef.current.map(({ country_name, shortcode, id_country }) => ({ label: country_name.concat(" (", shortcode, ")"), value: id_country }));
+
+                        setCountries(countriesOptions);
+
+                        countryAux.current = countriesRef.current.find(({ id_country }) => id_country == session.country_id);
+
+                        setCountry(countriesOptions.find(({ value }) => value == session.country_id));
+                    }
+                }
 
                 if (session.country_id === 2) { // Venezuela
                     const reportTypesResponse = await getReportTypes("paginated=no");
 
                     if (reportTypesResponse) {
                         const incomeReports = []; const outcomeReports = [];
-
+                        
                         reportTypesResponse.forEach((reportType) => {
                             if (reportType.type === "income") incomeReports.push({ value: reportType.id, label: reportType.name });
                             if (reportType.type === "expense") outcomeReports.push({ value: reportType.id, label: reportType.name });
                         });
-
-                        setReportTypes([
+                        
+                        vzlaReportTypes.current = [
                             { label: "INGRESO", options: incomeReports },
                             { label: "EGRESO", options: outcomeReports },
-                        ])
+                        ];
+
+                        setReportTypes(vzlaReportTypes.current);
                     }
                 } else {
                     console.log()
@@ -57,15 +84,38 @@ const ReportForm = () => {
         fetchData();
     }, [session.country_id])
 
+    const handleCountry = (option) => {
+        if (option.value !== country?.value) {
+            if (tableData.body.length > 0) {
+                countryAux.current = countriesRef.current.find(({ id_country }) => id_country === option.value);
+                setShowCountryConfirmation(true);
+            } else {
+                setCountry(option);
+    
+                setReportTypes([]);
+                setReportType(null);
+    
+                if (option.value === 2) setReportTypes(vzlaReportTypes.current);
+            }
+
+            clearError();
+        }
+    }
+
+    const handleCountryChangeConfirm = () => {
+        setCountry({ label: `${countryAux.current.country_name} (${countryAux.current.shortcode})`, value: countryAux.current.id_country });
+        clearTableData();
+    }
+
     const handleReport = ({ value }) => {
         console.log(value)
-    }
+    }    
 
     const handleReportType = (option) => {
         if (option.value !== reportType?.value) {
             if (tableData.body.length > 0) {
                 reportTypeAux.current = option;
-                setShowConfirmation(true);
+                setShowReportConfirmation(true);
             } else {
                 setReportType(option);
             }
@@ -84,50 +134,56 @@ const ReportForm = () => {
     }
 
     const clearTableData = () => {
-        setTableData({ header: [], body: [], })
+        setTableData({ header: [], body: [], });
+        subreports.current = [];
     }
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = (formData = new FormData()) => {
         clearError();
 
-        const data = new FormData(event.target);
-
         try {
-            const newEntry = {};
+            const newTableEntry = {}; const newEntry = {};
             let footAmount = 0;
             let headColumns = [...tableData.header];
-            let errors = [];
-    
-            data.forEach((value, key) => {
-                if (!value || value == "0,00" || value == 0) {
-                    errors.push(`El campo ${reportsColumnsMap.get(key)} posee un valor inadecuado.`);
+
+            if (headColumns.length === 0) {
+                for (let key of formData.keys()) {
+                    if (reportsColumnsMap.has(key)) headColumns.push(reportsColumnsMap.get(key));
+                }
+            }
+
+            formData.forEach((value, key) => {
+                let formattedValue;
+
+                if (["amount", "rate", "conversion",].includes(key)) {
+                    formattedValue = parseFloat(value.replace(/[.,]/gi, '')) / 100;
+                } else if (key === "transferences_quantity") {
+                    formattedValue = parseInt(value);
                 } else {
-                    if (key === "amount") {
-                        footAmount = new Number(value.replace(/[.,]/gi, '')) / 100;
-                    }
-                    newEntry[key] = value.trim();
+                    formattedValue = value.trim();
+                }
+
+                newEntry[key] = formattedValue;
+
+                if (reportsColumnsMap.has(key)) {
+                    newTableEntry[key] = value.trim();
                 }
             });
-    
-            if (errors.length > 0) throw new Error(errors.join(";"));
 
-            if ([8, 106].includes(reportType)) { // Traspasos
-                const senderAccount = data.get("senderAccount");
-                const receiverAccount = data.get("receiverAccount");
+            newEntry["isDuplicated"] = true;
 
-                if (senderAccount.toLowerCase() === receiverAccount.toLowerCase()) {
-                    throw new Error("Las cuentas bancarias deben ser diferentes.");
-                }
+            newTableEntry["isDuplicated"] = "Sí";
+
+            if (!formData.has("isDuplicated")) {
+                headColumns.push("Duplicado");
+
+                newEntry["isDuplicated"] = false;
+
+                newTableEntry["isDuplicated"] = "No";
             }
 
-            if (tableData.header.length === 0) {
-                for (let key of data.keys()) headColumns.push(reportsColumnsMap.get(key));
-            }
-
-            setTableData((prev) => ({ header: headColumns, body: [...prev.body, newEntry], footer: prev.footer + footAmount }));
-    
-            event.target.reset();
+            subreports.current.push(newEntry);
+            setTableData((prev) => ({ header: headColumns, body: [...prev.body, newTableEntry], footer: prev.footer + footAmount }));
         } catch (error) {
             setError({
                 message: error.message.split(';'),
@@ -152,10 +208,8 @@ const ReportForm = () => {
         setError({
             show: true,
             message: [JSON.stringify({
-                id: 0,
-                reportType: reportType.value,
-                table: tableData.body,
-                totalAmount: tableData.footer,
+                type_id: reportType.value,
+                subreports: subreports.current,
             })],
             variant: "success"
         })
@@ -177,32 +231,51 @@ const ReportForm = () => {
                 </div>
             </section>
             <section className="container card border border-0 rounded p-4 pb-2 mb-4">
-                <div className="WelcomeContainer row align-items-center pb-2">
+                <div className="WelcomeContainer row justify-content-between align-items-center pb-2">
                     <div className="col-4">
                         <h5 style={{ color: "#052C65" }}>Tipo de reporte</h5>
                         <h6 className="welcome">Selecciona el tipo de reporte para continuar</h6>
                     </div>
-                    <Select
-                        inputId="reportTypes"
-                        name="reportTypes"
-                        options={reports}
-                        placeholder="Reporte"
-                        noOptionsMessage={() => "No hay resultados."}
-                        className={`${session.country_id !== 2 ? '' : 'invisible'} col-4`}
-                        onChange={handleReport}
-                    />
+                    {
+                        showCountries &&
+                        <Select
+                            inputId="country"
+                            name="country"
+                            options={countries}
+                            value={country}
+                            onChange={handleCountry}
+                            placeholder="País"
+                            noOptionsMessage={() => "No hay coincidencias"}
+                            className="col-6"
+                        />
+                    }
+                </div>
+                <div className="row justify-content-end py-2">
+                    {
+                        (country?.value !== 2 || session.country_id !== 2) &&
+                        <Select
+                            inputId="reportTypes"
+                            name="reportTypes"
+                            options={reports}
+                            placeholder="Reporte"
+                            noOptionsMessage={() => "No hay coincidencias"}
+                            className="col-4"
+                            onChange={handleReport}
+                        />
+                    }
                     <Select
                         inputId="reports"
                         name="reports"
                         options={reportTypes}
                         placeholder="Tipo de reporte"
                         value={reportType}
-                        noOptionsMessage={() => "No hay resultados."}
-                        className="col-4"
+                        noOptionsMessage={() => "No hay coincidencias"}
+                        isDisabled={reportTypes.length === 0}
+                        className="col-6"
                         onChange={handleReportType}
                     />
                 </div>
-                <ReportTableContext.Provider value={{ handleSubmit, }}>
+                <ReportTableContext.Provider value={{ handleSubmit, setError, countryAux }}>
                     <div className="py-4">
                         {
                             reportType && componentsMap.has(reportType.value) && componentsMap.get(reportType.value)
@@ -254,21 +327,28 @@ const ReportForm = () => {
                         </tbody>
                         <tfoot>
                             <tr>
-                                    {
-                                        tableData.footer > 0 &&
-                                        <td colSpan={tableData.header.length + 1} className="text-end"><strong>Monto total: {tableData.footer.toLocaleString("es-VE")}</strong></td>
-                                    }
+                                {
+                                    tableData.footer > 0 &&
+                                    <td colSpan={tableData.header.length + 1} className="text-end"><strong>Monto total: {tableData.footer.toLocaleString("es-VE")}</strong></td>
+                                }
                             </tr>
                         </tfoot>
                     </table>
                 }
             </section>
             <ModalConfirmation
-            show={showConfirmation}
-            setModalShow={setShowConfirmation}
-            action={handleReportChangeConfirm}
-            warning="Si cambia el reporte, se perderán todos los registros creados. ¿Está seguro?"
-            confirmButtonLabel="Confirmar" />
+                show={showReportConfirmation}
+                setModalShow={setShowReportConfirmation}
+                action={handleReportChangeConfirm}
+                warning="Si cambia el reporte, se perderán todos los registros creados. ¿Está seguro?"
+                confirmButtonLabel="Confirmar" />
+
+            <ModalConfirmation
+                show={showCountryConfirmation}
+                setModalShow={setShowCountryConfirmation}
+                action={handleCountryChangeConfirm}
+                warning="Si cambia el país, se perderán todos los registros creados. ¿Está seguro?"
+                confirmButtonLabel="Confirmar" />
         </>
     )
 }
