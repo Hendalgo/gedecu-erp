@@ -10,6 +10,7 @@ const UsersSelect = ({
     query = "",
     value = null,
     onChange = () => null,
+    onError = () => null,
 }) => {
     const [users, setUsers] = useState([]);
 
@@ -18,13 +19,13 @@ const UsersSelect = ({
             try {
                 const [usersResponse,] = await Promise.all([ getUsers("paginated=no".concat(query)), ]);
 
-                if (usersResponse) setUsers(usersResponse.map(({ name, email, id }) => {
+                if (usersResponse) setUsers(usersResponse.data.map(({ name, email, id }) => {
                     const label = name.concat(" (", email, ")");
                     return { label: label, value: id };
                 }));
 
-            } catch (error) {
-                console.error(error)
+            } catch ({ message, response }) {
+                onError({ show: true, message: [response?.data.message], variant: "danger", })
             }
         }
 

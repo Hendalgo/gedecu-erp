@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import BankAccountsSelect from "../../../BankAccountsSelect";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
-    const [user, setUser] = useState(null);
+    const [bankAccount, setBankAccount] = useState(null);
     const { handleSubmit, setError } = useContext(ReportTableContext);
 
     const handleLocalSubmit = (e) => {
@@ -13,12 +13,10 @@ const TypeTwoIncomeTransferenceReportForm = () => {
         let errors = [];
 
         try {
-            if (!user) errors.push("El campo Gestor es obligatorio.");
+            if (!bankAccount) errors.push("El campo Cuenta es obligatorio.");
             if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
             
             if (errors.length > 0) throw new Error(errors.join(";"));
-            
-            formData.append("user", user.label);
             
             handleSubmit(formData);
             
@@ -33,25 +31,27 @@ const TypeTwoIncomeTransferenceReportForm = () => {
     }
 
     const handleReset = () => {
-        setUser(null);
+        setBankAccount(null);
     }
 
     return(
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect
-                        id="user_id"
-                        name="user_id"
-                        value={user}
-                        onChange={setUser}
-                    />
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect
+                        id="account"
+                        name="account"
+                        value={bankAccount}
+                        onChange={setBankAccount}
+                        onError={setError} />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
                 </div>
+                <input type="hidden" name="currency_id" value={bankAccount?.currency_id || 0} />
+                <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
             </div>
             <div className="row text-end">
                 <div className="col">

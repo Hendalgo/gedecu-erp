@@ -1,12 +1,7 @@
 import { API_INSTANCE, USER_URL } from '../consts/ApiUrl'
 
 export const getUsers = async (querys) => {
-  try {
-    const request = await API_INSTANCE.get(USER_URL + '?' + querys)
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  return API_INSTANCE.get(USER_URL + '?' + querys);
 }
 export const createUser = async (form) => {
   try {

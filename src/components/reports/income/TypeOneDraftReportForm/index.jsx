@@ -12,7 +12,7 @@ const TypeOneDraftReportForm = () => {
     const [rate, setRate] = useState(0);
     const [user, setUser] = useState(null);
     const [bank, setBank] = useState(null);
-    const { handleSubmit, setError, countryAux } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country } = useContext(ReportTableContext);
     const { session } = useContext(SessionContext);
 
     const handleAmountChange = (amount) => {
@@ -66,15 +66,28 @@ const TypeOneDraftReportForm = () => {
 
     return(
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
-            <input type="hidden" id="country_id" name="country_id" value={countryAux?.current.id_country || session.country_id} />
+            <input type="hidden" id="country_id" name="country_id" value={country?.id_country || session.country_id} />
+            <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || 0} />
+            <input type="hidden" id="currency" name="currency" value={country?.currency || ""} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="bank_id" className="form-label">Banco <span className="Required">*</span></label>
-                    <BanksSelect id="bank" name="bank" value={bank} onChange={setBank} query="&country=2" />
+                    <BanksSelect
+                        id="bank"
+                        name="bank"
+                        value={bank}
+                        onChange={setBank}
+                        onError={setError}
+                        query="&country=2" />
                 </div>
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user" name="user" value={user} onChange={setUser} />
+                    <UsersSelect
+                        id="user"
+                        name="user"
+                        value={user}
+                        onError={setError}
+                        onChange={setUser} />
                 </div>
             </div>
             <div className="row mb-3">
@@ -83,8 +96,7 @@ const TypeOneDraftReportForm = () => {
                     <NumberInput id="transferences-quantity" name="transferences-quantity" />
                 </div>
                 <div className="col">
-                    <label htmlFor="amount" className="form-label">Monto total en { countryAux?.current.country_name
-                     || session.country_id } <span className="Required">*</span></label>
+                    <label htmlFor="amount" className="form-label">Monto total en { country?.currency || session.country_id } <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>

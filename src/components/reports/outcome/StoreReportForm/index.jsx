@@ -66,11 +66,22 @@ const StoreReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="store_id" className="form-label">Local <span className="Required">*</span></label>
-                    <StoresSelect id="store" name="store" value={store} onChange={setStore} />
+                    <StoresSelect
+                        id="store"
+                        name="store"
+                        value={store}
+                        onChange={setStore}
+                        onError={setError} />
                 </div>
                 <div className="col">
                     <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <BankAccountsSelect id="account" name="account" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta emisora" />
+                    <BankAccountsSelect
+                        id="account"
+                        name="account"
+                        value={bankAccount}
+                        onChange={setBankAccount}
+                        onError={setError}
+                        placeholder="Selecciona la cuenta emisora" />
                 </div>
             </div>
             <div className="row mb-3">
@@ -79,20 +90,29 @@ const StoreReportForm = () => {
                     <NumberInput id="transferences_quantity" name="transferences_quantity" />
                 </div>
                 <div className="col">
-                    <label htmlFor="amount" className="form-label">Monto total en COP <span className="Required">*</span></label>
+                    <label htmlFor="amount" className="form-label">Monto total en { store?.currency } <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
+            <input type="hidden" name="currency_id" value={store?.currency_id || 0} />
+            <input type="hidden" name="currency" value={store?.currency || ""} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa de cambio <span className="Required">*</span></label>
-                    <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
+                    <DecimalInput
+                        id="rate"
+                        name="rate"
+                        defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})}
+                        onChange={handleRateChange}
+                    />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en VED</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en {bankAccount?.currency}</label>
                     <input id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
+            <input type="hidden" id="conversionCurrency_id" name="conversionCurrency_id" value={bankAccount?.currency_id || 0} />
+            <input type="hidden" id="conversionCurrency" name="conversionCurrency" value={bankAccount?.currency || ""} />
             <div className="row mb-3">
                 <div className="col-6">
                     <Form.Check type="checkbox" id="isDuplicated" name="isDuplicated" label="Duplicado" />

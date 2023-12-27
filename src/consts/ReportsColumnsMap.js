@@ -15,5 +15,8 @@ reportsColumnsMap.set("supplier", "Proveedor");
 reportsColumnsMap.set("bank", "Banco");
 reportsColumnsMap.set("isDeliveryOrDeposit", "Depósito/Entrega");
 reportsColumnsMap.set("isDuplicated", "Duplicado");
+reportsColumnsMap.set("currency", "Moneda");
+reportsColumnsMap.set("conversionCurrency", "Moneda conversión");
+reportsColumnsMap.set("paymentMethod", "Medio de pago");
 
 export default reportsColumnsMap;

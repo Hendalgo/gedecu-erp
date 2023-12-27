@@ -5,7 +5,7 @@ import { ReportTableContext } from "../context/ReportTableContext";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import componentsMap from "../consts/ReportsComponentsMap";
 import ModalConfirmation from "../components/ModalConfirmation";
-import { getReportTypes } from "../helpers/reports";
+import { createReport, getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
 import { getCountries } from "../helpers/countries";
 
@@ -16,7 +16,6 @@ const reports = [
 
 const ReportForm = () => {
     const [countries, setCountries] = useState([]);
-    const countriesRef = useRef([]);
     const [country, setCountry] = useState(null);
     const countryAux = useRef(null);
     const [reportType, setReportType] = useState(null);
@@ -27,6 +26,7 @@ const ReportForm = () => {
     const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
     const reportTypeAux = useRef(null);
     const vzlaReportTypes = useRef([]);
+    const intlReportTypes = useRef([]);
     const subreports = useRef([]);
     const { session } = useContext(SessionContext);
 
@@ -39,13 +39,12 @@ const ReportForm = () => {
                     const countriesResponse = await getCountries("paginated=no");
 
                     if (countriesResponse && countriesResponse.data) {
-                        countriesRef.current = countriesResponse.data;
 
-                        const countriesOptions = countriesRef.current.map(({ country_name, shortcode, id_country }) => ({ label: country_name.concat(" (", shortcode, ")"), value: id_country }));
+                        const countriesOptions = countriesResponse.data.map(({ country_name, shortcode, currency_shortcode, id_country }) => {
+                            return { label: country_name.concat(" (", shortcode, ")"), value: id_country, currency: currency_shortcode, currency_id: 100, };
+                        });
 
                         setCountries(countriesOptions);
-
-                        countryAux.current = countriesRef.current.find(({ id_country }) => id_country == session.country_id);
 
                         setCountry(countriesOptions.find(({ value }) => value == session.country_id));
                     }
@@ -55,22 +54,25 @@ const ReportForm = () => {
                     const reportTypesResponse = await getReportTypes("paginated=no");
 
                     if (reportTypesResponse) {
-                        const incomeReports = []; const outcomeReports = [];
+                        const incomeReports = []; const outcomeReports = []; const neutroReports = [];
                         
                         reportTypesResponse.forEach((reportType) => {
                             if (reportType.type === "income") incomeReports.push({ value: reportType.id, label: reportType.name });
                             if (reportType.type === "expense") outcomeReports.push({ value: reportType.id, label: reportType.name });
+                            if (reportType.type === "neutro") neutroReports.push({ value: reportType.id, label: reportType.name });
                         });
                         
                         vzlaReportTypes.current = [
                             { label: "INGRESO", options: incomeReports },
                             { label: "EGRESO", options: outcomeReports },
+                            { label: "R1", options: neutroReports },
                         ];
 
                         setReportTypes(vzlaReportTypes.current);
                     }
                 } else {
-                    console.log()
+                    const reportTypesResponse = await getReportTypes("paginated=no");
+                    if (reportTypesResponse) intlReportTypes.current = reportTypesResponse;
                 }
             } catch (error) {
                 setError({
@@ -82,20 +84,22 @@ const ReportForm = () => {
         }
 
         fetchData();
-    }, [session.country_id])
+    }, [session.country_id, showCountries])
 
     const handleCountry = (option) => {
         if (option.value !== country?.value) {
             if (tableData.body.length > 0) {
-                countryAux.current = countriesRef.current.find(({ id_country }) => id_country === option.value);
+                countryAux.current = option;
+
                 setShowCountryConfirmation(true);
             } else {
                 setCountry(option);
+                let reportTypes = [];
     
-                setReportTypes([]);
+                if (option.value === 2) reportTypes = vzlaReportTypes.current;
+
+                setReportTypes(reportTypes);
                 setReportType(null);
-    
-                if (option.value === 2) setReportTypes(vzlaReportTypes.current);
             }
 
             clearError();
@@ -103,12 +107,21 @@ const ReportForm = () => {
     }
 
     const handleCountryChangeConfirm = () => {
-        setCountry({ label: `${countryAux.current.country_name} (${countryAux.current.shortcode})`, value: countryAux.current.id_country });
+        setCountry(countryAux.current);
         clearTableData();
+        let reportTypes = [];
+    
+        if (countryAux.current.value === 2) reportTypes = vzlaReportTypes.current;
+
+        setReportTypes(reportTypes);
+        setReportType(null);
     }
 
     const handleReport = ({ value }) => {
-        console.log(value)
+        const reportTypes = intlReportTypes.current
+        .filter(({ id }) => (id % value) == 0); // R1 o R2
+
+        setReportTypes([]);
     }    
 
     const handleReportType = (option) => {
@@ -204,19 +217,36 @@ const ReportForm = () => {
         setTableData(({header: columns, body: newEntries}));
     }
 
-    const postReport = () => {
-        setError({
-            show: true,
-            message: [JSON.stringify({
-                type_id: reportType.value,
-                subreports: subreports.current,
-            })],
-            variant: "success"
-        })
-        // Crear data del reporte según tipo de reporte
-        // Mandar a servidor
-        // Validar respuesta
-        // Redireccionar
+    const postReport = async () => {
+        console.log(JSON.stringify({
+            name: reportType.label,
+            subreports: subreports.current,
+        }))
+        try {
+            // const response = await createReport({
+            //     type_id: reportType.value,
+            //     subreports: subreports.current,
+            // });
+
+            // if (response.status === 201) {
+                setReportType(null);
+                clearTableData();
+
+                setError({
+                    show: true,
+                    message: ["Reporte creado exitosamente."],
+                    variant: "success"
+                });
+            // }
+        } catch ({message, error, response}) {
+            let errorsMessages;
+
+            if (error) {
+                errorsMessages = Object.values(error).flat();
+            }
+
+            setError({ show: true, message: errorsMessages, variant: "danger" });
+        }
     }
 
     return(
@@ -232,7 +262,7 @@ const ReportForm = () => {
             </section>
             <section className="container card border border-0 rounded p-4 pb-2 mb-4">
                 <div className="WelcomeContainer row justify-content-between align-items-center pb-2">
-                    <div className="col-4">
+                    <div className="col-6">
                         <h5 style={{ color: "#052C65" }}>Tipo de reporte</h5>
                         <h6 className="welcome">Selecciona el tipo de reporte para continuar</h6>
                     </div>
@@ -252,7 +282,7 @@ const ReportForm = () => {
                 </div>
                 <div className="row justify-content-end py-2">
                     {
-                        (country?.value !== 2 || session.country_id !== 2) &&
+                        ((country && country.value !== 2) || session.country_id !== 2) &&
                         <Select
                             inputId="reportTypes"
                             name="reportTypes"
@@ -275,7 +305,7 @@ const ReportForm = () => {
                         onChange={handleReportType}
                     />
                 </div>
-                <ReportTableContext.Provider value={{ handleSubmit, setError, countryAux }}>
+                <ReportTableContext.Provider value={{ handleSubmit, setError, country }}>
                     <div className="py-4">
                         {
                             reportType && componentsMap.has(reportType.value) && componentsMap.get(reportType.value)

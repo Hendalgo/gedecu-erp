@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => null }) => {
+const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => null, readOnly = false, }) => {
   const inputRef = useRef();
   const prevNumber = useRef("0,00");
 
@@ -40,6 +40,7 @@ const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => n
       defaultValue={defaultValue}
       onClick={({ target }) => target.setSelectionRange(target.value.length, target.value.length)}
       onChange={handleInputChange}
+      readOnly={readOnly}
     />
   );
 };

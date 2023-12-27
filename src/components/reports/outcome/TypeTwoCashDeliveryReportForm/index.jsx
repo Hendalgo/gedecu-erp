@@ -2,10 +2,13 @@ import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { SessionContext } from "../../../../context/SessionContext";
+import { Form } from "react-bootstrap";
 
 const TypeTwoCashDeliveryReportForm = () => {
     const [user, setUser] = useState(null);
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session, } = useContext(SessionContext);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -41,11 +44,24 @@ const TypeTwoCashDeliveryReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user_id" name="user_id" value={user} onChange={setUser} />
+                    <UsersSelect
+                        id="user"
+                        name="user"
+                        value={user}
+                        query={`&role=2&country=${country?.value || session.country_id}`}
+                        onError={setError}
+                        onChange={setUser} />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={() => null} />
+                </div>
+            </div>
+            <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency_id} />
+            <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

@@ -21,31 +21,45 @@ import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTw
 import OutcomeWalletReportForm from "../components/reports/outcome/WalletReportForm";
 
 const componentsMap = new Map();
-componentsMap.set(0, <SupplierReportForm />);
-componentsMap.set(0, <ReceivedHelpReportForm />)
+
+/* VZLA */
+
+// Income
+componentsMap.set(1, <SupplierReportForm />);
+componentsMap.set(2, <ReceivedHelpReportForm />)
 componentsMap.set(3, <IncomeWalletReportForm />)
-componentsMap.set(0, <TypeOneWalletReportForm />)
-componentsMap.set(2, <TypeOneDraftReportForm />)
-componentsMap.set(0, <TypeTwoIncomeWalletAccountReportForm />)
-componentsMap.set(0, <TypeTwoCashReportForm />)
-componentsMap.set(0, <TypeTwoIncomeTransferenceReportForm />)
-componentsMap.set(0, <TypeTwoHelpReportForm />)
-componentsMap.set(0, <TypeTwoTransferReportForm />)
-componentsMap.set(0, <StoreReportForm />)
-componentsMap.set(0, <OutcomeWalletReportForm />)
-componentsMap.set(0, <SendedHelpReportForm />)
-componentsMap.set(0, <TypeTwoTransferReportForm />)
-// componentsMap.set(8, <TransferReportForm />)
-componentsMap.set(0, <RefillReportForm />)
-componentsMap.set(0, <TaxReportForm />)
-componentsMap.set(0, <CreditReportForm />)
-componentsMap.set(0, <OtherReportForm />)
-componentsMap.set(1, <TypeTwoWalletAccountReportForm />)
-componentsMap.set(0, <TypeTwoCashDeliveryReportForm />)
-componentsMap.set(0, <TypeTwoDepositReportForm />)
-componentsMap.set(0, <TypeTwoOutcomeTransferenceReportForm />)
-componentsMap.set(111, <TaxReportForm />)
-componentsMap.set(112, <CreditReportForm />)
-componentsMap.set(113, <OtherReportForm />)
+
+// Expense
+componentsMap.set(4, <StoreReportForm />)
+componentsMap.set(5, <OutcomeWalletReportForm />)
+componentsMap.set(6, <SendedHelpReportForm />)
+componentsMap.set(7, <TypeTwoTransferReportForm />)
+componentsMap.set(8, <RefillReportForm />)
+componentsMap.set(9, <TaxReportForm />)
+componentsMap.set(10, <CreditReportForm />)
+componentsMap.set(11, <OtherReportForm />)
+
+/* International R2 */
+
+// Income
+componentsMap.set(12, <TypeTwoIncomeWalletAccountReportForm />)
+componentsMap.set(13, <TypeTwoCashReportForm />)
+componentsMap.set(14, <TypeTwoIncomeTransferenceReportForm />)
+componentsMap.set(15, <TypeTwoHelpReportForm />)
+componentsMap.set(16, <TypeTwoTransferReportForm />)
+
+// Expense
+componentsMap.set(17, <TypeTwoCashDeliveryReportForm />)
+componentsMap.set(18, <TypeTwoWalletAccountReportForm />)
+componentsMap.set(19, <TaxReportForm />)
+componentsMap.set(20, <CreditReportForm />)
+componentsMap.set(21, <OtherReportForm />)
+
+/* International R1 */
+componentsMap.set(22, <TypeOneWalletReportForm />)
+componentsMap.set(23, <TypeOneDraftReportForm />)
+
+// componentsMap.set(0, <TypeTwoDepositReportForm />)
+// componentsMap.set(0, <TypeTwoOutcomeTransferenceReportForm />)
 
 export default componentsMap;

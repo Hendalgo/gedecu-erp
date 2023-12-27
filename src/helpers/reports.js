@@ -17,14 +17,8 @@ export const getInconsistences = async (query) => {
     return error.response
   }
 }
-export const createReport = async (form) => {
-  try {
-    const request = await API_INSTANCE.post(REPORTS_URL, form)
-
-    return request
-  } catch (error) {
-    return error.response
-  }
+export const createReport = async (data) => {
+  return API_INSTANCE.post(REPORTS_URL, data);
 }
 export const updateReport = async (form, id) => {
   try {

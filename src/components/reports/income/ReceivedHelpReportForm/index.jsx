@@ -45,11 +45,23 @@ const ReceivedHelpReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user" name="user" value={user} onChange={setUser} />
+                    <UsersSelect
+                        id="user"
+                        name="user"
+                        value={user}
+                        query="&role=2&country=2"
+                        onChange={setUser}
+                        onError={setError} />
                 </div>
                 <div className="col">
                     <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <BankAccountsSelect id="account" name="account" value={bankAccount} onChange={setBankAccount} placeholder="Selecciona la cuenta receptora" />
+                    <BankAccountsSelect
+                        id="account"
+                        name="account"
+                        value={bankAccount}
+                        onChange={setBankAccount}
+                        onError={setError}
+                        placeholder="Selecciona la cuenta receptora" />
                 </div>
             </div>
             <div className="row mb-3">
@@ -57,6 +69,8 @@ const ReceivedHelpReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
                 </div>
+                <input type="hidden" name="currency_id" value={bankAccount?.currency_id || 0} />
+                <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
                 <div className="col">
                     <label htmlFor="reference" className="form-label">Referencia <span className="Required">*</span></label>
                     <input type="text" id="reference" name="reference" maxLength={20} className="form-control" />

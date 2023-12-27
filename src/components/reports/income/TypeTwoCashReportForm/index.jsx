@@ -1,7 +1,7 @@
-import { FormCheck } from "react-bootstrap";
 import DecimalInput from "../../../DecimalInput";
 import { useContext } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { Form } from "react-bootstrap";
 
 const TypeTwoCashReportForm = () => {
     const { handleSubmit, setError } = useContext(ReportTableContext);
@@ -12,7 +12,6 @@ const TypeTwoCashReportForm = () => {
         let errors = [];
 
         try {
-            if (!formData.has("isDeliveryOrDeposit")) errors.push("Debe indicar si el movimiento es Depósito o Entrega.");
             if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
             
             if (errors.length > 0) throw new Error(errors.join(";"));
@@ -32,15 +31,14 @@ const TypeTwoCashReportForm = () => {
     return(
         <form onSubmit={handleLocalSubmit} autoComplete="off">
             <div className="row mb-3">
-                <div className="col">
-                    <FormCheck defaultChecked id="deposit" name="isDeliveryOrDeposit" value="Depósito" inline type="radio" label="Depósito" />
-                    <FormCheck id="delivery" name="isDeliveryOrDeposit" inline value="Entrega" type="radio" label="Entrega" />
+                <div className="col-6">
+                    <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
+                    <DecimalInput id="amount" name="amount" />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col-6">
-                    <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" />
+                    <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

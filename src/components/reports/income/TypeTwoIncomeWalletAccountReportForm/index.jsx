@@ -3,11 +3,14 @@ import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import BankAccountsSelect from "../../../BankAccountsSelect";
+import { Form } from "react-bootstrap";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
+    const [bankAccount, setBankAccount] = useState(null);
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
     const { session } = useContext(SessionContext);
 
     const handleAmountChange = (amount) => {
@@ -24,6 +27,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
         let errors = [];
 
         try {
+            if (formData.get("transferences_quantity") === 0) errors.push("El campo N° de transferencias es obligatorio.");
             if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
             if (formData.get("rate") === "0,00") errors.push("El campo Tasa es obligatorio.");
             
@@ -56,22 +60,41 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferences" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferences" name="transferences"/>
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect
+                        id="account"
+                        name="account"
+                        value={bankAccount}
+                        query="&type=300"
+                        onChange={setBankAccount}
+                        onError={setError} />
                 </div>
                 <div className="col">
-                    <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" onChange={handleAmountChange} />
+                    <label htmlFor="transferences_quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences_quantity" name="transferences_quantity"/>
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
+                    <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
+                    <DecimalInput id="amount" name="amount" onChange={handleAmountChange} />
+                </div>
+                <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
                     <DecimalInput id="rate" name="rate" onChange={handleRateChange} />
                 </div>
-                <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en { session.name }</label>
+                <input type="hidden" name="currency" value={ country?.currency || session.country.currency_id } />
+                <input type="hidden" name="currency_id" value={ country?.currency_id || session.country.currency_id } />
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency_id }</label>
                     <input type="text" id="conversion" name="conversion" value={conversion} readOnly className="form-control" />
+                </div>
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

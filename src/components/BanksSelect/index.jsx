@@ -10,14 +10,19 @@ const BanksSelect = ({
     query = "",
     value = null,
     onChange = () => null,
+    onError = () => null,
 }) => {
     const [banks, setBanks] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
-            const banksResponse = await getBanks("paginated=no".concat(query));
+            try {
+                const banksResponse = await getBanks("paginated=no".concat(query));
 
-            if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: id })));
+                if (banksResponse) setBanks(banksResponse.map(({ id, name, }) => ({ label: name, value: id })));
+            } catch ({ message, response }) {
+                onError({show: true, message: [response.data.message], variant: "danger",});
+            }
         }
 
         fetchData();

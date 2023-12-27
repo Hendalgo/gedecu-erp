@@ -1,13 +1,20 @@
 import DecimalInput from "../../../DecimalInput";
 import StoresSelect from "../../../StoresSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { Form } from "react-bootstrap";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoHelpReportForm = () => {
     const [store, setStore] = useState(null);
     const [bankAccount, setBankAccount] = useState(null);
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
+
+    useEffect(() => {
+        console.log(session)
+    }, []);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -21,9 +28,6 @@ const TypeTwoHelpReportForm = () => {
             
             if (errors.length > 0) throw new Error(errors.join(";"));
             
-            formData.append("store", store.label);
-            formData.append("account", bankAccount.label);
-
             handleSubmit(formData);
             
             e.target.reset();
@@ -46,17 +50,35 @@ const TypeTwoHelpReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="store_id">Local <span className="Required">*</span></label>
-                    <StoresSelect id="store_id" name="store_id" value={store}  onChange={setStore} />
+                    <StoresSelect
+                        id="store"
+                        name="store"
+                        value={store}
+                        query={`&country=${country?.value || session.country_id}`}
+                        onError={setError}
+                        onChange={setStore} />
                 </div>
                 <div className="col">
                     <label htmlFor="account_id">Cuenta <span className="Required">*</span></label>
-                    <BankAccountsSelect id="account_id" name="account_id" value={bankAccount} onChange={setBankAccount} />
+                    <BankAccountsSelect
+                        id="account"
+                        name="account"
+                        value={bankAccount}
+                        onError={setError}
+                        onChange={setBankAccount} />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col-6">
                     <label htmlFor="amount">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
+                </div>
+            </div>
+            <input type="hidden" name="currency_id" value={bankAccount?.value || 0} />
+            <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

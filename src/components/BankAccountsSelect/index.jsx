@@ -10,6 +10,7 @@ const BankAccountsSelect = ({
     query = "",
     value = null,
     onChange = () => null,
+    onError = () => null,
 }) => {
     const [bankAccounts, setBankAccounts] = useState([]);
 
@@ -18,13 +19,13 @@ const BankAccountsSelect = ({
             try {
                 const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no".concat(query)), ]);
 
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, id }) => {
+                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, currency, id }) => {
                     const label = name.concat(" - ", identifier);
-                    return { label: label, value: id };
+                    return { label: label, value: id, currency_id: currency.id, currency: currency.shortcode, };
                 }));
 
-            } catch (error) {
-                console.error(error)
+            } catch ({ message, response }) {
+                onError({ show: true, message: [response.data.message], variant: "danger", });
             }
         }
 

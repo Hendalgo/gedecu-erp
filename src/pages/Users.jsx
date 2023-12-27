@@ -35,11 +35,11 @@ const Users = () => {
   }
   useEffect(() => {
     getUsersRoles('order=created_at&order_by=desc').then(r => setUserRoles(r))
-    getUsers().then(r => setUsers(r))
+    getUsers().then(r => setUsers(r.data))
   }, [])
   const handleType = (e) => {
     setOffset(1)
-    getUsers(`order=created_at&order_by=desc${e ? `&role=${e}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+    getUsers(`order=created_at&order_by=desc${e ? `&role=${e}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
   }
   const handleSearch = (e) => {
     e.preventDefault()
@@ -50,7 +50,7 @@ const Users = () => {
   }
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getUsers(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+    getUsers(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
   }
   const handleUser = (user) => {
     setModalEditShow(true)

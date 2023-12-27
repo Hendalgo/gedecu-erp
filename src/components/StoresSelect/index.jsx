@@ -10,18 +10,21 @@ const StoresSelect = ({
     query = "",
     value = null,
     onChange = () => null,
+    onError = () => null,
 }) => {
     const [stores, setStores] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [storesResponse,] = await Promise.all([ getStores("paginated=no"), ]);
+                const [storesResponse,] = await Promise.all([ getStores("paginated=no".concat(query)), ]);
 
-                if (storesResponse) setStores(storesResponse.map(({ name, id }) => ({ label: name, value: id })));
+                if (storesResponse) setStores(storesResponse.map(({ name, id, country }) => {
+                    return { label: name, value: id, currency_id: country.currency_id, currency: country.currency.shortcode, };
+                }));
 
-            } catch (error) {
-                console.error(error)
+            } catch ({ message, response }) {
+                onError({ show: true, message: [response.data.message], variant: "danger", });
             }
         }
 
