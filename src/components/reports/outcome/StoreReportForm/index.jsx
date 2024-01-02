@@ -81,6 +81,7 @@ const StoreReportForm = () => {
                         value={bankAccount}
                         onChange={setBankAccount}
                         onError={setError}
+                        query="&country=2"
                         placeholder="Selecciona la cuenta emisora" />
                 </div>
             </div>
@@ -111,8 +112,6 @@ const StoreReportForm = () => {
                     <input id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
-            <input type="hidden" id="conversionCurrency_id" name="conversionCurrency_id" value={bankAccount?.currency_id || 0} />
-            <input type="hidden" id="conversionCurrency" name="conversionCurrency" value={bankAccount?.currency || ""} />
             <div className="row mb-3">
                 <div className="col-6">
                     <Form.Check type="checkbox" id="isDuplicated" name="isDuplicated" label="Duplicado" />

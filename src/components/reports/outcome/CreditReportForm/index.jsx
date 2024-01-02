@@ -44,6 +44,7 @@ const CreditReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
+                        query="&country=2"
                         onChange={setBankAccount}
                         onError={setError} />
                 </div>

@@ -9,6 +9,7 @@ const UsersSelect = ({
     noOptionsMessage = "No hay coincidencias",
     query = "",
     value = null,
+    disabled = false,
     onChange = () => null,
     onError = () => null,
 }) => {
@@ -41,6 +42,7 @@ const UsersSelect = ({
                 options={users}
                 placeholder={placeholder}
                 value={value}
+                isDisabled={disabled}
                 noOptionsMessage={() => noOptionsMessage}
                 onChange={(value) => onChange(value)}
                 isClearable

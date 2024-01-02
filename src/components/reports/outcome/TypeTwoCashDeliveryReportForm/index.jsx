@@ -21,8 +21,6 @@ const TypeTwoCashDeliveryReportForm = () => {
             
             if (errors.length > 0) throw new Error(errors.join(";"));
             
-            formData.append("user", user.label);
-            
             handleSubmit(formData);
             
             e.target.reset();
@@ -41,6 +39,7 @@ const TypeTwoCashDeliveryReportForm = () => {
 
     return(
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
+            <input type="hidden" name="country_id" value={country?.id || session.country_id} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
@@ -48,7 +47,7 @@ const TypeTwoCashDeliveryReportForm = () => {
                         id="user"
                         name="user"
                         value={user}
-                        query={`&role=2&country=${country?.value || session.country_id}`}
+                        query={`&role=5&country=${country?.value || session.country_id}`}
                         onError={setError}
                         onChange={setUser} />
                 </div>
@@ -58,7 +57,7 @@ const TypeTwoCashDeliveryReportForm = () => {
                 </div>
             </div>
             <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency_id} />
-            <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
+            <input type="hidden" name="currency" value={country?.currency || session.country.currency_id} />
             <div className="row mb-3">
                 <div className="col-6">
                     <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />

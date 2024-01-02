@@ -4,12 +4,14 @@ import { useContext, useState } from "react";
 import { getBankAccounts } from "../../../../helpers/banksAccounts";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoWalletAccountReportForm = () => {
     const [bankAccounts, setBankAccounts] = useState([]);
     const [bankAccount, setBankAccount] = useState(null);
     const [paymentMethod, setPaymentMethod] = useState({label: "Efectivo", value: 1});
-    const { handleSubmit, setError, } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     const handlePaymentMethodChange = async (option) => {
         if (option.value !== paymentMethod.value) {
@@ -18,8 +20,8 @@ const TypeTwoWalletAccountReportForm = () => {
             if (option.value === 2 && bankAccounts.length === 0) {
                 const bankAccountsResponse = await getBankAccounts("paginated=no");
 
-                if (bankAccountsResponse) setBankAccounts(bankAccountsResponse.map(({ name, identifier, id }) => {
-                    return { label: name.concat(" - ", identifier), value: id };
+                if (bankAccountsResponse) setBankAccounts(bankAccountsResponse.map(({ name, identifier, id, currency_id, currency, }) => {
+                    return { label: name.concat(" - ", identifier), value: id, currency_id: currency_id, currency: currency.shortcode, };
                 }));
             }
         }
@@ -75,6 +77,8 @@ const TypeTwoWalletAccountReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={() => null} />
                 </div>
+                <input type="hidden" name="currency_id" value={paymentMethod.value == 1 ? (country?.currency_id || session.country.currency_id) : (bankAccount?.currency_id || 0)} />
+                <input type="hidden" name="currency" value={paymentMethod.value == 1 ? (country?.currency || session.country.currency.shortcode) : (bankAccount?.currency || "")} />
             </div>
                 <div className={`row mb-3 ${paymentMethod.value !== 2 ? 'd-none' : 'd-block'}`}>
                     <div className="col-6">

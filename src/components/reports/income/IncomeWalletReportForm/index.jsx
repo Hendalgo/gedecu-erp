@@ -48,6 +48,7 @@ const IncomeWalletReportForm = () => {
                         value={bankAccount}
                         onChange={setBankAccount}
                         onError={setError}
+                        query="&country=2"
                         placeholder="Selecciona la cuenta receptora" />
                 </div>
                 <div className="col">

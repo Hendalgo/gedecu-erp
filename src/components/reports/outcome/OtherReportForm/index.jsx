@@ -6,8 +6,15 @@ import { Form } from "react-bootstrap";
 
 const OtherReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
+    const [motive, setMotive] = useState("");
     const { handleSubmit, setError } = useContext(ReportTableContext);
+    const CHARS_LIMIT = 60;
 
+    const handleMotiveChange = ({ target }) => {
+        if (target.value.length <= CHARS_LIMIT) {
+            setMotive(target.value);
+        }
+    }
     const handleLocalSubmit = (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -34,6 +41,7 @@ const OtherReportForm = () => {
 
     const handleReset = () => {
         setBankAccount(null);
+        setMotive("");
     }
 
     return(
@@ -45,6 +53,7 @@ const OtherReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
+                        query="&country=2"
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>
@@ -58,7 +67,10 @@ const OtherReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="motive" className="form-label">Motivo <span className="Required">*</span></label>
-                    <textarea id="motive" name="motive" rows={5} className="form-control"></textarea>
+                    <textarea id="motive" name="motive" value={motive} onChange={handleMotiveChange} rows={5} className="form-control"></textarea>
+                    <small className="">
+                        {motive.length} / {CHARS_LIMIT}
+                    </small>
                 </div>
             </div>
             <div className="row mb-3">

@@ -1,10 +1,26 @@
 import DecimalInput from "../../../DecimalInput";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import { getStores } from "../../../../helpers/stores";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoCashReportForm = () => {
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session, } = useContext(SessionContext);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const storeResponse = await getStores(`paginated=no&country=${country?.value || session.country_id}`);
+                console.log(storeResponse);
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        fetchData();
+    }, []);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -31,6 +47,7 @@ const TypeTwoCashReportForm = () => {
     return(
         <form onSubmit={handleLocalSubmit} autoComplete="off">
             <div className="row mb-3">
+                Se puede colocar acá el Local relacionado al encargado que realiza los reportes
                 <div className="col-6">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />

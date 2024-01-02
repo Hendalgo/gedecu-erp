@@ -32,7 +32,7 @@ const BankAccounts = () => {
   useEffect(()=>{
     getBankAccounts(``)
     .then(r=>{
-      setBanks(r);
+      setBanks(r.data);
     });
   }, [])
   const handleSearch = (e) => {

@@ -4,6 +4,7 @@ import Select from "react-select";
 import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
     const [senderBankAccounts, setSenderBankAccounts] = useState([]);
@@ -11,12 +12,13 @@ const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
     const [receiverBankAccounts, setReceiverBankAccounts] = useState([]);
     const [selectedReceiverAccount, setSelectedReceiverAccount] = useState(null);
     const bankAccounts = useRef([]);
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no"), ]);
+                const [banksAccountsResponse] = await Promise.all([ getBankAccounts(`paginated=no&country=${country?.value || session.country_id}`), ]);
 
                 if (banksAccountsResponse) {
                     bankAccounts.current = banksAccountsResponse;
@@ -94,6 +96,8 @@ const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
     const handleReset = () => {
         setSelectedReceiverAccount(null);
         setSelectedSenderAccount(null);
+        setSenderBankAccounts(getOptions(bankAccounts.current));
+        setReceiverBankAccounts(getOptions(bankAccounts.current));
     }
 
     return(

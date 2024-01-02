@@ -1,3 +1,10 @@
+import DepositBoxIncomeCashReportForm from "../components/reports/deposit-box/DepositBoxIncomeCashReportForm";
+import DepositBoxOutcomeCashReportForm from "../components/reports/deposit-box/DepositBoxOutcomeCashReportForm";
+import DepositBoxOutcomeDeliveryReportForm from "../components/reports/deposit-box/DepositBoxOutcomeDeliveryReportForm";
+import DepositorIncomeCashReportForm from "../components/reports/depositor/DepositorIncomeCashReportForm";
+import DepositorOutcomeDeliveryReportForm from "../components/reports/depositor/DepositorOutcomeDeliveryReportForm";
+import DepositorOutcomeSupplierReportForm from "../components/reports/depositor/DepositorOutcomeSupplierReportForm";
+import DepositorOutcomeWalletReportForm from "../components/reports/depositor/DepositorOutcomeWalletReportForm";
 import IncomeWalletReportForm from "../components/reports/income/IncomeWalletReportForm";
 import ReceivedHelpReportForm from "../components/reports/income/ReceivedHelpReportForm";
 import SupplierReportForm from "../components/reports/income/SupplierReportForm";
@@ -19,6 +26,7 @@ import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepos
 import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
 import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTwoWalletAccountReportForm";
 import OutcomeWalletReportForm from "../components/reports/outcome/WalletReportForm";
+import SupplierOutcomeReportForm from "../components/reports/supplier/SupplierOutcomeReportForm";
 
 const componentsMap = new Map();
 
@@ -51,6 +59,9 @@ componentsMap.set(16, <TypeTwoTransferReportForm />)
 // Expense
 componentsMap.set(17, <TypeTwoCashDeliveryReportForm />)
 componentsMap.set(18, <TypeTwoWalletAccountReportForm />)
+componentsMap.set(25, <TypeTwoHelpReportForm />)
+componentsMap.set(0, <TypeTwoDepositReportForm />)
+componentsMap.set(0, <TypeTwoOutcomeTransferenceReportForm />)
 componentsMap.set(19, <TaxReportForm />)
 componentsMap.set(20, <CreditReportForm />)
 componentsMap.set(21, <OtherReportForm />)
@@ -59,7 +70,28 @@ componentsMap.set(21, <OtherReportForm />)
 componentsMap.set(22, <TypeOneWalletReportForm />)
 componentsMap.set(23, <TypeOneDraftReportForm />)
 
-// componentsMap.set(0, <TypeTwoDepositReportForm />)
-// componentsMap.set(0, <TypeTwoOutcomeTransferenceReportForm />)
+/* Depositor */
+
+// Income
+componentsMap.set(0, <DepositorIncomeCashReportForm />)
+
+// Expense
+componentsMap.set(0, <DepositorOutcomeWalletReportForm />)
+componentsMap.set(0, <DepositorOutcomeSupplierReportForm />)
+componentsMap.set(0, <DepositorOutcomeDeliveryReportForm />)
+
+/* Deposit Box */
+
+// Income
+componentsMap.set(0, <DepositBoxIncomeCashReportForm />)
+
+// Expense
+componentsMap.set(0, <DepositBoxOutcomeCashReportForm />)
+componentsMap.set(0, <DepositBoxOutcomeDeliveryReportForm />)
+
+/* Supplier */
+
+// Expense
+componentsMap.set(26, <SupplierOutcomeReportForm />)
 
 export default componentsMap;

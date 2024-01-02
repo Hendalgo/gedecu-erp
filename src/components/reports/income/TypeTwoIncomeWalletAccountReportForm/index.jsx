@@ -48,6 +48,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
     const handleReset = () => {
         setAmount(0);
         setRate(0);
+        setBankAccount(null);
     }
 
     const conversion = rate > 0 ? (amount * rate).toLocaleString("es-VE", {
@@ -65,7 +66,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query="&type=300"
+                        query={`&type=2&country=${country?.value || session.country_id}`}
                         onChange={setBankAccount}
                         onError={setError} />
                 </div>
@@ -79,12 +80,12 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={handleAmountChange} />
                 </div>
+                <input type="hidden" name="currency" value={ country?.currency || session.country.currency_id } />
+                <input type="hidden" name="currency_id" value={ country?.currency_id || session.country.currency_id } />
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
                     <DecimalInput id="rate" name="rate" onChange={handleRateChange} />
                 </div>
-                <input type="hidden" name="currency" value={ country?.currency || session.country.currency_id } />
-                <input type="hidden" name="currency_id" value={ country?.currency_id || session.country.currency_id } />
             </div>
             <div className="row mb-3">
                 <div className="col-6">

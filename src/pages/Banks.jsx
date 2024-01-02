@@ -36,7 +36,7 @@ export const BanksIndex = () => {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getBanks('order=created_at&order_by=desc').then(r => setBanks(r));
+    getBanks('order=created_at&order_by=desc').then(r => setBanks(r.data));
     getCountriesCount().then(r =>setCountryBank(r));
   }, [])
   const handleChange = (offset) => {

@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import { Form } from "react-bootstrap";
 
 const TypeTwoDepositReportForm = () => {
     const [user, setUser] = useState(null);
@@ -17,8 +18,6 @@ const TypeTwoDepositReportForm = () => {
             if (formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
             
             if (errors.length > 0) throw new Error(errors.join(";"));
-            
-            formData.append("user", user.label);
             
             handleSubmit(formData);
             
@@ -41,11 +40,16 @@ const TypeTwoDepositReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user_id" name="user" value={user} onChange={setUser} />
+                    <UsersSelect id="user" name="user" value={user} onChange={setUser} onError={setError} query="" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
+                </div>
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check type="checkbox" id="isDuplicated" name="isDuplicated" label="Duplicado" />
                 </div>
             </div>
             <div className="row text-end">

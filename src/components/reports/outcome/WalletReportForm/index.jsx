@@ -48,6 +48,7 @@ const OutcomeWalletReportForm = () => {
                         value={bankAccount}
                         onChange={setBankAccount}
                         onError={setError}
+                        query="&country=2"
                         placeholder="Selecciona la cuenta emisora" />
                 </div>
                 <div className="col">

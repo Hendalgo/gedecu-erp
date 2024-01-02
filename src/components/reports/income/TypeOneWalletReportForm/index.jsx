@@ -59,7 +59,6 @@ const TypeOneWalletReportForm = () => {
     return(
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <input type="hidden" id="country_id" name="country_id" value={country?.value || session.country_id} />
-            <input type="hidden" id="currency_id" name="currency_id" value={0} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="transferences_quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
@@ -76,9 +75,11 @@ const TypeOneWalletReportForm = () => {
                     <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en { country?.value || session.country_id }</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency.shortcode }</label>
                     <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
+                <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency_id} />
+                <input type="hidden" id="currency" name="currency" value={country?.currency || session.country.currency.shortcode} />
             </div>
             <div className="row mb-3">
                 <div className="col">

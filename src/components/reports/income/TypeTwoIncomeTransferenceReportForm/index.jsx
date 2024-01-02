@@ -2,10 +2,12 @@ import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
-    const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
+    const { session, } = useContext(SessionContext);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -43,6 +45,7 @@ const TypeTwoIncomeTransferenceReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
+                        query={`&country=${country?.value || session.country_id}`}
                         onChange={setBankAccount}
                         onError={setError} />
                 </div>

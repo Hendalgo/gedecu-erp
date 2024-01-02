@@ -44,6 +44,7 @@ const TaxReportForm = () => { // => Reporte de comisiones
                         id="account"
                         name="account"
                         value={bankAccount}
+                        query="&country=2"
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>

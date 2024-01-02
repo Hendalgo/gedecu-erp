@@ -9,71 +9,148 @@ import { createReport, getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
 import { getCountries } from "../helpers/countries";
 
-const reports = [
-    { value: 1, label: "Reporte Tipo 1" },
-    { value: 2, label: "Reporte Tipo 2" },
-]
+export default function ReportForm() {
+    const [isLoading, setIsLoading] = useState(false);
 
-const ReportForm = () => {
     const [countries, setCountries] = useState([]);
     const [country, setCountry] = useState(null);
+    const [showCountryConfirmation, setShowCountryConfirmation] = useState(false);
     const countryAux = useRef(null);
+
+    const [report, setReport] = useState(null);
+    const [reports, setReports] = useState([]);
+    const [showReportConfirmation, setShowReportConfirmation] = useState(false);
+    const reportAux = useRef(null);
+
     const [reportType, setReportType] = useState(null);
     const [reportTypes, setReportTypes] = useState([]);
-    const [showReportConfirmation, setShowReportConfirmation] = useState(false);
-    const [showCountryConfirmation, setShowCountryConfirmation] = useState(false);
-    const [error, setError] = useState({ show: false, message: [], variant: 'danger' });
-    const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
     const reportTypeAux = useRef(null);
+    const [showReportTypeConfirmation, setShowReportTypeConfirmation] = useState(false);
+
+    const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
+
     const vzlaReportTypes = useRef([]);
     const intlReportTypes = useRef([]);
+    const allReportsTypes = useRef([]);
+
     const subreports = useRef([]);
+
+    const [error, setError] = useState({ show: false, message: [], variant: 'danger' });
+
     const { session } = useContext(SessionContext);
 
     const showCountries = [1,].includes(session.role_id);
 
+    const setVzlaReportTypes = () => {
+        const incomeReports = []; const outcomeReports = [];
+
+        allReportsTypes.current.forEach((reportType) => {
+            const metaData = JSON.parse(reportType.meta_data);
+            if (metaData && !Object.keys(metaData).includes("type")) {
+                if (reportType.type === "income") incomeReports.push({ value: reportType.id, label: reportType.name });
+                if (reportType.type === "expense") outcomeReports.push({ value: reportType.id, label: reportType.name });
+            }
+        });
+
+        return [
+            { label: "INGRESO", options: incomeReports },
+            { label: "EGRESO", options: outcomeReports },
+        ];
+    }
+
+    const setIntlReportTypes = () => {
+        return allReportsTypes.current.filter((reportType) => {
+            const metaData = JSON.parse(reportType.meta_data);
+
+            return metaData && Object.keys(metaData).includes("type");
+        });
+    }
+
+    const setReportByRole = () => {
+        let option = null;
+
+        if (session.role_id === 3) { // Encargado de local
+            setReports([
+                { value: 1, label: "Reporte Tipo 1" },
+                { value: 2, label: "Reporte Tipo 2" },
+            ]);
+        }
+
+        if (session.role_id === 4) { // Proveedor
+            option = { value: 3, label: "Proveedor" };
+
+            setReports([
+                { value: 3, label: "Proveedor" },
+            ]);
+
+            setReport(option);
+        }
+
+        if (session.role_id === 5) { // Depositante
+            option = { value: 4, label: "Depositante" };
+
+            setReports([
+                { value: 4, label: "Depositante" },
+            ]);
+
+            setReport(option);
+        }
+
+        if (session.role_id === 6) { // Caja fuerte
+            option = { value: 5, label: "Caja fuerte" };
+
+            setReports([
+                { value: 5, label: "Caja fuerte" },
+            ]);
+
+            setReport(option);
+        }
+
+        handleReport(option);
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
+                allReportsTypes.current = await getReportTypes("paginated=no");
+
                 if (showCountries) {
                     const countriesResponse = await getCountries("paginated=no");
 
                     if (countriesResponse && countriesResponse.data) {
 
-                        const countriesOptions = countriesResponse.data.map(({ country_name, shortcode, currency_shortcode, id_country }) => {
-                            return { label: country_name.concat(" (", shortcode, ")"), value: id_country, currency: currency_shortcode, currency_id: 100, };
+                        const countriesOptions = countriesResponse.data.map(({ country_name, shortcode, currency_shortcode, id_country, currency_id, }) => {
+                            return {
+                                label: country_name.concat(" (", shortcode, ")"),
+                                value: id_country,
+                                currency: currency_shortcode,
+                                currency_id: currency_id,
+                            };
                         });
 
                         setCountries(countriesOptions);
-
                         setCountry(countriesOptions.find(({ value }) => value == session.country_id));
+                        setReports([
+                            { value: 1, label: "Reporte Tipo 1" },
+                            { value: 2, label: "Reporte Tipo 2" },
+                            { value: 3, label: "Proveedor" },
+                            { value: 4, label: "Depositante" },
+                            { value: 5, label: "Caja fuerte" },                        
+                        ])
                     }
                 }
 
-                if (session.country_id === 2) { // Venezuela
-                    const reportTypesResponse = await getReportTypes("paginated=no");
-
-                    if (reportTypesResponse) {
-                        const incomeReports = []; const outcomeReports = []; const neutroReports = [];
-                        
-                        reportTypesResponse.forEach((reportType) => {
-                            if (reportType.type === "income") incomeReports.push({ value: reportType.id, label: reportType.name });
-                            if (reportType.type === "expense") outcomeReports.push({ value: reportType.id, label: reportType.name });
-                            if (reportType.type === "neutro") neutroReports.push({ value: reportType.id, label: reportType.name });
-                        });
-                        
-                        vzlaReportTypes.current = [
-                            { label: "INGRESO", options: incomeReports },
-                            { label: "EGRESO", options: outcomeReports },
-                            { label: "R1", options: neutroReports },
-                        ];
+                if (allReportsTypes.current) {
+                    if (session.country_id === 2) { // Venezuela
+                        vzlaReportTypes.current = setVzlaReportTypes();
 
                         setReportTypes(vzlaReportTypes.current);
+                    } else {
+                        intlReportTypes.current = setIntlReportTypes();
                     }
-                } else {
-                    const reportTypesResponse = await getReportTypes("paginated=no");
-                    if (reportTypesResponse) intlReportTypes.current = reportTypesResponse;
                 }
+
+                setReportByRole();
             } catch (error) {
                 setError({
                     show: true,
@@ -96,9 +173,15 @@ const ReportForm = () => {
                 setCountry(option);
                 let reportTypes = [];
     
-                if (option.value === 2) reportTypes = vzlaReportTypes.current;
+                if (option.value === 2) {
+                    if (vzlaReportTypes.current.length === 0) {
+                        vzlaReportTypes.current = setVzlaReportTypes();
+                    }
+                    reportTypes = vzlaReportTypes.current;
+                }
 
                 setReportTypes(reportTypes);
+                setReport(null);
                 setReportType(null);
             }
 
@@ -117,18 +200,74 @@ const ReportForm = () => {
         setReportType(null);
     }
 
-    const handleReport = ({ value }) => {
-        const reportTypes = intlReportTypes.current
-        .filter(({ id }) => (id % value) == 0); // R1 o R2
+    const getReportTypesByReport = (report = 0) => {
+        if (intlReportTypes.current.length === 0) {
+            intlReportTypes.current = setIntlReportTypes();
+        }
 
-        setReportTypes([]);
-    }    
+        const filteredReports = intlReportTypes.current
+        .filter(({ meta_data }) => {
+            const metaData = JSON.parse(meta_data);
+            return metaData?.type == report;
+        })
+
+        if (report == 1 || report == 3) {
+            return filteredReports.map(({ name, id, }) => ({ label: name, value: id }));
+        }
+        
+        if (report == 2) {
+            const incomeReports = []; const expenseReports = [];
+
+            filteredReports.forEach((type) => {
+                if (type) {
+                    if (type.type === "income") incomeReports.push({ label: type.name, value: type.id, });
+                    if (type.type === "expense") expenseReports.push({ label: type.name, value: type.id, });
+                }
+            })
+
+            return [
+                {
+                    label: "INGRESO",
+                    options: incomeReports,
+                },
+                {
+                    label: "EGRESO",
+                    options: expenseReports,
+                },
+            ];
+        }
+        return [];
+    }
+
+    const handleReport = (option) => {
+        if (option?.value !== report?.value) {
+            if (tableData.body.length > 0) {
+                reportAux.current = option;
+                setShowReportConfirmation(true);
+            } else {
+                let reportTypes;
+        
+                reportTypes = getReportTypesByReport(option?.value);
+        
+                setReportTypes(reportTypes);
+                setReport(option);
+                setReportType(null);
+            }
+        }
+    }
+
+    const handleReportChangeConfirm = () => {
+        setReport(reportAux.current);
+        setReportType(null);
+        clearTableData();
+        setReportTypes(getReportTypesByReport(reportAux.current?.value));
+    }
 
     const handleReportType = (option) => {
         if (option.value !== reportType?.value) {
             if (tableData.body.length > 0) {
                 reportTypeAux.current = option;
-                setShowReportConfirmation(true);
+                setShowReportTypeConfirmation(true);
             } else {
                 setReportType(option);
             }
@@ -137,7 +276,7 @@ const ReportForm = () => {
         }
     }
 
-    const handleReportChangeConfirm = () => {
+    const handleReportTypeChangeConfirm = () => {
         setReportType(reportTypeAux.current);
         clearTableData();
     }
@@ -170,7 +309,7 @@ const ReportForm = () => {
 
                 if (["amount", "rate", "conversion",].includes(key)) {
                     formattedValue = parseFloat(value.replace(/[.,]/gi, '')) / 100;
-                } else if (key === "transferences_quantity") {
+                } else if (["transferences_quantity", "deposits_quantity",].includes(key)) {
                     formattedValue = parseInt(value);
                 } else {
                     formattedValue = value.trim();
@@ -188,7 +327,7 @@ const ReportForm = () => {
             newTableEntry["isDuplicated"] = "Sí";
 
             if (!formData.has("isDuplicated")) {
-                headColumns.push("Duplicado");
+                if (!headColumns.includes("Duplicado")) headColumns.push("Duplicado");
 
                 newEntry["isDuplicated"] = false;
 
@@ -207,6 +346,8 @@ const ReportForm = () => {
     }
 
     const handleDelete = (index) => {
+        setIsLoading(true);
+
         const newEntries = [...tableData.body];
         let columns = [...tableData.header];
 
@@ -215,52 +356,64 @@ const ReportForm = () => {
         if (newEntries.length === 0) columns = [];
 
         setTableData(({header: columns, body: newEntries}));
+
+        setIsLoading(false);
     }
 
     const postReport = async () => {
-        console.log(JSON.stringify({
-            name: reportType.label,
-            subreports: subreports.current,
-        }))
+        setIsLoading(true);
+
         try {
+            console.log(JSON.stringify({
+                name: reportType.label,
+                subreports: subreports.current,
+            }))
             // const response = await createReport({
             //     type_id: reportType.value,
             //     subreports: subreports.current,
             // });
 
             // if (response.status === 201) {
-                setReportType(null);
-                clearTableData();
+            //     setReportType(null);
+            //     clearTableData();
 
-                setError({
-                    show: true,
-                    message: ["Reporte creado exitosamente."],
-                    variant: "success"
-                });
+            //     setError({
+            //         show: true,
+            //         message: ["Reporte creado exitosamente."],
+            //         variant: "success"
+            //     });
             // }
         } catch ({message, error, response}) {
-            let errorsMessages;
+            let errorsMessages = [];
+
+            console.log(error, message, response)
 
             if (error) {
                 errorsMessages = Object.values(error).flat();
             }
 
+            if (response) {
+                errorsMessages.push(response.data.error);
+            }
+
             setError({ show: true, message: errorsMessages, variant: "danger" });
         }
+
+        setIsLoading(false);
     }
 
     return(
         <>
-            <section className="container p-2 mb-4">
+            <section className="container p-2 mb-2">
                 <div className="WelcomeContainer pb-2">
                     <h6 className="welcome">Agregar un nuevo reporte <span className="text-dark fs-5 fw-bold">+</span></h6>
                     <div className="d-flex align-items-center justify-content-between">
                         <h4>Nuevo Reporte</h4>
-                        <button type="button" className="btn btn-primary w-auto" disabled={tableData.body.length === 0} onClick={postReport}>Guardar +</button>
+                        <button type="button" className="btn btn-primary w-auto" disabled={tableData.body.length === 0 || isLoading} onClick={postReport}>Guardar +</button>
                     </div>
                 </div>
             </section>
-            <section className="container card border border-0 rounded p-4 pb-2 mb-4">
+            <section className="container card border border-0 rounded p-4 pb-2">
                 <div className="WelcomeContainer row justify-content-between align-items-center pb-2">
                     <div className="col-6">
                         <h5 style={{ color: "#052C65" }}>Tipo de reporte</h5>
@@ -277,20 +430,23 @@ const ReportForm = () => {
                             placeholder="País"
                             noOptionsMessage={() => "No hay coincidencias"}
                             className="col-6"
+                            isDisabled={isLoading}
                         />
                     }
                 </div>
                 <div className="row justify-content-end py-2">
                     {
-                        ((country && country.value !== 2) || session.country_id !== 2) &&
+                        ((country && country.value !== 2) || (!country && session.country_id !== 2)) &&
                         <Select
                             inputId="reportTypes"
                             name="reportTypes"
+                            value={report}
                             options={reports}
                             placeholder="Reporte"
                             noOptionsMessage={() => "No hay coincidencias"}
-                            className="col-4"
+                            className="col-6"
                             onChange={handleReport}
+                            isDisabled={isLoading || reports.length <= 1}
                         />
                     }
                     <Select
@@ -300,7 +456,7 @@ const ReportForm = () => {
                         placeholder="Tipo de reporte"
                         value={reportType}
                         noOptionsMessage={() => "No hay coincidencias"}
-                        isDisabled={reportTypes.length === 0}
+                        isDisabled={reportTypes.length === 0 || isLoading}
                         className="col-6"
                         onChange={handleReportType}
                     />
@@ -320,7 +476,7 @@ const ReportForm = () => {
                     </ul>
                 </Alert>
             </section>
-            <section>
+            <section className="overflow-x-auto">
                 {
                     (tableData && tableData.header.length > 0) &&
                     <table className="table TableP table-striped">
@@ -341,7 +497,7 @@ const ReportForm = () => {
                                             .concat("delete")
                                             .map((value, cellIndex) => {
                                                 return <td key={cellIndex}>{value === "delete" ?
-                                                <button className="TableActionButtons" onClick={() => handleDelete(rowIndex)}>
+                                                <button className="TableActionButtons" disabled={isLoading} onClick={() => handleDelete(rowIndex)}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                                         <path d="M15.3332 3C15.3332 2.44772 14.8855 2 14.3332 2H11.8158C11.3946 0.804906 10.267 0.0040625 8.99985 0H6.99985C5.73269 0.0040625 4.6051 0.804906 4.18385 2H1.6665C1.11422 2 0.666504 2.44772 0.666504 3C0.666504 3.55228 1.11422 4 1.6665 4H1.99985V12.3333C1.99985 14.3584 3.64147 16 5.6665 16H10.3332C12.3582 16 13.9998 14.3584 13.9998 12.3333V4H14.3332C14.8855 4 15.3332 3.55228 15.3332 3ZM11.9998 12.3333C11.9998 13.2538 11.2537 14 10.3332 14H5.6665C4.74604 14 3.99985 13.2538 3.99985 12.3333V4H11.9998V12.3333Z" fill="#495057"/>
                                                         <path d="M6.33301 12C6.88529 12 7.33301 11.5523 7.33301 11V7C7.33301 6.44772 6.88529 6 6.33301 6C5.78073 6 5.33301 6.44772 5.33301 7V11C5.33301 11.5523 5.78073 12 6.33301 12Z" fill="#495057"/>
@@ -367,10 +523,10 @@ const ReportForm = () => {
                 }
             </section>
             <ModalConfirmation
-                show={showReportConfirmation}
-                setModalShow={setShowReportConfirmation}
-                action={handleReportChangeConfirm}
-                warning="Si cambia el reporte, se perderán todos los registros creados. ¿Está seguro?"
+                show={showReportTypeConfirmation}
+                setModalShow={setShowReportTypeConfirmation}
+                action={handleReportTypeChangeConfirm}
+                warning="Si cambia el tipo de reporte, se perderán todos los registros creados. ¿Está seguro?"
                 confirmButtonLabel="Confirmar" />
 
             <ModalConfirmation
@@ -379,8 +535,13 @@ const ReportForm = () => {
                 action={handleCountryChangeConfirm}
                 warning="Si cambia el país, se perderán todos los registros creados. ¿Está seguro?"
                 confirmButtonLabel="Confirmar" />
+
+            <ModalConfirmation
+                show={showReportConfirmation}
+                setModalShow={setShowReportConfirmation}
+                action={handleReportChangeConfirm}
+                warning="Si cambia el reporte, se perderán todos los registros creados. ¿Está seguro?"
+                confirmButtonLabel="Confirmar" />
         </>
     )
 }
-
-export default ReportForm;

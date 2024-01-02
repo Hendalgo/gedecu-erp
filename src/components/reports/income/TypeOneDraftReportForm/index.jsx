@@ -1,19 +1,42 @@
 import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
-import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
 import BanksSelect from "../../../BanksSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import { Form } from "react-bootstrap";
+import Select from "react-select";
+import { getUsers } from "../../../../helpers/users";
 
 const TypeOneDraftReportForm = () => {
     const [amount, setAmount] = useState(0);
     const [rate, setRate] = useState(0);
     const [user, setUser] = useState(null);
+    const [users, setUsers] = useState([]);
     const [bank, setBank] = useState(null);
     const { handleSubmit, setError, country } = useContext(ReportTableContext);
     const { session } = useContext(SessionContext);
+
+    const handleBankChange = async (option) => {
+        if (option?.value !== bank?.value) {
+            setBank(option);
+            setUsers([]);
+            setUser(null);
+
+            if (option) {
+                try {
+                    const usersResponse = await getUsers(`paginated=no&bank=${option.value}`);
+
+                    if (usersResponse) setUsers(usersResponse.data.map(({ name, email, id }) => {
+                        const label = name.concat(" (", email, ")");
+                        return { label: label, value: id };
+                    }));
+                } catch (error) {
+                    setError({ show: true, message: [], variant: "danger", });
+                }
+            }
+        }
+    }
 
     const handleAmountChange = (amount) => {
         if (Number.isNaN(amount)) setError({ show: true, message: ["Valor inadecuado."], variant: "danger" });
@@ -67,8 +90,6 @@ const TypeOneDraftReportForm = () => {
     return(
         <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
             <input type="hidden" id="country_id" name="country_id" value={country?.id_country || session.country_id} />
-            <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || 0} />
-            <input type="hidden" id="currency" name="currency" value={country?.currency || ""} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="bank_id" className="form-label">Banco <span className="Required">*</span></label>
@@ -76,37 +97,43 @@ const TypeOneDraftReportForm = () => {
                         id="bank"
                         name="bank"
                         value={bank}
-                        onChange={setBank}
+                        onChange={handleBankChange}
                         onError={setError}
                         query="&country=2" />
                 </div>
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect
-                        id="user"
-                        name="user"
+                    <Select
+                        inputId="user_id"
+                        name="user_id"
                         value={user}
-                        onError={setError}
-                        onChange={setUser} />
+                        options={users}
+                        onChange={setUser}
+                        placeholder="Selecciona el gestor"
+                        noOptionsMessage={() => "No hay coincidencias"}
+                        isDisabled={users.length === 0} />
+                    <input type="hidden" name="user" value={user?.label || ""} />
                 </div>
             </div>
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="transferences-quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
-                    <NumberInput id="transferences-quantity" name="transferences-quantity" />
+                    <label htmlFor="transferences_quantity" className="form-label">N° de transferencias <span className="Required">*</span></label>
+                    <NumberInput id="transferences_quantity" name="transferences_quantity" />
                 </div>
                 <div className="col">
-                    <label htmlFor="amount" className="form-label">Monto total en { country?.currency || session.country_id } <span className="Required">*</span></label>
+                    <label htmlFor="amount" className="form-label">Monto total en { country?.currency || country?.currency_id || session.country.currency_id } <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
+            <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency_id} />
+            <input type="hidden" id="currency" name="currency" value={country?.currency || session.country.currency_id} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
                     <DecimalInput id="rate" name="rate" defaultValue={rate.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleRateChange} />
                 </div>
                 <div className="col">
-                    <label htmlFor="conversion" className="form-label">Monto total en VED</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en VES</label>
                     <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
             </div>
