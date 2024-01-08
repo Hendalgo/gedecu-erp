@@ -1,12 +1,7 @@
 import { REPORTS_URL, API_INSTANCE, REPORTS_TYPE_URL } from '../consts/ApiUrl'
 export const getReports = async (query) => {
-  try {
-    const request = await API_INSTANCE.get(REPORTS_URL + '?' + query)
-
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  const request = await API_INSTANCE.get(REPORTS_URL + '?' + query);
+  return request.data
 }
 export const getInconsistences = async (query) => {
   try {
@@ -17,6 +12,12 @@ export const getInconsistences = async (query) => {
     return error.response
   }
 }
+
+export const getReportById = async (id) => {
+  const response = await API_INSTANCE.get(`${REPORTS_URL}/${id}`);
+  return response.data;
+}
+
 export const createReport = async (data) => {
   return API_INSTANCE.post(REPORTS_URL, data);
 }

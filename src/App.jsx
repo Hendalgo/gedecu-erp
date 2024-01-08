@@ -18,6 +18,8 @@ import Countries, { CountriesIndex } from './pages/Countries'
 import ReportTypes from './pages/ReportTypes'
 import Currencies from './pages/Currencies'
 import ReportForm from './pages/ReportForm'
+import ReportsByUser from './pages/ReportsByUser'
+import ReportDetail from './pages/ReportDetail'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -45,6 +47,7 @@ function App () {
               <Route path={`${REPORTS_ROUTE}`} element={<Reports />}>
                 <Route index element={<ReportsIndex />} />
                 <Route path={`create`} element={<ReportForm />} />
+                <Route path={`:id`} element={<ReportDetail />} />
                 <Route path={`${REPORTS_DUPLICATE_ROUTE}`} element={<DuplicateReports />} />
                 <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
                 <Route path={`${REPORTS_TYPE_ROUTE}`} element={<ReportTypes />} />
@@ -54,7 +57,10 @@ function App () {
                 <Route index element={<BanksIndex/>}/>
                 <Route path={`${BANK_ACCOUNTS_ROUTE}`} element={<BankAccounts/>}/>
               </Route>
-              <Route path={`${USERS_ROUTE}`} element={<Users />} />
+              <Route path={`${USERS_ROUTE}`}>
+                <Route index element={<Users />} />
+                <Route path=":id/reports" element={<ReportsByUser />} />
+              </Route>
               <Route path={`${COUNTRIES_ROUTE}`} element={<Countries/>} >
                 <Route index element={<CountriesIndex />} />
                 <Route path={`${CURRENCIES_ROUTE}`} element={<Currencies />}/>
