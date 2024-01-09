@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getReportById } from "../helpers/reports";
 import { Alert, Card } from "react-bootstrap";
+import reportsColumnsMap from "../consts/ReportsColumnsMap";
 
 export default function ReportDetail() {
     const [report, setReport] = useState(null);
@@ -21,12 +22,43 @@ export default function ReportDetail() {
         fetchData();
     }, [id]);
 
-    const subreports = report ? JSON.parse(report.subreports) : [];
+    const subreports = report ? JSON.parse(report.meta_data) : [];
+    const tableHeaderSet = new Set();
+    const tableBody = [];
+
+    subreports.forEach((report) => {
+        const newEntry = {};
+        Object.entries(report).forEach(([key, value]) => {
+        if (reportsColumnsMap.has(key)) {
+                tableHeaderSet.add(reportsColumnsMap.get(key));
+                let formattedValue = value;
+                if (["amount", "rate", "conversion"].includes(key)) {
+                    formattedValue = formattedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
+                }
+
+                if (key === "isDuplicated") {
+                    formattedValue = "No";
+                    if (value) {
+                        formattedValue = "Sí";
+                    }
+                }
+
+                newEntry[key] = formattedValue;
+            }
+        })
+
+        tableBody.push(newEntry);
+    });
+
+    const tableHeader = Array.from(tableHeaderSet);
+    const reportStyles = report ? JSON.parse(report.type.config)?.styles : {};
+
+    if (!report) return <></>;
 
     return (
         <>
             {/* Breadcrumb */}
-            <section className="p-2">
+            <section className="p-2 mb-4">
                 <div className="WelcomeContainer">
                     <h6 className="welcome">Información detallada</h6>
                     <h4>Reporte</h4>
@@ -40,30 +72,57 @@ export default function ReportDetail() {
                 </ul>
             </Alert>
             <section>
+                <table className="table table-striped tableP">
+                    <thead>
+                        <tr>
+                            {
+                                tableHeader.map((column, index) => <th key={index}>{column}</th>)
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            tableBody.map((row, index) => {
+                                return <tr key={`row-${index}`}>
+                                    {
+                                        Object.values(row).map((value, colIndex) => {
+                                            return <td key={`col-${colIndex}`}>{value}</td>
+                                        })
+                                    }
+                                </tr>
+                            })
+                        }
+                    </tbody>
+                </table>
             </section>
             <section className="p-2 row mt-3 justify-content-end">
-                <Card className="col-6">
-                    <Card.Header as={"h5"}>Sobre el reporte:</Card.Header>
+                <Card className="col-5">
+                    <Card.Header as={"h5"} style={{color: "#052C65", fontSize: "18px", fontWeight: 600, backgroundColor: "#fff"}}>Sobre el reporte:</Card.Header>
                     <Card.Body>
-                        <div className="row mb-2">
+                        <div className="row">
                             <div className="col-6">
-                                <h6>RESPONSABLE:</h6>
+                                <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>RESPONSABLE:</h6>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{report.user.name}</p>
                             </div>
                             <div className="col-6">
-                                <h6>ROL:</h6>
-                            </div>
-                        </div>
-                        <div className="row mb-2">
-                            <div className="col-6">
-                                <h6>FECHA Y HORA:</h6>
-                            </div>
-                            <div className="col-6">
-                                <h6>ID REPORTE:</h6>
+                                <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ROL:</h6>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{report.user.role_id}</p>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-6">
-                                <h6>MOTIVO:</h6>
+                                <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>FECHA Y HORA:</h6>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{new Date(report.created_at).toLocaleString("es-VE")}</p>
+                            </div>
+                            <div className="col-6">
+                                <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ID REPORTE:</h6>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>#{report.id.toString().padStart(6, "0")}</p>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-6">
+                                <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MOTIVO:</h6>
+                                <span style={reportStyles}>{report.type.name}</span>
                             </div>
                         </div>
                     </Card.Body>

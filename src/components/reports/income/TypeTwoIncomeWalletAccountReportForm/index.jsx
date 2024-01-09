@@ -80,7 +80,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={handleAmountChange} />
                 </div>
-                <input type="hidden" name="currency" value={ country?.currency || session.country.currency_id } />
+                <input type="hidden" name="currency" value={ country?.currency || session.country.currency.shortcode } />
                 <input type="hidden" name="currency_id" value={ country?.currency_id || session.country.currency_id } />
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
@@ -89,7 +89,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
             </div>
             <div className="row mb-3">
                 <div className="col-6">
-                    <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency_id }</label>
+                    <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency.shortcode }</label>
                     <input type="text" id="conversion" name="conversion" value={conversion} readOnly className="form-control" />
                 </div>
             </div>

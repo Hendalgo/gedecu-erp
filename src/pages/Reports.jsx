@@ -6,7 +6,6 @@ import PaginationTable from '../components/PaginationTable'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { getReportTypes, getReports } from '../helpers/reports'
 import { useFormatDate } from '../hooks/useFormatDate'
-import ModalViewReport from '../components/ModalViewReport'
 import Welcome from '../components/Welcome'
 import ModalCreateReport from '../components/ModalCreateReport'
 import TableLoader from '../components/Loaders/TableLoader'
@@ -19,18 +18,23 @@ const Reports = () => {
 export const ReportsIndex = () => {
   const { session } = useContext(SessionContext);
   const [offset, setOffset] = useState(1);
-  const [report, setReport] = useState()
   const [reportType, setReportType] = useState([])
   const [date, setDate] = useState("")
-  const [modalShow, setModalShow] = useState(false)
   const [modalCreateShow, setModalCreateShow] = useState(false)
   const [reports, setReports] = useState([])
   const form = useRef()
   const navigate = useNavigate();
 
   useEffect(() => {
-    getReportTypes(`paginated=no`).then(r => setReportType(r))
-    getReports('order=created_at&order_by=desc').then(r => setReports(r))
+    const fetchData = async () => {
+      const [reportTypesResponse, reportsResponse] = await Promise.all([getReportTypes(`paginated=no`), getReports('order=created_at&order_by=desc'),]);
+      if (reportTypesResponse) setReportType(reportTypesResponse);
+      if (reportsResponse) setReports(reportsResponse);
+    }
+
+    if (session.role_id !== 1) return navigate(`/${DASHBOARD_ROUTE}/${USERS_ROUTE}/${session.id}/reports`);
+
+    fetchData();
   }, [])
 
   const handleChange = (offset) => {
@@ -102,19 +106,16 @@ export const ReportsIndex = () => {
                       <tr className='pt-4'>
                         <th scope='col'>Responsable</th>
                         <th scope='col'>Fecha - Hora</th>
-                        <th scope='col'>Motivo</th>
                       </tr>
                     </thead>
                     <tbody>
                       {
                         reports.data.map(e => {
-                          const color = JSON.parse(e.type.config).styles
-                          
                           return (
                             <tr key={e.id}>
                               <td scope='row'>
                                 <div className='d-flex justify-content-between align-items-center'>
-                                  <span>{e.user.name}</span>
+                                  <span>{e.user_name} ({e.email})</span>
                                   <span>
                                     <button className='btn' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${USERS_ROUTE}/${e.user_id}/${REPORTS_ROUTE}`)}>
                                       <svg xmlns='http://www.w3.org/2000/svg' width='17' height='13' viewBox='0 0 17 13' fill='none'>
@@ -125,10 +126,7 @@ export const ReportsIndex = () => {
                                   </span>
                                 </div>
                               </td>
-                              <td>{useFormatDate(e.created_at)}</td>
-                              <td>
-                                <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.type.name}</span>
-                              </td>
+                              <td>{useFormatDate(e.report_date)}</td>
                             </tr>
                           )
                         }
@@ -143,9 +141,6 @@ export const ReportsIndex = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
         <div className=''>
-          {
-            modalShow && <ModalViewReport setModalShow={setModalShow} modalShow={modalShow} report={report} />
-          }
           {
             modalCreateShow && <ModalCreateReport setModalShow={setModalCreateShow} modalShow={modalCreateShow} />
           }

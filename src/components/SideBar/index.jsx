@@ -20,7 +20,7 @@ const SideBar = ({ children }) => {
     menus = AdminMenus;
   }
   else{
-    menus = NormalUserMenu;
+    menus = NormalUserMenu(session);
   }
   return width > 1440 
     ?<SideBarBig menus={menus} setSession={setSession} isActive={isActive}>{children}</SideBarBig>

@@ -15,12 +15,11 @@ export default function ReportsByUser() {
     const { session } = useContext(SessionContext);
     const {id} = useParams();
     const navigate = useNavigate();
-    // console.log(session)
 
     const getUserReports = async (params = "") => {
         try {
             setIsLoading(true);
-            const reportsData = await getReports(`user=${id}${params}`);
+            const reportsData = await getReports(`order=created_at&order_by=desc&user=${id}${params}`);
             setIsLoading(false);
             return reportsData;
         } catch (error) {
@@ -48,6 +47,9 @@ export default function ReportsByUser() {
 
         setReports(await getUserReports(`&page=${selected + 1}`));
     }
+
+    if (!reports) return <></>
+
     return (
         <>
             <section>
@@ -89,8 +91,9 @@ export default function ReportsByUser() {
                         <table className="mt-2 table table-striped tableP">
                             <thead>
                                 <tr>
-                                    <th scope="col">Nombre</th>
+                                    <th scope="col">ID</th>
                                     <th scope="col">Fecha - Hora</th>
+                                    <th scope="col">Tipo</th>
                                     <th />
                                 </tr>
                             </thead>
@@ -100,10 +103,11 @@ export default function ReportsByUser() {
                                     <tr>
                                         <th colSpan={3} className="text-center">No hay reportes para mostrar.</th>
                                     </tr>
-                                    : reports.data.map(({ id, created_at, user, }) => {
+                                    : reports.data.map(({ id, created_at, type }) => {
                                         return <tr key={id}>
-                                            <td>{user.name}</td>
+                                            <td>#{id.toString().padStart(6, "0")}</td>
                                             <td>{new Date(created_at).toLocaleString("es-VE")}</td>
+                                            <td>{type.name}</td>
                                             <td>
                                                 <button className='btn' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${id}`)}>
                                                     <svg xmlns='http://www.w3.org/2000/svg' width='17' height='13' viewBox='0 0 17 13' fill='none'>

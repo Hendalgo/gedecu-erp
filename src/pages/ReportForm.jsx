@@ -61,8 +61,7 @@ export default function ReportForm() {
     const setIntlReportTypes = () => {
         return allReportsTypes.current.filter((reportType) => {
             const metaData = JSON.parse(reportType.meta_data);
-
-            return metaData && Object.keys(metaData).includes("type");
+            return !metaData || (metaData && Object.keys(metaData).includes("type"));
         });
     }
 
@@ -208,10 +207,10 @@ export default function ReportForm() {
         const filteredReports = intlReportTypes.current
         .filter(({ meta_data }) => {
             const metaData = JSON.parse(meta_data);
-            return metaData?.type == report;
+            return !metaData || metaData?.type == report;
         })
 
-        if (report == 1 || report == 3) {
+        if (report == 1 || report == 3 || report == 5) {
             return filteredReports.map(({ name, id, }) => ({ label: name, value: id }));
         }
         
@@ -221,7 +220,7 @@ export default function ReportForm() {
             filteredReports.forEach((type) => {
                 if (type) {
                     if (type.type === "income") incomeReports.push({ label: type.name, value: type.id, });
-                    if (type.type === "expense") expenseReports.push({ label: type.name, value: type.id, });
+                    if (type.type === "expense" || type.type === "neutro") expenseReports.push({ label: type.name, value: type.id, });
                 }
             })
 
@@ -236,6 +235,23 @@ export default function ReportForm() {
                 },
             ];
         }
+
+        if (report == 4) {
+            const expenseReports = filteredReports.slice(1).map(({name, id,}) => ({label: name, value: id}));
+            const incomeReports = filteredReports.at(0);
+
+            return [
+                {
+                    label: "INGRESO",
+                    options: [{label: incomeReports.name, value: incomeReports.id}] // Efectivo
+                },
+                {
+                    label: "EGRESO",
+                    options: expenseReports
+                }
+            ];
+        }
+
         return [];
     }
 
@@ -364,29 +380,23 @@ export default function ReportForm() {
         setIsLoading(true);
 
         try {
-            console.log(JSON.stringify({
-                name: reportType.label,
+            const response = await createReport({
+                type_id: reportType.value,
                 subreports: subreports.current,
-            }))
-            // const response = await createReport({
-            //     type_id: reportType.value,
-            //     subreports: subreports.current,
-            // });
+            });
 
-            // if (response.status === 201) {
-            //     setReportType(null);
-            //     clearTableData();
+            if (response.status === 201) {
+                setReportType(null);
+                clearTableData();
 
-            //     setError({
-            //         show: true,
-            //         message: ["Reporte creado exitosamente."],
-            //         variant: "success"
-            //     });
-            // }
+                setError({
+                    show: true,
+                    message: ["Reporte creado exitosamente."],
+                    variant: "success"
+                });
+            }
         } catch ({message, error, response}) {
             let errorsMessages = [];
-
-            console.log(error, message, response)
 
             if (error) {
                 errorsMessages = Object.values(error).flat();

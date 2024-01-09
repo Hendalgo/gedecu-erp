@@ -65,23 +65,25 @@ export const AdminMenus = [
   }
 ]
 
-export  const NormalUserMenu = [
-  {
-    title: 'Escritorio',
-    src: 'home-blue-icon',
-    link: DASHBOARD_INDEX_ROUTE,
-    isActive: false
-  },
-  {
-    title: 'Reportes',
-    src: 'document-white-icon',
-    link: 'reports',
-    others: [
-      {
-        name: 'Duplicados',
-        link: 'reports/' + REPORTS_DUPLICATE_ROUTE
-      }
-    ],
-    isActive: false
-  }
-]
+export function NormalUserMenu(session = null) {
+  return [
+    {
+      title: 'Escritorio',
+      src: 'home-blue-icon',
+      link: DASHBOARD_INDEX_ROUTE,
+      isActive: false
+    },
+    {
+      title: 'Reportes',
+      src: 'document-white-icon',
+      link: `users/${session.id}/reports`,
+      others: [
+        {
+          name: 'Duplicados',
+          link: 'reports/' + REPORTS_DUPLICATE_ROUTE
+        }
+      ],
+      isActive: false
+    },
+  ];
+}
