@@ -106,7 +106,7 @@ export default function ReportDetail() {
                             </div>
                             <div className="col-6">
                                 <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ROL:</h6>
-                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{report.user.role_id}</p>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{report.user.role.name}</p>
                             </div>
                         </div>
                         <div className="row">

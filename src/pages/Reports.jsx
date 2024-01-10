@@ -95,7 +95,7 @@ export const ReportsIndex = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable offset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
+                    <PaginationTable text="usuarios" offset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -105,6 +105,7 @@ export const ReportsIndex = () => {
                     <thead>
                       <tr className='pt-4'>
                         <th scope='col'>Responsable</th>
+                        <th scope='col'>Rol</th>
                         <th scope='col'>Fecha - Hora</th>
                       </tr>
                     </thead>
@@ -126,6 +127,7 @@ export const ReportsIndex = () => {
                                   </span>
                                 </div>
                               </td>
+                              <td>{e.user.role.name}</td>
                               <td>{useFormatDate(e.report_date)}</td>
                             </tr>
                           )

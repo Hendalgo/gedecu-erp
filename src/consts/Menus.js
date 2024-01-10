@@ -85,5 +85,11 @@ export function NormalUserMenu(session = null) {
       ],
       isActive: false
     },
-  ];
+    {
+      title: 'Cuentas de banco',
+      src: 'bank',
+      link: 'banks/' + BANK_ACCOUNTS_ROUTE,
+      isActive: false
+    },
+    ];
 }
