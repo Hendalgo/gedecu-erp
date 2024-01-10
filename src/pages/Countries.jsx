@@ -105,6 +105,7 @@ export const CountriesIndex = () => {
                       <tr className='pt-4'>
                         <th scope='col'>País</th>
                         <th scope='col'>Código</th>
+                        {/* <th scope='col'>Código local</th> */}
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
@@ -112,13 +113,14 @@ export const CountriesIndex = () => {
                       {
                         countries.data.map(e => {
                     return (
-                      <tr key={e.id}>
+                      <tr key={e.id_country}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
                             <span>{e.country_name}</span>
                           </div>
                         </td>
                         <td>{e.shortcode}</td>
+                        {/* <td>{Código local}</td> */}
                         {
                           useCheckRole(session)
                           &&
