@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getUsers } from '../../helpers/users'
 import { getCountriesCount } from '../../helpers/banks'
@@ -11,26 +11,23 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
+
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getUsers(`paginated=no`).then(r =>{
-      setUsers(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.email}`,
-          value: e.id
-        }
-      }))
-    }); 
+    Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
+    .then(([countriesResponse, usersResponse]) => {
+      setCountries(countriesResponse);
+      setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
+    })
+    .catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    });
   }, [])
+
   const handleStore = async () => {
     try {
-      const formData = form.current
-      const request = await createStore({
-        name: formData.name.value,
-        location: formData.location.value,
-        country_id: formData.country_id.value,
-        user_id: formData.user.value
-      })
+      const formData = new FormData(form.current);
+      const request = await createStore(formData);
 
       switch (request.status) {
         case 201:
@@ -69,21 +66,21 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='container' action='' ref={form}>
+        <form className='container' action='' ref={form} autoComplete='off'>
           <div className='row mb-3'>
             <div className=' col '>
               <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
-              <input required className='form-control' type='text' name='name' />
+              <input required className='form-control' type='text' name='name' id='name' />
             </div>
             <div className='col'>
               <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
-              <input required className='form-control' type='text' name='location' />
+              <input required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
           <div className='row'>
-            <div className='col'>
+            <div className='col-6'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <select required className='form-select' name='country_id' id=''>
+              <select required className='form-select' name='country_id' id='country_id'>
                 {
               countries
                 ? countries.map(e => {
@@ -94,11 +91,12 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
               </select>
             </div>
             <div className='col '>
-              <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span></label>
+              <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
               <Select
                 placeholder="Seleccione un manejador"
                 noOptionsMessage={()=> "No hay coincidencias"}
-                name='user'
+                inputId='user_id'
+                name='user_id'
                 options={users}
               />
             </div>

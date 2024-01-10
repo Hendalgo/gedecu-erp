@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
@@ -164,9 +164,9 @@ const Stores = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
+        {modalShow && <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />
+        {modalEdit && <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Local"} action={()=>handleDelete(store)}/>
       </div>
     </div>

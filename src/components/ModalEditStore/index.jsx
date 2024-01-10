@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
 import { updateStore } from '../../helpers/stores'
-import SearchSelect from '../SearchSelect'
 import Select from 'react-select'
 
 const ModalEditStore = ({ modalShow, setModalShow, store }) => {
@@ -13,25 +12,23 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [display, setDisplay] = useState('hidden')
   const [alertType, setAlertType] = useState('danger')
   const form = useRef()
+  
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getUsers(`paginated=no`).then(r =>{
-      setUsers(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.email}`,
-          value: e.id
-        }
-      }))
-    }); 
+    Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
+    .then(([countriesResponse, usersResponse]) => {
+      setCountries(countriesResponse);
+      setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
+    })
+    .catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    });
   }, [])
+  
   const handleStore = async () => {
     try {
-      const request = await updateStore(store.id, {
-        name: form.current.name.value,
-        location: form.current.location.value,
-        country_id: form.current.country.value,
-        user_id: form.current.user.value
-      })
+      const formData = new FormData(form.current);
+      const request = await updateStore(store.id, formData)
 
       switch (request.status) {
         case 201:
@@ -85,18 +82,18 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
         <form className='container' action='' ref={form}>
           <div className='row mb-3'>
             <div className=' col '>
-              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span> <span className='Required'>*</span></label>
-              <input defaultValue={store.name} required className='form-control' type='text' name='name' />
+              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
+              <input defaultValue={store.name} required className='form-control' type='text' name='name' id='name' />
             </div>
             <div className='col'>
-              <label htmlFor='location'  className='form-label'>Dirección  <span className='Required'>*</span><span className='Required'>*</span></label>
-              <input defaultValue={store.location} required className='form-control' type='text' name='location' />
+              <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
+              <input defaultValue={store.location} required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
           <div className='row'>
             <div className='col'>
-              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span> <span className='Required'>*</span></label>
-              <select required className='form-select' name='country' id=''>
+              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
+              <select required className='form-select' name='country_id' id='country_id'>
                 {
                   countries
                     ? countries.map(e => {
@@ -107,9 +104,10 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
               </select>
             </div>
             <div className='col '>
-            <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span> <span className='Required'>*</span></label>
+            <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
               <Select
-                name={"user"}
+                inputId={"user_id"}ks
+                name={"user_id"}
                 placeholder="Seleccione un manejador"
                 noOptionsMessage={()=> "No hay coincidencias"}
                 options={users}
