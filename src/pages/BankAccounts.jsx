@@ -32,7 +32,7 @@ const BankAccounts = () => {
   useEffect(()=>{
     getBankAccounts(``)
     .then(r=>{
-      setBanks(r.data);
+      setBanks(r);
     });
   }, [])
   const handleSearch = (e) => {
@@ -88,7 +88,7 @@ const BankAccounts = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='bancos' quantity={banks.last_page} itemsTotal={banks.total} handleChange={handleChange} />
+                    <PaginationTable text='cuentas' quantity={banks.last_page} itemsTotal={banks.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>
@@ -102,7 +102,7 @@ const BankAccounts = () => {
                         <th scope='col'>Propietario</th>
                         <th scope='col'>Banco</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Monto</th>
+                        {/* <th scope='col'>Monto</th> */}
                         <th />
                       </tr>
                     </thead>
@@ -120,7 +120,7 @@ const BankAccounts = () => {
                         <td>{e.name}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
-                        <td>{e.bank.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        {/* <td>{e.bank.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td> */}
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -161,9 +161,9 @@ const BankAccounts = () => {
           : <div className='mt-4'><TableLoader /></div>
       }
       <div className=''>
-        <ModalCreateBankAccount setModalShow={setModalShow} modalShow={modalShow} />
+        {modalShow && <ModalCreateBankAccount setModalShow={setModalShow} modalShow={modalShow} />}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditBankAccount setModalShow={setModalEditShow} modalShow={modalEditShow} bankAccount ={bankAccount}/>
+        {modalEditShow && <ModalEditBankAccount setModalShow={setModalEditShow} modalShow={modalEditShow} bankAccount ={bankAccount}/>}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Cuenta de banco"} action={()=>handleDelete(bankAccount)}/>
       </div>
     </div>

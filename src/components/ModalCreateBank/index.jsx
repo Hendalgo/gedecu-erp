@@ -1,26 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createUser, getUsersRoles } from '../../helpers/users'
 import { createBank, getCountriesCount } from '../../helpers/banks'
-import { getCurrencies } from '../../helpers/currencies'
 import Select from 'react-select'
+
 const ModalCreateBank = ({ modalShow, setModalShow }) => {
-  const [countries, setCountries] = useState()
+  const [countries, setCountries] = useState();
+  const [accountTypes, setAccountTypes] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
-  const [currencies, setCurrencies] = useState([])
   const form = useRef()
+
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getCurrencies('paginated=no').then(r =>{
-      setCurrencies(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.symbol}`,
-          value: e.id
-        }
-      }))
-    });
+    Promise.all([ getCountriesCount() ])
+    .then(([countries]) => {
+      setCountries(countries)
+      // Tipos de cuentas
+    }).catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    })
   }, [])
+
   const handleUser = async () => {
     try {
       const formData = new FormData(form.current)
@@ -84,14 +84,9 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
               </div>
             </div>
             <div className="row mt-3">
-              <div className='col'>
-                <label htmlFor="bank" className='form-label'>Moneda <span className='Required'>*</span></label>
-                <Select
-                  placeholder="Seleccione una moneda"
-                  noOptionsMessage={()=> "No hay coincidencias"}
-                  name='currency'
-                  options={currencies}
-                />
+              <div className='col-6'>
+                <label htmlFor='account_type'>Tipo de cuenta <span className='Required'>*</span></label>
+                <Select inputId='account_type' name='account_type' options={accountTypes} placeholder='Selecciona el tipo de cuenta' noOptionsMessage={() => "No hay coincidencias"} />
               </div>
             </div>
           </div>
