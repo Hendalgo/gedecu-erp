@@ -1,33 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getCountriesCount, updateBank } from '../../helpers/banks'
-import { getCurrencies } from '../../helpers/currencies'
 import Select from 'react-select'
 
 const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
-  const [currencies, setCurrencies] = useState([])
+  const [accountTypes, setAccountTypes] = useState([]);
   const form = useRef()
+
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getCurrencies('paginated=no').then(r =>{
-      setCurrencies(r.map( e=> {
-        return{
-          label: `${bank.currency.name} - ${bank.currency.symbol}`,
-          value: e.id
-        }
-      }))
-    });
+    Promise.all([ getCountriesCount() ])
+    .then(([countries]) => {
+      setCountries(countries)
+      // Tipos de cuentas
+    }).catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    })
   }, [])
+
   const handleUser = async () => {
     try {
-      const request = await updateBank(bank.id, {
-        name: bank.name,
-        country: form.current.country.value,
-        currency: form.current.currency.value
-      })
+      const data = new FormData(form.current);
+      const request = await updateBank(bank.id, data)
       switch (request.status) {
         case 201:
           setErrorMessage('Banco actualizado con éxito')
@@ -71,11 +68,11 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                 <div className="row">
                   <div className='col'>
                     <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
-                    <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' name='name' value={bank.name} />
+                    <input required onChange={(e) => setBank({ ...bank, name: e.target.value })} className='form-control' type='text' id='name' name='name' value={bank.name} />
                   </div>
                   <div className='col'>
                     <label htmlFor='country'>País <span className='Required'>*</span></label>
-                    <select required className='form-select' name='country' id=''>
+                    <select required className='form-select' name='country' id='country'>
                       {
                         countries
                           ? countries.map(e => {
@@ -87,18 +84,14 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                   </div>
                 </div>
                 <div className="row mt-3">
-                  <div className='col'>
-                    <label htmlFor="bank" className='form-label'>Moneda <span className='Required'>*</span></label>
+                  <div className='col-6'>
+                    <label htmlFor="account_type" className='form-label'>Tipo de cuenta <span className='Required'>*</span></label>
                     <Select
-                      placeholder="Seleccione una moneda"
-                      noOptionsMessage={()=> "No hay coincidencias"}
-                      name='currency'
-                      options={currencies}
-                      defaultValue={{
-                        label: `${bank.currency.name} - ${bank.currency.symbol}`,
-                        value: bank.currency.id
-                      }}
-                    />
+                      inputId='account_type'
+                      name='account_type'
+                      options={accountTypes}
+                      placeholder="Selecciona el tipo de cuenta"
+                      noOptionsMessage={()=> "No hay coincidencias"} />
                   </div>
                 </div>
               </div>

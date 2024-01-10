@@ -1,19 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createCountry, updateCountry } from '../../helpers/countries'
+import { updateCountry } from '../../helpers/countries'
+import { getCurrencies } from '../../helpers/currencies';
+import Select from 'react-select';
 
 const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
+  const [currencies, setCurrencies] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const currencyResponse = await getCurrencies("paginated=no");
+
+      if (currencyResponse) setCurrencies(
+        currencyResponse.map(({name, shortcode, id}) => ({label: name.concat(" (", shortcode, ")"), value: id}))
+      );
+    }
+
+    fetchData();
+  }, [])
+
   const handleCountry = async () => {
     try {
       const formData = new FormData(form.current)
-      const request = await updateCountry(country.id_country, {
-        country_name: formData.get("country_name"),
-        country_shortcode: formData.get("country_shortcode")
-      });
+      const request = await updateCountry(country.id_country, formData);
 
       switch (request.status) {
         case 201:
@@ -60,11 +72,21 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
             <div className='row mb-3'>
               <div className='col'>
                 <label htmlFor='name' className='form-label'>Nombre del país <span className='Required'>*</span></label>
-                <input defaultValue={country.country_name} required className='form-control' type='text' name='country_name' placeholder='Venezuela'/>
+                <input defaultValue={country.country_name} required className='form-control' type='text' id='name' name='country_name' placeholder='Venezuela'/>
               </div>
               <div className='col'>
                 <label htmlFor='identifier'  className='form-label'>Código del país <span className='Required'>*</span></label>
-                <input defaultValue={country.shortcode} required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
+                <input defaultValue={country.shortcode} required className='form-control' type='text' id='identifier' name='country_shortcode' placeholder='VE'/>
+              </div>
+            </div>
+            <div className='row'>
+              <div className='col-6'>
+                <label htmlFor='locale' className='form-label'>Código local <span className='Required'>*</span></label>
+                <input defaultValue="" required className='form-control' type='text' id='locale' name='locale' />
+              </div>
+              <div className='col-6'>
+                <label htmlFor='currency_id' className='form-label'>Moneda <span className='Required'>*</span></label>
+                <Select inputId='currency_id' name='currency_id' options={currencies} defaultValue={{ label: country.currency_name.concat(" (", country.currency_shortcode, ")"), value: country.currency_id }} placeholder="Selecciona una moneda" noOptionsMessage={() => "No hay coincidencias."} />
               </div>
             </div>
           </div>

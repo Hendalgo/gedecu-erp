@@ -88,7 +88,7 @@ const Currencies = () => {
                 <div className='col-12'>
                   <div className='d-flex justify-content-between'>
                     <div />
-                    <PaginationTable text='locales' quantity={currencies.last_page} itemsTotal={currencies.total} handleChange={handleChange} />
+                    <PaginationTable text='monedas' quantity={currencies.last_page} itemsTotal={currencies.total} handleChange={handleChange} />
                   </div>
                 </div>
               </div>

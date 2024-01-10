@@ -36,7 +36,7 @@ export const BanksIndex = () => {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getBanks('order=created_at&order_by=desc').then(r => setBanks(r.data));
+    getBanks('order=created_at&order_by=desc').then(r => setBanks(r));
     getCountriesCount().then(r =>setCountryBank(r));
   }, [])
   const handleChange = (offset) => {
@@ -107,7 +107,7 @@ export const BanksIndex = () => {
                         <th scope='col'>ID Banco</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Monto</th>
+                        {/* <th scope='col'>Monto</th> */}
                         <th />
                       </tr>
                     </thead>
@@ -123,7 +123,7 @@ export const BanksIndex = () => {
                         </td>
                         <td>{e.name}</td>
                         <td>{e.country.name}</td>
-                        <td>{e.currency.symbol} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        {/* <td>{e.currency.symbol} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td> */}
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -164,9 +164,11 @@ export const BanksIndex = () => {
           : <div className='mt-4'><TableLoader /></div>
       }
       <div className=''>
-        <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />
+        {
+          modalShow && <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />
+        }
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />
+        {modalEditShow && <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"banco"} action={()=>handleDelete(bank)}/>
       </div>
     </div>
