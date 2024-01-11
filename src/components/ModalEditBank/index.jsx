@@ -13,7 +13,8 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
   useEffect(() => {
     Promise.all([ getCountriesCount(), getBanksTypes("paginated=no"), ])
     .then(([countries, banksTypes,]) => {
-      setCountries(countries);
+      setCountries(countries.map(({name, id}) => ({ label: name, value: id })));
+
       const filteredBanksTypes = [];
 
       banksTypes.forEach(({name, id}) => {
@@ -31,8 +32,15 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
 
   const handleUser = async () => {
     try {
-      const data = new FormData(form.current);
+      const formData = new FormData(form.current);
+      const data = {};
+
+      for (const [key, val] of formData.entries()) {
+        data[key] = val;
+      }
+
       const request = await updateBank(bank.id, data)
+
       switch (request.status) {
         case 201:
           setErrorMessage('Banco actualizado con éxito')
@@ -80,15 +88,13 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                   </div>
                   <div className='col'>
                     <label htmlFor='country'>País <span className='Required'>*</span></label>
-                    <select required className='form-select' name='country' id='country'>
-                      {
-                        countries
-                          ? countries.map(e => {
-                            return <option key={e.id} selected={e.id === bank.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                          })
-                          : null
-                      }
-                    </select>
+                    <Select
+                      inputId='country'
+                      name='country'
+                      options={countries}
+                      defaultValue={{ label: bank.country.name, value: bank.country_id }}
+                      placeholder="Seleccione un país"
+                      noOptionsMessage={() => "No hay coincidencias"} />
                   </div>
                 </div>
                 <div className="row mt-3">

@@ -115,7 +115,7 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
                     name='bank_id'
                     options={banks}
                     defaultValue={{
-                      label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
+                      label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name}`,
                       value: bankAccount.bank.id
                     }}
                   />

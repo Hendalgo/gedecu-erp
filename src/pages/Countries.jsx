@@ -165,8 +165,8 @@ export const CountriesIndex = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>
-        <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>
+        {modalShow && <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>}
+        {modalEdit && <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(country)}/>
       </div>

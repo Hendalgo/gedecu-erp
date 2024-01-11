@@ -16,7 +16,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   useEffect(() => {
     Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
     .then(([countriesResponse, usersResponse]) => {
-      setCountries(countriesResponse);
+      setCountries(countriesResponse.map(({name, id}) => ({label: name, value: id})));
       setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
     })
     .catch(({error, message}) => {
@@ -28,7 +28,13 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const handleStore = async () => {
     try {
       const formData = new FormData(form.current);
-      const request = await updateStore(store.id, formData)
+      const data = {};
+
+      for (const [key, val] of formData.entries()) {
+        data[key] = val;
+      }
+
+      const request = await updateStore(store.id, data);
 
       switch (request.status) {
         case 201:
@@ -93,20 +99,12 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
           <div className='row'>
             <div className='col'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <select required className='form-select' name='country_id' id='country_id'>
-                {
-                  countries
-                    ? countries.map(e => {
-                      return <option key={e.id} defaultValue={e.id === store.country.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
-              </select>
+              <Select inputId='country_id' name='country_id' options={countries} defaultValue={{label: store.country.name, value: store.country.id}} />
             </div>
             <div className='col '>
             <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
               <Select
-                inputId={"user_id"}ks
+                inputId={"user_id"}
                 name={"user_id"}
                 placeholder="Seleccione un manejador"
                 noOptionsMessage={()=> "No hay coincidencias"}

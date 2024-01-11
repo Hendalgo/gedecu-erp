@@ -16,7 +16,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
   useEffect(() => {
     Promise.all([getBanks(`paginated=no`), getCurrencies("paginated=no")])
     .then(([banksResponse, currenciesResponse]) => {
-      setBanks(banksResponse.map(e => ({ label: `${e.name}`, value: e.id } )));
+      setBanks(banksResponse.map(e => ({ label: `${e.name} - ${e.country.name}`, value: e.id } )));
       setCurrencies(currenciesResponse.map(({ name, shortcode, id }) => ({ label: name.concat(" (", shortcode, ")"), value: id })));
     })
     .catch(({error, message}) => {

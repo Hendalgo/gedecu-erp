@@ -15,7 +15,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
   useEffect(() => {
     Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
     .then(([countriesResponse, usersResponse]) => {
-      setCountries(countriesResponse);
+      setCountries(countriesResponse.map(({name, id}) => ({label: name, value: id})));
       setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
     })
     .catch(({error, message}) => {
@@ -80,15 +80,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
           <div className='row'>
             <div className='col-6'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <select required className='form-select' name='country_id' id='country_id'>
-                {
-              countries
-                ? countries.map(e => {
-                  return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                })
-                : null
-            }
-              </select>
+              <Select inputId='country_id' name='country_id' options={countries} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
             </div>
             <div className='col '>
               <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>

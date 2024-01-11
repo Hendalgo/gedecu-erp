@@ -25,7 +25,13 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
   const handleCountry = async () => {
     try {
       const formData = new FormData(form.current)
-      const request = await updateCountry(country.id_country, formData);
+      const data = {};
+
+      for (const [key, val] of formData.entries()) {
+        data[key] = val;
+      }
+
+      const request = await updateCountry(country.id_country, data);
 
       switch (request.status) {
         case 201:

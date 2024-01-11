@@ -98,9 +98,9 @@ const BankAccounts = () => {
                         <th scope='col'>ID</th>
                         <th scope='col'>Encargado</th>
                         <th scope='col'>Propietario</th>
+                        <th scope='col'>Balance</th>
                         <th scope='col'>Banco</th>
                         <th scope='col'>País</th>
-                        {/* <th scope='col'>Monto</th> */}
                         <th />
                       </tr>
                     </thead>
@@ -116,9 +116,9 @@ const BankAccounts = () => {
                         </td>
                         <th>{e.user.name}</th>
                         <td>{e.name}</td>
+                        <td>{`${e.currency.shortcode} ${e.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}`}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
-                        {/* <td>{e.bank.currency.symbol} {e.balance.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td> */}
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -155,7 +155,7 @@ const BankAccounts = () => {
                 </div>
               </div>
             </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay bancos para mostrar</div>
+            : <div className='d-flex justify-content-center align-items-center'>No hay cuentas para mostrar</div>
           : <div className='mt-4'><TableLoader /></div>
       }
       <div className=''>
