@@ -1,20 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { getCountriesCount, updateBank } from '../../helpers/banks'
+import { getBanksTypes, getCountriesCount, updateBank } from '../../helpers/banks'
 import Select from 'react-select'
 
 const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
-  const [countries, setCountries] = useState()
+  const [countries, setCountries] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const [accountTypes, setAccountTypes] = useState([]);
   const form = useRef()
 
   useEffect(() => {
-    Promise.all([ getCountriesCount() ])
-    .then(([countries]) => {
-      setCountries(countries)
-      // Tipos de cuentas
+    Promise.all([ getCountriesCount(), getBanksTypes("paginated=no"), ])
+    .then(([countries, banksTypes,]) => {
+      setCountries(countries);
+      const filteredBanksTypes = [];
+
+      banksTypes.forEach(({name, id}) => {
+        if (id !== 3) {
+          filteredBanksTypes.push({label: name, value: id});
+        }
+      });
+
+      setAccountTypes(filteredBanksTypes);
     }).catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
@@ -90,6 +98,7 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                       inputId='account_type'
                       name='account_type'
                       options={accountTypes}
+                      defaultValue={{label: "", value: 0}}
                       placeholder="Selecciona el tipo de cuenta"
                       noOptionsMessage={()=> "No hay coincidencias"} />
                   </div>

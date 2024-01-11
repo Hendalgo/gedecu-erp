@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import Welcome from '../components/Welcome'
 import SearchBar from '../components/SearchBar';
-import { Navigate } from 'react-router-dom';
 import { SessionContext } from '../context/SessionContext';
 import { useCheckRole } from '../hooks/useCheckRole';
 import TableLoader from '../components/Loaders/TableLoader';
@@ -26,15 +25,14 @@ const BankAccounts = () => {
   });
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const form = useRef()
-  if (!useCheckRole(session)) {
-    return <Navigate to={"/"}/>
-  }
+
   useEffect(()=>{
     getBankAccounts(``)
     .then(r=>{
       setBanks(r);
     });
   }, [])
+
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)

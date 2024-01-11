@@ -38,8 +38,11 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
   const handleBankAccount = async () => {
     try {
       const formData = new FormData(form.current);
-      formData["amount"] = new Number(formData["amount"].replace(/\D/g, "")) / 100;
-      const request = await updateBankAccount(bankAccount.id, formData);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      const request = await updateBankAccount(bankAccount.id, data);
 
       switch (request.status) {
         case 201:
@@ -104,12 +107,12 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
               </div>
               <div className="row mb-3">
                 <div className='col'>
-                  <label htmlFor="bank" className='form-label'>Banco <span className='Required'>*</span></label>
+                  <label htmlFor="bank_id" className='form-label'>Banco <span className='Required'>*</span></label>
                   <Select
                     placeholder="Seleccione un banco"
                     noOptionsMessage={()=> "No hay coincidencias"}
-                    inputId='bank'
-                    name='bank'
+                    inputId='bank_id'
+                    name='bank_id'
                     options={banks}
                     defaultValue={{
                       label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
@@ -118,12 +121,12 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
                   />
                 </div>
                 <div className="col">
-                  <label htmlFor="currency" className='form-label'>Moneda <span className='Required'>*</span></label>
+                  <label htmlFor="currency_id" className='form-label'>Moneda <span className='Required'>*</span></label>
                   <Select
                     placeholder="Seleccione una moneda"
                     noOptionsMessage={()=> "No hay coincidencias"}
-                    inputId='currency'
-                    name='currency'
+                    inputId='currency_id'
+                    name='currency_id'
                     options={currencies}
                     defaultValue={{label: `${bankAccount.currency.name} (${bankAccount.currency.shortcode})`, value: bankAccount.currency.id}}
                   />
@@ -131,8 +134,8 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
               </div>
               <div className="row">
               <div className='col-6'>
-                <label htmlFor="amount" className='form-label'>Monto inicial <span className='Required'>*</span></label>
-                <DecimalInput id='amount' name='amount' readOnly defaultValue={bankAccount.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})} />
+                <label htmlFor="balance" className='form-label'>Monto inicial <span className='Required'>*</span></label>
+                <DecimalInput id='balance' name='balance' readOnly defaultValue={bankAccount.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})} />
               </div>
             </div>
             </div>

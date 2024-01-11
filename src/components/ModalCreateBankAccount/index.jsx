@@ -37,7 +37,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
   const handleBankAccount = async () => {
     try {
       const formData = new FormData(form.current);
-      formData["amount"] = new Number(formData["amount"].replace(/\D/g, "")) / 100;
+      formData.set("balance", new Number(formData.get("balance").replace(/\D/g, "")) / 100);
       const request = await createBankAccount(formData);
 
       switch (request.status) {
@@ -114,8 +114,8 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
             </div>
             <div className="row">
               <div className='col-6'>
-                <label htmlFor="amount" className='form-label'>Monto inicial <span className='Required'>*</span></label>
-                <DecimalInput id='amount' name='amount' />
+                <label htmlFor="balance" className='form-label'>Monto inicial <span className='Required'>*</span></label>
+                <DecimalInput id='balance' name='balance' />
               </div>
             </div>
           </div>

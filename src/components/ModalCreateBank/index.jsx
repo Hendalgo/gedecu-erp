@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createBank, getCountriesCount } from '../../helpers/banks'
+import { createBank, getBanksTypes, getCountriesCount } from '../../helpers/banks'
 import Select from 'react-select'
 
 const ModalCreateBank = ({ modalShow, setModalShow }) => {
@@ -11,10 +11,18 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
   const form = useRef()
 
   useEffect(() => {
-    Promise.all([ getCountriesCount() ])
-    .then(([countries]) => {
-      setCountries(countries)
-      // Tipos de cuentas
+    Promise.all([ getCountriesCount(), getBanksTypes("paginated=no"), ])
+    .then(([countries, banksTypes,]) => {
+      setCountries(countries);
+      const filteredBanksTypes = [];
+
+      banksTypes.forEach(({name, id}) => {
+        if (id !== 3) {
+          filteredBanksTypes.push({label: name, value: id});
+        }
+      });
+
+      setAccountTypes(filteredBanksTypes);
     }).catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
@@ -63,16 +71,16 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='FormContainer' action='' ref={form}>
+        <form className='FormContainer' action='' ref={form} autoComplete='off'>
           <div className='container'>
             <div className="row">
               <div className='col me-4'>
                 <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='name' />
+                <input required className='form-control' type='text' name='name' id='name' />
               </div>
               <div className='col'>
                 <label htmlFor='country'>País <span className='Required'>*</span></label>
-                <select required className='form-select' name='country' id=''>
+                <select required className='form-select' name='country' id='country'>
                   {
                     countries
                       ? countries.map(e => {
@@ -85,8 +93,8 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
             </div>
             <div className="row mt-3">
               <div className='col-6'>
-                <label htmlFor='account_type'>Tipo de cuenta <span className='Required'>*</span></label>
-                <Select inputId='account_type' name='account_type' options={accountTypes} placeholder='Selecciona el tipo de cuenta' noOptionsMessage={() => "No hay coincidencias"} />
+                <label htmlFor='type_id'>Tipo de cuenta <span className='Required'>*</span></label>
+                <Select inputId='type_id' name='type_id' options={accountTypes} placeholder='Selecciona el tipo de cuenta' noOptionsMessage={() => "No hay coincidencias"} />
               </div>
             </div>
           </div>
