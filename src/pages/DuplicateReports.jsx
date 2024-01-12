@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import { SessionContext } from '../context/SessionContext'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { getReportTypes, getReports, updateReport } from '../helpers/reports'
 import { useFormatDate } from '../hooks/useFormatDate'
 import ModalViewReport from '../components/ModalViewReport'
@@ -13,52 +13,46 @@ import ModalCreateReport from '../components/ModalCreateReport'
 import TableLoader from '../components/Loaders/TableLoader'
 import CheckButton from '../components/CheckButton'
 import { useCheckRole } from '../hooks/useCheckRole'
+
 const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
   const [report, setReport] = useState()
   const [offset, setOffset] = useState(1)
   
   const [reportType, setReportType] = useState([
-    {
-      id: 'done',
-      name: 'Correcto'
-    },
-    {
-      id: 'cancel',
-      name: 'Cancelado'
-    }
+    { id: 'done', name: 'Correcto' },
+    { id: 'cancel', name: 'Cancelado' }
   ])
   const [modalShow, setModalShow] = useState(false)
   const [modalCreateShow, setModalCreateShow] = useState(false)
   const [reports, setReports] = useState([])
   const form = useRef()
   const formDate = useRef()
-  useEffect(() => {
-    getReports(`order=created_at&order_by=desc&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r))
-  }, [])
+  const navigate = useNavigate();
+
+  useEffect(() => {}, []);
+
   const handleChange = (offset) => {
     setOffset(offset.selected + 1)
     getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
+
   const handleModal = (id) => {
     setReport(reports.data.find((el) => el.id === id))
     setModalShow(true)
   }
+
   const handleType = (e) => {
-    setOffset(1)
+    setOffset(1);
 
     const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
-    getReports(`order=created_at${date}&order_by=desc&duplicated=yes${e ? `&duplicated_status=${e}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
-  const handleSearch = (e) => {
-    e.preventDefault()
 
-    setOffset(1)
-    if (form.current.search !== '') {
-      const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
-      getReports(`order=created_at${date}&order_by=desc&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
-    }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setOffset(1);
   }
+
   const handleDone = (id) => {
     updateReport({
       duplicated_status: 'done'
@@ -66,6 +60,7 @@ const DuplicateReports = () => {
 
     getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
+
   const handleCancel = (id) => {
     updateReport({
       duplicated_status: 'cancel'
@@ -73,23 +68,20 @@ const DuplicateReports = () => {
 
     getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
   }
+
   const handleDate = (e) => {
-    setOffset(1)
-    e.preventDefault()
-    if (formDate.current.date.value) {
-      getReports(`date=${formDate.current.date.value}&search=${form.current.search.value}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e => console.error(e))
-    } else {
-      getReports(`search=${form.current.search.value}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}`).then(r => setReports(r)).catch(e => console.error(e))
-    }
+    e.preventDefault();
+    setOffset(1);
   }
+
   return (
     <>
       <div className='container-fluid'>
-        <Welcome text='Reportes duplicados' add={() => setModalCreateShow(true)} textButton='Reporte' />
+        <Welcome text='Reportes duplicados' showButton={false} />
         <div className='row mt-4'>
           <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
             <div className='col-8'><FilterTableButtons data={reportType} callback={handleType} /></div>
-            <div className='col-4'><SearchBar text='reportes' /></div>
+            <div className='col-4'><SearchBar text='Duplicados' /></div>
           </form>
         </div>
 
@@ -101,40 +93,35 @@ const DuplicateReports = () => {
             </form>
           </div>
         </div>
-        {
-        Array.isArray(reports.data)
-          ? reports.data.length > 0
 
-            ? <>
-              <div className='row mt-4'>
-                <div className='col-12'>
-                  <div className='d-flex justify-content-between'>
-                    <div />
-                    <PaginationTable offset={offset} itemOffset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
-                  </div>
+        {
+          Array.isArray(reports.data) ? reports.data.length > 0 ?
+          <>
+            <div className='row mt-4'>
+              <div className='col-12'>
+                <div className='d-flex justify-content-end'>
+                  <PaginationTable offset={offset} itemOffset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
                 </div>
               </div>
-              <div className='row mt-2'>
-                <div className='table-responsive'>
-                  <table className='table TableP table-borderless align-middle'>
-                    <thead className=''>
-                      <tr className='pt-4'>
-                        <th scope='col'>Realizado por:</th>
-                        <th scope='col'>Fecha</th>
-                        <th scope='col'>Motivo</th>
-                        <th scope='col'>Banco</th>
-                        <th scope='col'>Cuenta</th>
-                        <th scope='col'>Monto</th>
-                        {
-                          useCheckRole(session)
-                          &&
-                          <th />
-                        }
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                  reports.data.map(e => {
+            </div>
+
+            <div className='row mt-2'>
+              <div className='table-responsive'>
+                <table className='table TableP table-borderless align-middle'>
+                  <thead className=''>
+                    <tr className='pt-4'>
+                      <th scope='col'>Realizado por:</th>
+                      <th scope='col'>Fecha</th>
+                      <th scope='col'>Motivo</th>
+                      <th scope='col'>Banco</th>
+                      <th scope='col'>Cuenta</th>
+                      <th scope='col'>Monto</th>
+                      { session.role_id === 1 && <th /> }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* {
+                      reports.data.map(e => {
                     const color = JSON.parse(e.type.config).styles
                     let currency = e.bank_account.bank.currency.symbol
                     
@@ -180,19 +167,15 @@ const DuplicateReports = () => {
                     )
                   }
                   )
-                }
-                    </tbody>
-                  </table>
-                </div>
+                } */}
+                  </tbody>
+                </table>
               </div>
-            </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay reportes para mostrar</div>
-          : <div className='mt-4'><TableLoader /></div>
+            </div>
+          </> :
+          <div className='d-flex justify-content-center align-items-center'>No hay reportes duplicados para mostrar</div> :
+          <div className='mt-4'><TableLoader /></div>
         }
-        <div className=''>
-          <ModalViewReport setModalShow={setModalShow} modalShow={modalShow} report={report} />
-          <ModalCreateReport setModalShow={setModalCreateShow} modalShow={modalCreateShow} />
-        </div>
       </div>
     </>
   )

@@ -20,6 +20,7 @@ import Currencies from './pages/Currencies'
 import ReportForm from './pages/ReportForm'
 import ReportsByUser from './pages/ReportsByUser'
 import ReportDetail from './pages/ReportDetail'
+import DuplicateReportForm from './pages/DuplicateReportForm'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -49,6 +50,7 @@ function App () {
                 <Route path={`create`} element={<ReportForm />} />
                 <Route path={`:id`} element={<ReportDetail />} />
                 <Route path={`${REPORTS_DUPLICATE_ROUTE}`} element={<DuplicateReports />} />
+                <Route path={`${REPORTS_DUPLICATE_ROUTE}/:id`} element={<DuplicateReportForm />} />
                 <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
                 <Route path={`${REPORTS_TYPE_ROUTE}`} element={<ReportTypes />} />
               </Route>

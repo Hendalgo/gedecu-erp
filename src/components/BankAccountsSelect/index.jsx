@@ -11,6 +11,7 @@ const BankAccountsSelect = ({
     value = null,
     onChange = () => null,
     onError = () => null,
+    disabled = false,
 }) => {
     const [bankAccounts, setBankAccounts] = useState([]);
 
@@ -19,8 +20,8 @@ const BankAccountsSelect = ({
             try {
                 const [banksAccountsResponse] = await Promise.all([ getBankAccounts("paginated=no".concat(query)), ]);
 
-                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ name, identifier, currency, id }) => {
-                    const label = name.concat(" - ", identifier);
+                if (banksAccountsResponse) setBankAccounts(banksAccountsResponse.map(({ bank, identifier, currency, id }) => {
+                    const label = bank.name.concat(" - ", identifier);
                     return { label: label, value: id, currency_id: currency.id, currency: currency.shortcode, };
                 }));
 
@@ -44,6 +45,7 @@ const BankAccountsSelect = ({
                 placeholder={placeholder}
                 noOptionsMessage={() => noOptionsMessage}
                 isClearable
+                isDisabled={disabled}
             />
         </>
     )

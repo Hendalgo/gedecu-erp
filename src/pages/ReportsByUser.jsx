@@ -53,7 +53,7 @@ export default function ReportsByUser() {
     return (
         <>
             <section>
-                <Welcome text="Reportes de usuario" showButton={false} />
+                <Welcome text="Reportes de usuario" showButton={session.role_id !== 1} add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)} />
             </section>
             <section>
                 <div className='row mt-3'>
@@ -101,7 +101,7 @@ export default function ReportsByUser() {
                                 {
                                     reports.data.length === 0 ?
                                     <tr>
-                                        <th colSpan={3} className="text-center">No hay reportes para mostrar.</th>
+                                        <th colSpan={4} className="text-center">No hay reportes para mostrar.</th>
                                     </tr>
                                     : reports.data.map(({ id, created_at, type }) => {
                                         return <tr key={id}>

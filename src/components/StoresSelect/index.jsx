@@ -11,6 +11,7 @@ const StoresSelect = ({
     value = null,
     onChange = () => null,
     onError = () => null,
+    disabled = false,
 }) => {
     const [stores, setStores] = useState([]);
 
@@ -29,7 +30,7 @@ const StoresSelect = ({
         }
 
         fetchData();
-    }, [])
+    }, [query])
 
     return (
         <>
@@ -43,6 +44,7 @@ const StoresSelect = ({
                 noOptionsMessage={() => noOptionsMessage}
                 onChange={(value) => onChange(value)}
                 isClearable
+                isDisabled={disabled}
             />
         </>
     )
