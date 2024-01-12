@@ -4,6 +4,7 @@ import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
 import { updateStore } from '../../helpers/stores'
 import Select from 'react-select'
+import DecimalInput from '../DecimalInput'
 
 const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [countries, setCountries] = useState()
@@ -96,10 +97,10 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
               <input defaultValue={store.location} required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
-          <div className='row'>
+          <div className='row mb-3'>
             <div className='col'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <Select inputId='country_id' name='country_id' options={countries} defaultValue={{label: store.country.name, value: store.country.id}} />
+              <Select isDisabled inputId='country_id' name='country_id' options={countries} defaultValue={{label: store.country.name, value: store.country.id}} />
             </div>
             <div className='col '>
             <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
@@ -116,6 +117,12 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
                   }
                 }
               />
+            </div>
+          </div>
+          <div className='row'>
+            <div className='col-6'>
+              <label htmlFor='balance'>Monto inicial</label>
+              <DecimalInput id='balance' name='balance' readOnly />
             </div>
           </div>
         </form>

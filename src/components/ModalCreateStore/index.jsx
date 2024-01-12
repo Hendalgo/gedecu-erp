@@ -4,6 +4,7 @@ import { getUsers } from '../../helpers/users'
 import { getCountriesCount } from '../../helpers/banks'
 import { createStore } from '../../helpers/stores'
 import Select from 'react-select'
+import DecimalInput from '../DecimalInput'
 
 const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState();
@@ -27,6 +28,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const handleStore = async () => {
     try {
       const formData = new FormData(form.current);
+      formData.set("balance", new Number(formData.get("balance").replace(/\D/g, "")) / 100);
       const request = await createStore(formData);
 
       switch (request.status) {
@@ -77,7 +79,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
               <input required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
-          <div className='row'>
+          <div className='row mb-3'>
             <div className='col-6'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
               <Select inputId='country_id' name='country_id' options={countries} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
@@ -91,6 +93,12 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
                 name='user_id'
                 options={users}
               />
+            </div>
+          </div>
+          <div className='row'>
+            <div className='col-6'>
+              <label htmlFor='balance'>Monto inicial</label>
+              <DecimalInput id='balance' name='balance' />
             </div>
           </div>
         </form>

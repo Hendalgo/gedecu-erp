@@ -99,10 +99,10 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                 </div>
                 <div className="row mt-3">
                   <div className='col-6'>
-                    <label htmlFor="account_type" className='form-label'>Tipo de cuenta <span className='Required'>*</span></label>
+                    <label htmlFor="type_id" className='form-label'>Tipo de cuenta <span className='Required'>*</span></label>
                     <Select
-                      inputId='account_type'
-                      name='account_type'
+                      inputId='type_id'
+                      name='type_id'
                       options={accountTypes}
                       defaultValue={{label: "", value: 0}}
                       placeholder="Selecciona el tipo de cuenta"
