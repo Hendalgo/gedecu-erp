@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
@@ -164,7 +164,7 @@ const Currencies = () => {
         {modalShow && <ModalCreateCurrency modalShow={modalShow} setModalShow={setModalShow}/>}
         {currency && modalEdit && <ModalEditCurrency modalShow={modalEdit} setModalShow={setModalEdit} currency={currency}/>}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"moneda"} action={()=>handleDelete(currency)}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina la moneda, se eliminarán otros recursos (cuentas bancarias) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(currency)}/>
       </div>
     </div>
   )

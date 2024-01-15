@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 import Welcome from '../components/Welcome'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
@@ -166,7 +166,7 @@ const Users = () => {
         <ModalCreateUser modalShow={modalShow} setModalShow={setModalShow} />
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"usuario"} action={()=>handleDelete(editUser)}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el usuario, se eliminarán otros recursos (cuentas de banco) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(editUser)}/>
       </div>
     </div>
   )

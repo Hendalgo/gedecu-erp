@@ -4,13 +4,11 @@ import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
 import { updateStore } from '../../helpers/stores'
 import Select from 'react-select'
-import DecimalInput from '../DecimalInput'
 
 const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [countries, setCountries] = useState()
   const [errorMessage, setErrorMessage] = useState()
   const [users, setUsers] = useState([])
-  const [display, setDisplay] = useState('hidden')
   const [alertType, setAlertType] = useState('danger')
   const form = useRef()
   
@@ -61,15 +59,6 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
     }
   }
 
-  
-  const handleSearch = async(e) => {
-    try {
-      const users = await getUsers(`search=${e}`);
-      return users.data;
-    } catch (error) {
-      
-    }
-  }
   return (
     store
       ? <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -119,12 +108,6 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
                   null
                 }
               />
-            </div>
-          </div>
-          <div className='row'>
-            <div className='col-6'>
-              <label htmlFor='balance'>Monto inicial</label>
-              <DecimalInput id='balance' name='balance' readOnly />
             </div>
           </div>
         </form>

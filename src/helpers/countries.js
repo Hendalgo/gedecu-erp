@@ -7,7 +7,7 @@ export const getCountriesTotal = async () => {
     return []
   }
 }
-export const getCountries = async (query) => {
+export const getCountries = async (query = "") => {
   const request = await API_INSTANCE.get(`${COUNTRIES_URL}?${query}`);
   return request.data;
 }

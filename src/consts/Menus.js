@@ -49,6 +49,12 @@ export const AdminMenus = [
     title: 'Usuarios',
     src: 'user',
     link: 'users',
+    others: [
+      {
+        name: 'Depositantes',
+        link: 'users/depositors',
+      },
+    ],
     isActive: false
   },
   {
@@ -66,7 +72,7 @@ export const AdminMenus = [
 ]
 
 export function NormalUserMenu(session = null) {
-  return [
+  const menu = [
     {
       title: 'Escritorio',
       src: 'home-blue-icon',
@@ -85,11 +91,16 @@ export function NormalUserMenu(session = null) {
       ],
       isActive: false
     },
-    {
+  ];
+
+  if ([2,3,4].includes(session.role_id)) {
+    menu.push({
       title: 'Cuentas de banco',
       src: 'bank',
       link: 'banks/' + BANK_ACCOUNTS_ROUTE,
       isActive: false
-    },
-    ];
+    });
+  }
+
+  return menu;
 }

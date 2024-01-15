@@ -1,22 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getUsers } from '../../helpers/users'
-import { getCountriesCount } from '../../helpers/banks'
 import { createStore } from '../../helpers/stores'
 import Select from 'react-select'
 import DecimalInput from '../DecimalInput'
+import { getCountries } from '../../helpers/countries'
 
 const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState();
+  const [country, setCountry] = useState(null);
   const [users, setUsers] = useState();
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef()
 
   useEffect(() => {
-    Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
+    Promise.all([getCountries("paginated=no"), getUsers(`paginated=no&role=3`)])
     .then(([countriesResponse, usersResponse]) => {
-      setCountries(countriesResponse.map(({name, id}) => ({label: name, value: id})));
+      setCountries(countriesResponse.data.map(({name, id, currency}) => ({label: name, value: id, currency: currency.shortcode})));
       setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
     })
     .catch(({error, message}) => {
@@ -53,6 +54,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
       setAlertType('danger')
     }
   }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -82,7 +84,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
           <div className='row mb-3'>
             <div className='col-6'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <Select inputId='country_id' name='country_id' options={countries} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
+              <Select inputId='country_id' name='country_id' options={countries} value={country} onChange={setCountry} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
             </div>
             <div className='col '>
               <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
@@ -98,7 +100,10 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
           <div className='row'>
             <div className='col-6'>
               <label htmlFor='balance'>Monto inicial</label>
-              <DecimalInput id='balance' name='balance' />
+              <div className="input-group">
+                <span className="input-group-text">{country?.currency || ""}</span>
+                <DecimalInput id='balance' name='balance' />
+              </div>
             </div>
           </div>
         </form>

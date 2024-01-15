@@ -169,7 +169,7 @@ export const BanksIndex = () => {
         }
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         {modalEditShow && <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />}
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"banco"} action={()=>handleDelete(bank)}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el banco, se eliminarán recursos (cuentas de banco) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(bank)}/>
       </div>
     </div>
   )

@@ -2,7 +2,6 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Welcome from '../components/Welcome'
 import SearchBar from '../components/SearchBar';
 import { SessionContext } from '../context/SessionContext';
-import { useCheckRole } from '../hooks/useCheckRole';
 import TableLoader from '../components/Loaders/TableLoader';
 import { deleteBankAccount, getBankAccounts } from '../helpers/banksAccounts';
 import PaginationTable from '../components/PaginationTable';
@@ -10,12 +9,17 @@ import ModalCreateBankAccount from '../components/ModalCreateBankAccount';
 import ModalEditBankAccount from '../components/ModalEditBankAccount';
 import ModalConfirmation from '../components/ModalConfirmation';
 import AlertMessage from '../components/AlertMessage'
+import { getBanks } from '../helpers/banks';
+import FilterTableButtons from '../components/FilterTableButtons';
+import { useNavigate } from 'react-router-dom';
+import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes';
 
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
   const [modalShow, setModalShow] = useState(false)
   const [modalEditShow, setModalEditShow] = useState(false)
   const [banks, setBanks] = useState([]);
+  const [banksFilter, setBanksFilter] = useState([]);
   const [offset, setOffset] = useState(1)
   const [bankAccount, setBankAccount] = useState();
   const [alert, setAlert] = useState({
@@ -25,13 +29,26 @@ const BankAccounts = () => {
   });
   const [modalConfirmShow, setModalConfirmShow] = useState(false)
   const form = useRef()
+  const navigate = useNavigate();
 
   useEffect(()=>{
-    getBankAccounts(``)
-    .then(r=>{
-      setBanks(r);
-    });
-  }, [])
+    const fetchData = async () => {
+      try {
+        const [banksResponse, accountsResponse] = await Promise.all([getBanks("paginated=no"), getBankAccounts()]);
+
+        if (banksResponse) setBanksFilter(banksResponse);
+        if (accountsResponse) setBanks(accountsResponse);
+      } catch ({message, error}) {
+        setAlert({show: true, text: message, variant: "danger"});
+      }
+    }
+
+    if ([5,6].includes(session.role_id)) {
+      navigate(`?${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+    }
+
+    fetchData();
+  }, [session.role_id])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -40,7 +57,13 @@ const BankAccounts = () => {
       getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
     }
   }
-  
+
+  const handleBankChange = async (bankId) => {
+    setOffset(1);
+    const accountsResponse = await getBankAccounts(`order=created_at${bankId ? `&bank=${bankId}` : ""}`);
+    setBanks(accountsResponse);
+  }
+
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
     getBankAccounts(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setBanks(r))
@@ -67,12 +90,13 @@ const BankAccounts = () => {
       })
     }).catch();
   }
+
   return (
     <div className="container-fluid">
       <Welcome text={'Cuentas de banco'} textButton={'Cuenta'}  add={()=> setModalShow(true)}/>
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8'></div>
+          <div className='col-8'><FilterTableButtons data={banksFilter} callback={handleBankChange} /></div>
           <div className='col-4'><SearchBar text='Cuentas' /></div>
         </form>
       </div>

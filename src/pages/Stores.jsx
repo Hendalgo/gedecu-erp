@@ -103,6 +103,7 @@ const Stores = () => {
                         <th scope='col'>Dirección</th>
                         <th scope='col'>País</th>
                         <th scope='col'>Manejador</th>
+                        <th scope='col'>Balance</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
@@ -120,6 +121,7 @@ const Stores = () => {
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>
                         <td>{e.user ? e.user.name : "Sin encargado"}</td>
+                        <td>{e.country.currency.shortcode} {e.account.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
                         {
                           useCheckRole(session)
                           &&

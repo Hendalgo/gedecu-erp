@@ -21,6 +21,7 @@ import ReportForm from './pages/ReportForm'
 import ReportsByUser from './pages/ReportsByUser'
 import ReportDetail from './pages/ReportDetail'
 import DuplicateReportForm from './pages/DuplicateReportForm'
+import Depositors from './pages/Depositors'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -62,6 +63,7 @@ function App () {
               <Route path={`${USERS_ROUTE}`}>
                 <Route index element={<Users />} />
                 <Route path=":id/reports" element={<ReportsByUser />} />
+                <Route path="depositors" element={<Depositors />} />
               </Route>
               <Route path={`${COUNTRIES_ROUTE}`} element={<Countries/>} >
                 <Route index element={<CountriesIndex />} />

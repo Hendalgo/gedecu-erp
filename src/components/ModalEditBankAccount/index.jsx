@@ -4,7 +4,6 @@ import { getBanks} from '../../helpers/banks'
 import { updateBankAccount } from '../../helpers/banksAccounts'
 import { useEffect } from 'react'
 import Select from 'react-select'
-import DecimalInput from '../DecimalInput'
 import { getCurrencies } from '../../helpers/currencies'
 
 const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
@@ -66,14 +65,6 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
       setAlertType('danger')
     }
   }
-  const handleSearch = async (e)=>{
-    try {
-      const banks = await getBanks(`search=${e}`);
-      return banks.data;
-    } catch (error) {
-      
-    }
-  }
 
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -132,12 +123,6 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
                   />
                 </div>
               </div>
-              <div className="row">
-              <div className='col-6'>
-                <label htmlFor="balance" className='form-label'>Monto inicial <span className='Required'>*</span></label>
-                <DecimalInput id='balance' name='balance' readOnly defaultValue={bankAccount.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})} />
-              </div>
-            </div>
             </div>
           </form>
           :null

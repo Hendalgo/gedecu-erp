@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
@@ -170,7 +170,7 @@ export const CountriesIndex = () => {
         {modalShow && <ModalCreateCountry modalShow={modalShow} setModalShow={setModalShow}/>}
         {modalEdit && <ModalEditCountry modalShow={modalEdit} setModalShow={setModalEdit} country={country}/>}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(country)}/>
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el país, se eliminarán otros recursos (monedas, bancos, locales...) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(country)}/>
       </div>
     </div>
   )
