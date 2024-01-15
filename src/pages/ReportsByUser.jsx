@@ -53,7 +53,7 @@ export default function ReportsByUser() {
     return (
         <>
             <section>
-                <Welcome text="Reportes de usuario" showButton={session.role_id !== 1} add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)} />
+                <Welcome text="Reportes de usuario" showButton={session.role_id !== 1} add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)} textButton="Reportes" />
             </section>
             <section>
                 <div className='row mt-3'>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import AddButton from '../components/AddButton'
 import './Home.css'
@@ -7,7 +7,6 @@ import Card from '../components/Card'
 import Chart from '../components/Chart'
 import { ReactSVG } from 'react-svg'
 import BankCard from '../components/BankCard'
-import Header from '../components/Header'
 import DownloadButton from '../components/DownloadButton'
 import { getReports } from '../helpers/reports'
 import { getBanks } from '../helpers/banks'
@@ -29,11 +28,26 @@ const Home = () => {
   const [banks, setBanks] = useState([])
   const [countriesTotal, setCountriesTotal] = useState([])
   const topClass = useCheckRole(session)? 'col-9': 'col-12';
+
   useEffect(() => {
-    getReports().then(r => setReports(r.data)).finally(() => setLoadingReports(false))
-    getBanks().then(r => setBanks(r.data)).finally(() => setLoadingBanks(false))
-    getCountriesTotal().then(r => setCountriesTotal(r))
+    const fetchData = async () => {
+      const [ banksResponse, ] = await Promise.all([
+        // getBanks(),
+        // getReports(),
+        // getCountriesTotal(),
+      ]);
+
+      if (banksResponse) {
+        setBanks(banksResponse.data);
+      }
+
+      setLoadingBanks(false);
+      setLoadingReports(false);
+    }
+
+    fetchData();
   }, [])
+
   return (
     <>
       <div className='container-fluid'>
@@ -100,9 +114,9 @@ const Home = () => {
                       <div className='row pt-4'>
                         <Title title='Estadísticas' icon='/arrow-grow.svg' description='Estadísticas' />
                       </div>
-                      <div className='row pt-4'>
+                      {/* <div className='row pt-4'>
                         <Chart />
-                      </div>
+                      </div> */}
                     </div>
                     {
                       useCheckRole(session)
@@ -126,7 +140,8 @@ const Home = () => {
                                 {
                                   banks.length > 0
                                     ? banks.map(e =>
-                                      <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={`${e.currency.shortcode} ${e.currency.symbol}`} name={e.name} />
+                                      <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={``} name={e.name} />
+                                      // <BankCard key={e.id} amount={e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })} currency={`${e.currency.shortcode} ${e.currency.symbol}`} name={e.name} />
                                     )
                                     : null
                                 }
@@ -183,7 +198,9 @@ const Home = () => {
                                 </tr>
                               )
                             })
-                            : 'No hay reportes que mostrar'
+                            : <tr>
+                              <td colSpan={5}>No hay reportes que mostrar</td>
+                            </tr>
                         }
                         </tbody>
                       </table>
@@ -193,8 +210,8 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <ModalCreateUser setModalShow={setModalUser} modalShow={modalUser} />
-        <ModalCreateReport setModalShow={setModalReport} modalShow={modalReport} />
+        {/* <ModalCreateUser setModalShow={setModalUser} modalShow={modalUser} />
+        <ModalCreateReport setModalShow={setModalReport} modalShow={modalReport} /> */}
       </div>
     </>
   )

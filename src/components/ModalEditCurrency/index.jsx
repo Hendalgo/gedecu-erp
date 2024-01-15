@@ -1,19 +1,35 @@
-import React, { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createCurrency, updateCurrency } from '../../helpers/currencies'
+import { updateCurrency } from '../../helpers/currencies'
+import { getCountries } from '../../helpers/countries';
+import Select from 'react-select';
 
 const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
+  const [countries, setCountries] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
 
+  useEffect(() => {
+    getCountries("paginated=no&order=name")
+    .then((response) => {
+      if (response) setCountries(response.data.map(({name, shortcode, id}) => ({ label: `${name} (${shortcode})`, value: id })));
+    })
+    .catch(({message, error}) => {
+      setErrorMessage(message);
+      setAlertType("danger");
+    });
+  }, []);
+
   const handleCurrency = async () => {
     try {
-      const request = await updateCurrency(currency.id, {
-        name: form.current.name.value,
-        symbol: form.current.symbol.value,
-        shortcode: form.current.shortcode.value
-      });
+      const formData = new FormData(form.current);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      const request = await updateCurrency(currency.id, data);
 
       switch (request.status) {
         case 201:
@@ -37,6 +53,7 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
       setAlertType('danger')
     }
   }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -52,21 +69,27 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='FormContainer' action='' ref={form}>
+        <form className='FormContainer' action='' ref={form} autoComplete='off'>
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
                 <label htmlFor='name' className='form-label'>Nombre de la moneda <span className='Required'>*</span></label>
-                <input defaultValue={currency.name} required className='form-control' type='text' name='name' placeholder='Dólar estadounidense'/>
+                <input defaultValue={currency.name} required className='form-control' type='text' id='name' name='name' placeholder='Dólar estadounidense'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código de la moneda <span className='Required'>*</span></label>
-                <input defaultValue={currency.shortcode} required className='form-control' type='text' name='shortcode' placeholder='USD'/>
+                <label htmlFor='shortcode'  className='form-label'>Código de la moneda <span className='Required'>*</span></label>
+                <input defaultValue={currency.shortcode} required className='form-control' type='text' id='shortcode' name='shortcode' placeholder='USD'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda <span className='Required'>*</span></label>
-                <input defaultValue={currency.symbol} required className='form-control' type='text' name='symbol' placeholder='$'/>
+                <label htmlFor='symbol'  className='form-label'>Símbolo de la moneda <span className='Required'>*</span></label>
+                <input defaultValue={currency.symbol} required className='form-control' type='text' id='symbol' name='symbol' placeholder='$'/>
               </div>
+              <div className="row">
+              <div className="col-6">
+                <label htmlFor='country' className='form-label'>País</label>
+                <Select inputId='country' name='country_id' options={countries} defaultValue={{ label: `${currency.country.name} (${currency.country.shortcode})`, value: currency.country.id }} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} isDisabled />
+              </div>
+            </div>
             </div>
           </div>
         </form>

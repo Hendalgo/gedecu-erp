@@ -119,7 +119,7 @@ const Stores = () => {
                         <td>{e.name}</td>
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>
-                        <td>{e.user.name}</td>
+                        <td>{e.user ? e.user.name : "Sin encargado"}</td>
                         {
                           useCheckRole(session)
                           &&

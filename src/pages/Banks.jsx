@@ -107,7 +107,7 @@ export const BanksIndex = () => {
                         <th scope='col'>ID Banco</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>País</th>
-                        {/* <th scope='col'>Monto</th> */}
+                        <th scope='col'>Tipo</th>
                         <th />
                       </tr>
                     </thead>
@@ -123,7 +123,7 @@ export const BanksIndex = () => {
                         </td>
                         <td>{e.name}</td>
                         <td>{e.country.name}</td>
-                        {/* <td>{e.currency.symbol} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td> */}
+                        <td>{e.type.name}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>

@@ -1,26 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { createCountry } from '../../helpers/countries'
-import Select from 'react-select'
-import { getCurrencies } from '../../helpers/currencies'
 
 const ModalCreateCountry = ({ modalShow, setModalShow }) => {
-  const [currencies, setCurrencies] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const currencyResponse = await getCurrencies("paginated=no");
-
-      if (currencyResponse) setCurrencies(
-        currencyResponse.map(({name, shortcode, id}) => ({label: name.concat(" (", shortcode, ")"), value: id}))
-      );
-    }
-
-    fetchData();
-  }, [])
 
   const handleCountry = async () => {
     try {
@@ -80,10 +65,6 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
               <div className='col-6'>
                 <label htmlFor='locale' className='form-label'>Código local <span className='Required'>*</span></label>
                 <input required className='form-control' type='text' id='locale' name='locale' placeholder='es-VE'/>
-              </div>
-              <div className='col-6'>
-                <label htmlFor='currency_id' className='form-label'>Moneda <span className='Required'>*</span></label>
-                <Select inputId='currency_id' name='currency_id' options={currencies} placeholder="Selecciona una moneda" noOptionsMessage={() => "No hay coincidencias."} />
               </div>
             </div>
           </div>

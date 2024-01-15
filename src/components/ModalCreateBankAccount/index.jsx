@@ -102,12 +102,12 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
                 />
               </div>
               <div className="col">
-                <label htmlFor="currency" className='form-label'>Moneda <span className='Required'>*</span></label>
+                <label htmlFor="currency_id" className='form-label'>Moneda <span className='Required'>*</span></label>
                 <Select
                   placeholder="Seleccione una moneda"
                   noOptionsMessage={()=> "No hay coincidencias"}
-                  inputId='currency'
-                  name='currency'
+                  inputId='currency_id'
+                  name='currency_id'
                   options={currencies}
                 />
               </div>

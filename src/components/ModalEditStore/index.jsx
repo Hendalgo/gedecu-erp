@@ -111,10 +111,12 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
                 noOptionsMessage={()=> "No hay coincidencias"}
                 options={users}
                 defaultValue={
+                  store.user ?
                   {
                     label: `${store.user.name} - ${store.user.email}`,
                     value: store.user.id
-                  }
+                  } :
+                  null
                 }
               />
             </div>

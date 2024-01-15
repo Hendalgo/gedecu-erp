@@ -104,7 +104,7 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
                       inputId='type_id'
                       name='type_id'
                       options={accountTypes}
-                      defaultValue={{label: "", value: 0}}
+                      defaultValue={{label: bank.type.name, value: bank.type_id}}
                       placeholder="Selecciona el tipo de cuenta"
                       noOptionsMessage={()=> "No hay coincidencias"} />
                   </div>

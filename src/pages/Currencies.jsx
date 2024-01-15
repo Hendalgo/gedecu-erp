@@ -100,6 +100,7 @@ const Currencies = () => {
                         <th scope='col'>Nombre</th>
                         <th scope='col'>Código</th>
                         <th scope='col'>Símbolo</th>
+                        <th scope='col'>País</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
@@ -115,6 +116,7 @@ const Currencies = () => {
                         </td>
                         <td>{e.shortcode}</td>
                         <td>{e.symbol}</td>
+                        <td>{e.country.name}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -159,8 +161,8 @@ const Currencies = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateCurrency modalShow={modalShow} setModalShow={setModalShow}/>
-        {currency && <ModalEditCurrency modalShow={modalEdit} setModalShow={setModalEdit} currency={currency}/>}
+        {modalShow && <ModalCreateCurrency modalShow={modalShow} setModalShow={setModalShow}/>}
+        {currency && modalEdit && <ModalEditCurrency modalShow={modalEdit} setModalShow={setModalEdit} currency={currency}/>}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"moneda"} action={()=>handleDelete(currency)}/>
       </div>

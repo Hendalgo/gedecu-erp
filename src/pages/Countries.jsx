@@ -35,7 +35,9 @@ export const CountriesIndex = () => {
     return <Navigate to={"/"}/>
   }
   useEffect(() => {
-    getCountries().then(r => setCountries(r));
+    getCountries().then(r => {
+      setCountries(r)
+    });
   }, [])
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
@@ -113,10 +115,10 @@ export const CountriesIndex = () => {
                       {
                         countries.data.map(e => {
                     return (
-                      <tr key={e.id_country}>
+                      <tr key={e.id}>
                         <td scope='row'>
                           <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.country_name}</span>
+                            <span>{e.name}</span>
                           </div>
                         </td>
                         <td>{e.shortcode}</td>

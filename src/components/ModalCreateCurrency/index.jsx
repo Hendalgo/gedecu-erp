@@ -1,11 +1,25 @@
-import React, { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { createCurrency } from '../../helpers/currencies'
+import { getCountries } from '../../helpers/countries'
+import Select from 'react-select'
 
 const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
+  const [countries, setCountries] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const form = useRef();
+
+  useEffect(() => {
+    getCountries("paginated=no&order=name")
+    .then((response) => {
+      if (response) setCountries(response.data.map(({name, shortcode, id}) => ({ label: `${name} (${shortcode})`, value: id })));
+    })
+    .catch(({message, error}) => {
+      setErrorMessage(message);
+      setAlertType("danger");
+    });
+  }, []);
 
   const handleCurrency = async () => {
     try {
@@ -33,6 +47,7 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
       setAlertType('danger')
     }
   }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -48,20 +63,26 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='FormContainer' action='' ref={form}>
+        <form className='FormContainer' action='' ref={form} autoComplete='off'>
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
                 <label htmlFor='name' className='form-label'>Nombre de la moneda <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='name' placeholder='Dólar estadounidense'/>
+                <input required className='form-control' type='text' id='name' name='name' placeholder='Dólar estadounidense'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código de la moneda <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='shortcode' placeholder='USD'/>
+                <label htmlFor='shortcode'  className='form-label'>Código de la moneda <span className='Required'>*</span></label>
+                <input required className='form-control' type='text' id='shortcode' name='shortcode' placeholder='USD'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Símbolo de la moneda <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='symbol' placeholder='$'/>
+                <label htmlFor='symbol' className='form-label'>Símbolo de la moneda <span className='Required'>*</span></label>
+                <input required className='form-control' type='text' id='symbol' name='symbol' placeholder='$'/>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-6">
+                <label htmlFor='country' className='form-label'>País</label>
+                <Select inputId='country' name='country_id' options={countries} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
               </div>
             </div>
           </div>
