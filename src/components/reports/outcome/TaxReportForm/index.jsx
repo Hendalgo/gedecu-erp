@@ -3,10 +3,12 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TaxReportForm = () => { // => Reporte de comisiones
     const [bankAccount, setBankAccount] = useState(null);
     const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -44,7 +46,7 @@ const TaxReportForm = () => { // => Reporte de comisiones
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query="&country=2"
+                        query={`&country=${session.country.id}`}
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>

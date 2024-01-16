@@ -3,11 +3,13 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const OtherReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
     const [motive, setMotive] = useState("");
     const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
     const CHARS_LIMIT = 60;
 
     const handleMotiveChange = ({ target }) => {
@@ -53,7 +55,7 @@ const OtherReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query="&country=2"
+                        query={`&country=${session.country.id}`}
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>

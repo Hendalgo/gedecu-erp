@@ -71,7 +71,7 @@ const TypeTwoHelpReportForm = () => {
                     <DecimalInput id="amount" name="amount" />
                 </div>
             </div>
-            <input type="hidden" name="currency_id" value={bankAccount?.value || 0} />
+            <input type="hidden" name="currency_id" value={bankAccount?.currency_id || 0} />
             <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
             <div className="row mb-3">
                 <div className="col-6">

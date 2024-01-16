@@ -78,7 +78,7 @@ const TypeOneWalletReportForm = () => {
                     <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency.shortcode }</label>
                     <input type="text" id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                 </div>
-                <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency_id} />
+                <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency.id} />
                 <input type="hidden" id="currency" name="currency" value={country?.currency || session.country.currency.shortcode} />
             </div>
             <div className="row mb-3">

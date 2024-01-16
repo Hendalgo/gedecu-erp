@@ -111,9 +111,9 @@ export const ReportsIndex = () => {
                     </thead>
                     <tbody>
                       {
-                        reports.data.map(e => {
+                        reports.data.map((e, index) => {
                           return (
-                            <tr key={e.id}>
+                            <tr key={index}>
                               <td scope='row'>
                                 <div className='d-flex justify-content-between align-items-center'>
                                   <span>{e.user_name} ({e.email})</span>

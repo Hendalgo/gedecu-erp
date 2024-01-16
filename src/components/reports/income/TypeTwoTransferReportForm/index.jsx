@@ -37,8 +37,8 @@ const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
     }, [])
 
     const getOptions = (optionsList = []) => {
-        return optionsList.map(({ name, identifier, currency, id }) => {
-            return { label: name.concat(" - ", identifier), value: id, currency_id: currency.id, currency: currency.shortcode, };
+        return optionsList.map(({ bank, identifier, currency, id }) => {
+            return { label: bank.name.concat(" - ", identifier), value: id, currency_id: currency.id, currency: currency.shortcode, };
         })
     }
 

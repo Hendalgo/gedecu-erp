@@ -66,7 +66,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query={`&type=2&country=${country?.value || session.country_id}`}
+                        query={`&type=2`}
                         onChange={setBankAccount}
                         onError={setError} />
                 </div>
@@ -80,8 +80,8 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={handleAmountChange} />
                 </div>
-                <input type="hidden" name="currency" value={ country?.currency || session.country.currency.shortcode } />
-                <input type="hidden" name="currency_id" value={ country?.currency_id || session.country.currency_id } />
+                <input type="hidden" name="currency_id" value={ bankAccount?.currency_id || 0 } />
+                <input type="hidden" name="currency" value={ bankAccount?.currency || "" } />
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
                     <DecimalInput id="rate" name="rate" onChange={handleRateChange} />
@@ -92,6 +92,8 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                     <label htmlFor="conversion" className="form-label">Monto total en { country?.currency || session.country.currency.shortcode }</label>
                     <input type="text" id="conversion" name="conversion" value={conversion} readOnly className="form-control" />
                 </div>
+                <input type="hidden" name="conversionCurrency" value={ country?.currency || session.country.currency.shortcode } />
+                <input type="hidden" name="conversionCurrency_id" value={ country?.currency_id || session.country.currency_id } />
             </div>
             <div className="row mb-3">
                 <div className="col-6">

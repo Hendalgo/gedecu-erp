@@ -121,12 +121,12 @@ const TypeOneDraftReportForm = () => {
                     <NumberInput id="transferences_quantity" name="transferences_quantity" />
                 </div>
                 <div className="col">
-                    <label htmlFor="amount" className="form-label">Monto total en { country?.currency || country?.currency_id || session.country.currency_id } <span className="Required">*</span></label>
+                    <label htmlFor="amount" className="form-label">Monto total en { country?.currency || session.country.currency.shortcode } <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" defaultValue={amount.toLocaleString("es-VE", {minimumFractionDigits:2})} onChange={handleAmountChange} />
                 </div>
             </div>
-            <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency_id} />
-            <input type="hidden" id="currency" name="currency" value={country?.currency || session.country.currency_id} />
+            <input type="hidden" id="currency_id" name="currency_id" value={country?.currency_id || session.country.currency.id} />
+            <input type="hidden" id="currency" name="currency" value={country?.currency || session.country.currency.shortcode} />
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>

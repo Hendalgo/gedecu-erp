@@ -56,8 +56,8 @@ const TypeTwoCashDeliveryReportForm = () => {
                     <DecimalInput id="amount" name="amount" onChange={() => null} />
                 </div>
             </div>
-            <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency_id} />
-            <input type="hidden" name="currency" value={country?.currency || session.country.currency_id} />
+            <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency.id} />
+            <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
             <div className="row mb-3">
                 <div className="col-6">
                     <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />

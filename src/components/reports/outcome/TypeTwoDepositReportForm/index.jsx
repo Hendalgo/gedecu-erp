@@ -3,10 +3,12 @@ import DecimalInput from "../../../DecimalInput";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoDepositReportForm = () => {
     const [user, setUser] = useState(null);
     const { handleSubmit, setError } = useContext(ReportTableContext);
+    const { session } = useContext(SessionContext);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -46,6 +48,8 @@ const TypeTwoDepositReportForm = () => {
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
                 </div>
+                <input type="hidden" name="currency_id" value={session.country.currency.id} />
+                <input type="hidden" name="currency" value={session.country.currency.shortcode} />
             </div>
             <div className="row mb-3">
                 <div className="col-6">

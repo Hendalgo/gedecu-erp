@@ -101,7 +101,7 @@ export default function ReportsByUser() {
                                 {
                                     reports.data.length === 0 ?
                                     <tr>
-                                        <th colSpan={4} className="text-center">No hay reportes para mostrar.</th>
+                                        <td colSpan={4} className="text-center">No hay reportes para mostrar.</td>
                                     </tr>
                                     : reports.data.map(({ id, created_at, type }) => {
                                         return <tr key={id}>
