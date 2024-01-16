@@ -4,23 +4,35 @@ import './SideBar.css'
 import { ReactSVG } from 'react-svg'
 import { SessionContext } from '../../context/SessionContext'
 import { Accordion } from 'react-bootstrap'
-import { REPORTS_ROUTE} from '../../consts/Routes'
 import { logout } from '../../helpers/logout'
 import { AdminMenus, NormalUserMenu } from '../../consts/Menus'
 import { useCheckRole } from '../../hooks/useCheckRole'
 import useScreenSize from '../../hooks/useScreenSize'
+import { getStores } from '../../helpers/stores'
 
 const SideBar = ({ children }) => {
   const location = useLocation();
   const [isActive, setIsActive] = useState(AdminMenus);
+  const [store, setStore] = useState(AdminMenus);
   const {width, maxHeight} = useScreenSize() 
   let menus = [];
   const {session, setSession } = useContext(SessionContext)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (session.role_id === 3) {
+        const storesResponse = await getStores(`paginated=no&user=${session.id}`);
+        setStore(storesResponse.at(0))
+      }
+    }
+    fetchData();
+  }, [session.role_id, session.id]);
+
   if (useCheckRole(session)) {
     menus = AdminMenus;
   }
   else{
-    menus = NormalUserMenu(session);
+    menus = NormalUserMenu(session, store);
   }
   return width > 1440 
     ?<SideBarBig menus={menus} setSession={setSession} isActive={isActive}>{children}</SideBarBig>

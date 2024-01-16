@@ -22,38 +22,48 @@ export default function ReportDetail() {
         fetchData();
     }, [id]);
 
-    const subreports = report ? JSON.parse(report.meta_data) : [];
-    const tableHeaderSet = new Set();
-    const tableBody = [];
+    const getSubreportsTable = () => {
+        const tableHeaderSet = new Set();
 
-    subreports.forEach((report) => {
-        const newEntry = {};
-        Object.entries(report).forEach(([key, value]) => {
-        if (reportsColumnsMap.has(key)) {
-                tableHeaderSet.add(reportsColumnsMap.get(key));
-                let formattedValue = value;
-                if (["amount", "rate", "conversion"].includes(key)) {
-                    formattedValue = formattedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
-                }
+        const subreports = report.subreports.map(({ data }) => {
+            const newEntry = {};
+            const parsedData = JSON.parse(data);
 
-                if (key === "isDuplicated") {
-                    formattedValue = "No";
-                    if (value) {
-                        formattedValue = "Sí";
+            Object.entries(parsedData).forEach(([key, value]) => {
+                if (reportsColumnsMap.has(key)) {
+                    tableHeaderSet.add(reportsColumnsMap.get(key));
+                    let formattedValue = value;
+
+                    if (["amount", "rate", "conversion"].includes(key)) {
+                        formattedValue = formattedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
                     }
-                }
 
-                newEntry[key] = formattedValue;
-            }
+                    if (key === "isDuplicated") {
+                        formattedValue = "No";
+                        if (value) {
+                            formattedValue = "Sí";
+                        }
+                    }
+
+                    newEntry[key] = formattedValue;
+                }
+            });
+
+            return newEntry;
         })
 
-        tableBody.push(newEntry);
-    });
+        const tableHeader = Array.from(tableHeaderSet);
 
-    const tableHeader = Array.from(tableHeaderSet);
-    const reportStyles = report ? JSON.parse(report.type.config)?.styles : {};
+        return {
+            subreports, tableHeader
+        }
+    }
 
+    
     if (!report) return <></>;
+    
+    const { subreports, tableHeader } = getSubreportsTable();
+    const reportStyles = JSON.parse(report.type.config)?.styles;
 
     return (
         <>
@@ -82,7 +92,7 @@ export default function ReportDetail() {
                     </thead>
                     <tbody>
                         {
-                            tableBody.map((row, index) => {
+                            subreports.map((row, index) => {
                                 return <tr key={`row-${index}`}>
                                     {
                                         Object.values(row).map((value, colIndex) => {

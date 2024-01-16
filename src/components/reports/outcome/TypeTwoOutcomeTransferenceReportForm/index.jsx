@@ -49,7 +49,7 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
                 </div>
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user" name="user" value={user} onChange={setUser} onError={setError} query="" />
+                    <UsersSelect id="user" name="user" value={user} onChange={setUser} onError={setError} query="&role=3" />
                 </div>
             </div>
             <div className="row mb-3">

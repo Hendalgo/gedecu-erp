@@ -42,7 +42,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
 
       switch (request.status) {
         case 201:
-          setErrorMessage('Banco creado con éxito')
+          setErrorMessage('Cuenta creada con éxito')
           setAlertType('success')
 
           window.location.reload()
@@ -53,12 +53,12 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
           break
 
         default:
-          setErrorMessage('Error en la creación del banco')
+          setErrorMessage('Error en la creación de la cuenta')
           setAlertType('danger')
           break
       }
     } catch (error) {
-      setErrorMessage('Error en la creación del banco')
+      setErrorMessage('Error en la creación de la cuenta')
       setAlertType('danger')
     }
   }

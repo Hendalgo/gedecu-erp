@@ -368,6 +368,7 @@ export default function ReportForm() {
         let columns = [...tableData.header];
 
         newEntries.splice(index, 1);
+        subreports.current.splice(index, 1);
 
         if (newEntries.length === 0) columns = [];
 
@@ -397,13 +398,13 @@ export default function ReportForm() {
             }
         } catch ({message, error, response}) {
             let errorsMessages = [];
-
+            console.log(message, error, response);
             if (error) {
                 errorsMessages = Object.values(error).flat();
             }
 
             if (response) {
-                errorsMessages.push(response.data.error);
+                errorsMessages.push(response.data.error || response.data.message);
             }
 
             setError({ show: true, message: errorsMessages, variant: "danger" });

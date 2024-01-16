@@ -3,6 +3,7 @@ import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import { SessionContext } from "../../../../context/SessionContext";
+import { Form } from "react-bootstrap";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
@@ -55,6 +56,11 @@ const TypeTwoIncomeTransferenceReportForm = () => {
                 </div>
                 <input type="hidden" name="currency_id" value={bankAccount?.currency_id || 0} />
                 <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
+                </div>
             </div>
             <div className="row text-end">
                 <div className="col">

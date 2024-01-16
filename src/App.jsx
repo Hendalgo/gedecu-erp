@@ -22,6 +22,7 @@ import ReportsByUser from './pages/ReportsByUser'
 import ReportDetail from './pages/ReportDetail'
 import DuplicateReportForm from './pages/DuplicateReportForm'
 import Depositors from './pages/Depositors'
+import StoreDetail from './pages/StoreDetail'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -55,7 +56,10 @@ function App () {
                 <Route path={`${REPORTS_MISS_ROUTE}`} element={<Inconsistences />} />
                 <Route path={`${REPORTS_TYPE_ROUTE}`} element={<ReportTypes />} />
               </Route>
-              <Route path={`${STORES_ROUTE}`} element={<Stores />} />
+              <Route path={`${STORES_ROUTE}`} >
+                <Route index element={<Stores />} />
+                <Route path={`:id`} element={<StoreDetail />} />
+              </Route>
               <Route path={`${BANKS_ROUTE}`} element={<Banks/>}>
                 <Route index element={<BanksIndex/>}/>
                 <Route path={`${BANK_ACCOUNTS_ROUTE}`} element={<BankAccounts/>}/>

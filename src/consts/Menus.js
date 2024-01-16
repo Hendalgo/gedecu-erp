@@ -71,7 +71,7 @@ export const AdminMenus = [
   }
 ]
 
-export function NormalUserMenu(session = null) {
+export function NormalUserMenu(session = null, store = null) {
   const menu = [
     {
       title: 'Escritorio',
@@ -92,6 +92,15 @@ export function NormalUserMenu(session = null) {
       isActive: false
     },
   ];
+
+  if (store) {
+    menu.push({
+      title: 'Locales',
+      src: 'map-marker-home',
+      link: `stores/${store.id}`,
+      isActive: false
+    });
+  }
 
   if ([2,3,4].includes(session.role_id)) {
     menu.push({

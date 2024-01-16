@@ -9,8 +9,9 @@ import TableLoader from '../components/Loaders/TableLoader'
 import ModalEditStore from '../components/ModalEditStore'
 import { useCheckRole } from '../hooks/useCheckRole'
 import ModalConfirmation from '../components/ModalConfirmation'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AlertMessage from '../components/AlertMessage'
+import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes'
 
 const Stores = () => {
   const { session } = useContext(SessionContext)
@@ -26,13 +27,21 @@ const Stores = () => {
   const [modalEdit, setModalEdit] = useState(false)
   const [stores, setStores] = useState([])
   const form = useRef()
+  const navigate = useNavigate();
 
-  if (!useCheckRole(session)) {
-    return <Navigate to={"/"}/>
-  }
   useEffect(() => {
-    getStores('order=created_at&order_by=desc').then(r => setStores(r))
-  }, [])
+    const fetchData = async () => {
+      const storesResponse = await getStores(`order=created_at`);
+      setStores(storesResponse);
+    }
+
+    if (session.role_id !== 1) {
+      navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+    }
+
+    fetchData();
+  }, [session.role_id])
+
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
     getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setStores(r))
