@@ -58,7 +58,7 @@ export default function DepositorOutcomeSupplierReportForm() {
                 <div className="col-6">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" />
-                    <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency_id} />
+                    <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency.id} />
                     <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
                 </div>
             </div>

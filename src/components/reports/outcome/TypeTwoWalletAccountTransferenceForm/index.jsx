@@ -1,12 +1,12 @@
 import DecimalInput from "../../../DecimalInput";
-import { useContext, } from "react";
+import { useContext, useState, } from "react";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
-import { SessionContext } from "../../../../context/SessionContext";
+import BankAccountsSelect from "../../../BankAccountsSelect";
 
-const TypeTwoWalletAccountReportForm = () => { // Reporte 2 > Egreso > Cuenta Billetera Efectivo
-    const { handleSubmit, setError, country, } = useContext(ReportTableContext);
-    const { session } = useContext(SessionContext);
+export default function TypeTwoWalletAccountTransferenceForm() { // Reporte 2 > Egreso > Cuenta Billetera Transferencia
+    const [account, setAccount] = useState(null);
+    const { handleSubmit, setError, } = useContext(ReportTableContext);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -15,6 +15,7 @@ const TypeTwoWalletAccountReportForm = () => { // Reporte 2 > Egreso > Cuenta Bi
         const data = new FormData(e.target);
 
         try {
+            if (!account) errors.push("El campo Cuenta es obligatorio.");
             if (data.get("amount") === "0,00") errors.push("El campo Monto es obligatorio.");
 
             if (errors.length > 0) throw new Error(errors.join(";"));
@@ -27,31 +28,24 @@ const TypeTwoWalletAccountReportForm = () => { // Reporte 2 > Egreso > Cuenta Bi
         }
     }
 
+    const handleReset = () => {
+        setAccount(null);
+    }
+
     return(
-        <form onSubmit={handleLocalSubmit}>
+        <form onSubmit={handleLocalSubmit} onReset={handleReset}>
             <div className="row mb-3">
+                <div className="col-6">
+                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
+                    <BankAccountsSelect id="account" name="account" value={account} onChange={setAccount} query="&type=2" />
+                </div>
                 <div className="col-6">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                     <DecimalInput id="amount" name="amount" onChange={() => null} />
                 </div>
-                <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency.id} />
-                <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
+                <input type="hidden" name="currency_id" value={account?.currency_id || 0} />
+                <input type="hidden" name="currency" value={account?.currency || ""} />
             </div>
-            {/* <div className={`row mb-3 ${paymentMethod.value !== 2 ? 'd-none' : 'd-block'}`}>
-                <div className="col-6">
-                    <input type="hidden" name="account" value={bankAccount?.label || ""} />
-                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <Select
-                        inputId="account_id"
-                        name="account_id"
-                        options={bankAccounts}
-                        value={bankAccount}
-                        placeholder="Selecciona la cuenta"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                        onChange={setBankAccount}
-                    />
-                </div>
-            </div> */}
             <div className="row mb-3">
                 <div className="col-6">
                     <Form.Check id="isDuplicated" name="isDuplicated" label={`Duplicado`} />
@@ -65,5 +59,3 @@ const TypeTwoWalletAccountReportForm = () => { // Reporte 2 > Egreso > Cuenta Bi
         </form>
     )
 }
-
-export default TypeTwoWalletAccountReportForm;

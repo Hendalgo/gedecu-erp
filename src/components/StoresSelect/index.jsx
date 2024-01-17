@@ -21,7 +21,7 @@ const StoresSelect = ({
                 const [storesResponse,] = await Promise.all([ getStores("paginated=no".concat(query)), ]);
 
                 if (storesResponse) setStores(storesResponse.map(({ name, id, country }) => {
-                    return { label: name, value: id, currency_id: country.currency_id, currency: country.currency.shortcode, };
+                    return { label: name, value: id, currency_id: country.currency.id, currency: country.currency.shortcode, };
                 }));
 
             } catch ({ message, response }) {

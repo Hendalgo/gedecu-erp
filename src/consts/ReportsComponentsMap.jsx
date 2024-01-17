@@ -25,6 +25,7 @@ import TypeTwoCashDeliveryReportForm from "../components/reports/outcome/TypeTwo
 import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepositReportForm";
 import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
 import TypeTwoWalletAccountReportForm from "../components/reports/outcome/TypeTwoWalletAccountReportForm";
+import TypeTwoWalletAccountTransferenceForm from "../components/reports/outcome/TypeTwoWalletAccountTransferenceForm";
 import OutcomeWalletReportForm from "../components/reports/outcome/WalletReportForm";
 import SupplierOutcomeReportForm from "../components/reports/supplier/SupplierOutcomeReportForm";
 
@@ -59,6 +60,7 @@ componentsMap.set(16, <TypeTwoTransferReportForm />)
 // Expense
 componentsMap.set(17, <TypeTwoCashDeliveryReportForm />)
 componentsMap.set(18, <TypeTwoWalletAccountReportForm />)
+componentsMap.set(36, <TypeTwoWalletAccountTransferenceForm />)
 componentsMap.set(25, <TypeTwoHelpReportForm />)
 componentsMap.set(34, <TypeTwoDepositReportForm />)
 componentsMap.set(35, <TypeTwoOutcomeTransferenceReportForm />)
