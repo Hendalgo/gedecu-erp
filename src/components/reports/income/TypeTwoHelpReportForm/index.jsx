@@ -52,7 +52,7 @@ const TypeTwoHelpReportForm = () => {
                         id="store"
                         name="store"
                         value={store}
-                        query={`&country=${country?.value || session.country_id}`}
+                        query={`&not_owner=yes&country=${country?.value || session.country_id}`}
                         onError={setError}
                         onChange={setStore} />
                 </div>
