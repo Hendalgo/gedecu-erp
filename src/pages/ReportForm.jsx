@@ -379,6 +379,7 @@ export default function ReportForm() {
 
     const postReport = async () => {
         setIsLoading(true);
+        console.log(reportType.value, subreports.current);
 
         try {
             const response = await createReport({

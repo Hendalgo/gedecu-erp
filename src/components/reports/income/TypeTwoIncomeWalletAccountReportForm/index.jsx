@@ -94,7 +94,6 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
                 </div>
                 <input type="hidden" name="conversionCurrency" value={ country?.currency || session.country.currency.shortcode } />
                 <input type="hidden" name="conversionCurrency_id" value={ country?.currency_id || session.country.currency.id } />
-                <input type="hidden" name="convertAmount" defaultValue={false} />
             </div>
             <div className="row mb-3">
                 <div className="col-6">

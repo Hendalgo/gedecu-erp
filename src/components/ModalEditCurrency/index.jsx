@@ -8,9 +8,11 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
   const [countries, setCountries] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   useEffect(() => {
+    setLoading(true);
     getCountries("paginated=no&order=name")
     .then((response) => {
       if (response) setCountries(response.data.map(({name, shortcode, id}) => ({ label: `${name} (${shortcode})`, value: id })));
@@ -18,10 +20,14 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
     .catch(({message, error}) => {
       setErrorMessage(message);
       setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
     });
   }, []);
 
   const handleCurrency = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current);
       const data = {};
@@ -52,6 +58,7 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
       setErrorMessage('Error en la edicion de la moneda')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -102,7 +109,7 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCurrency} className='btn btn-primary'>Editar moneda</button>
+        <button onClick={handleCurrency} className='btn btn-primary' disabled={loading}>Editar moneda</button>
       </Modal.Footer>
     </Modal>
   )

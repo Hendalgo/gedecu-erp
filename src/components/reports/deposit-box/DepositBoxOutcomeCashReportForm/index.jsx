@@ -69,7 +69,7 @@ export default function DepositBoxOutcomeCashReportForm() {
             </div>
             <div className="row">
                 <div className="col text-end">
-                    <input type="submit" value="Agregar" />
+                    <input type="submit" value="Agregar" className="btn btn-outline-primary" />
                 </div>
             </div>
         </form>

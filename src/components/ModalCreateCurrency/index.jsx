@@ -8,9 +8,11 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   useEffect(() => {
+    setLoading(true);
     getCountries("paginated=no&order=name")
     .then((response) => {
       if (response) setCountries(response.data.map(({name, shortcode, id}) => ({ label: `${name} (${shortcode})`, value: id })));
@@ -18,10 +20,14 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
     .catch(({message, error}) => {
       setErrorMessage(message);
       setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
     });
   }, []);
 
   const handleCurrency = async () => {
+    setLoading(true);
     try {
       const request = await createCurrency(form.current);
 
@@ -46,6 +52,7 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación de la moneda')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -96,7 +103,7 @@ const ModalCreateCurrency = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCurrency} className='btn btn-primary'>Crear moneda</button>
+        <button onClick={handleCurrency} className='btn btn-primary' disabled={loading}>Crear moneda</button>
       </Modal.Footer>
     </Modal>
   )

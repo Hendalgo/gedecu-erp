@@ -5,9 +5,11 @@ import { updateCountry } from '../../helpers/countries'
 const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   const handleCountry = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current)
       const data = {};
@@ -39,6 +41,7 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
       setErrorMessage('Error en la edicion del país')
       setAlertType('danger')
     }
+    setLoading(false);
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -88,7 +91,7 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCountry} className='btn btn-primary'>Editar país</button>
+        <button onClick={handleCountry} className='btn btn-primary' disabled={loading}>Editar país</button>
       </Modal.Footer>
     </Modal>
   )

@@ -5,9 +5,11 @@ import { createCountry } from '../../helpers/countries'
 const ModalCreateCountry = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   const handleCountry = async () => {
+    setLoading(true);
     try {
       const request = await createCountry(form.current);
 
@@ -32,6 +34,7 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación del país')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -78,7 +81,7 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCountry} className='btn btn-primary'>Crear país</button>
+        <button onClick={handleCountry} className='btn btn-primary' disabled={loading}>Crear país</button>
       </Modal.Footer>
     </Modal>
   )

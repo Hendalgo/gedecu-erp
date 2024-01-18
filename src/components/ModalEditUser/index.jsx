@@ -8,12 +8,16 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef()
+
   useEffect(() => {
     getUsersRoles().then(r => setRoles(r))
     getCountriesCount().then(r => setCountries(r))
   }, [])
+
   const handleUser = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current)
       let userUpdate = []
@@ -54,6 +58,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           setAlertType('danger')
           break
       }
+      setLoading(true);
     } catch (error) {
       setErrorMessage('Error actualizando el usuario')
       setAlertType('danger')
@@ -136,7 +141,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           </Alert>
           : null
       }
-          <button onClick={handleUser} className='btn btn-primary'>Editar Usuario</button>
+          <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Editar Usuario</button>
         </Modal.Footer>
         </Modal>
       : null

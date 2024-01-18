@@ -8,12 +8,16 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef()
+
   useEffect(() => {
     getUsersRoles().then(r => setRoles(r))
     getCountriesCount().then(r => setCountries(r))
   }, [])
+
   const handleUser = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current)
       const request = await createUser(formData)
@@ -35,6 +39,7 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
           setAlertType('danger')
           break
       }
+      setLoading(false);
     } catch (error) {
       setErrorMessage('Error en la creación del usuario')
       setAlertType('danger')
@@ -116,7 +121,7 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleUser} className='btn btn-primary'>Crear Usuario</button>
+        <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Crear Usuario</button>
       </Modal.Footer>
     </Modal>
   )
