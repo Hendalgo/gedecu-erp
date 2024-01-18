@@ -1,6 +1,6 @@
 import { API_INSTANCE, CURRENCIES_URL } from "../consts/ApiUrl"
 
-export const getCurrencies = async (query) => {
+export const getCurrencies = async (query = "") => {
   try {
     const request = await API_INSTANCE.get(`${CURRENCIES_URL}?${query}`)
     return request.data

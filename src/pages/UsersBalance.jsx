@@ -5,8 +5,8 @@ import Welcome from "../components/Welcome";
 import TableLoader from "../components/Loaders/TableLoader";
 import PaginationTable from "../components/PaginationTable";
 
-export default function Depositors() {
-    const [depositors, setDepositors] = useState(null);
+export default function UsersBalance() {
+    const [users, setUsers] = useState(null);
     const [search, setSearch] = useState("");
     const [offset, setOffset] = useState(1);
 
@@ -28,26 +28,26 @@ export default function Depositors() {
     return (
         <>
             <section>
-                <Welcome text="Depositantes" showButton={false} />
+                <Welcome text="Saldo de usuarios" showButton={false} />
             </section>
             <section className="py-4">
                 <form onSubmit={handleSearchSubmit} action='GET' className='form-group row'>
                     <div className='col-8'><FilterTableButtons data={[]} callback={handleCountryChange} /></div>
-                    <div className='col-4'><SearchBar text='Depositante' /></div>
+                    <div className='col-4'><SearchBar text='Usuario' /></div>
                 </form>
             </section>
             <section>
                 <div className="mb-4 d-flex justify-content-end">
-                    <PaginationTable offset={offset} text='depositantes' quantity={depositors?.last_page || 1} itemsTotal={depositors?.total || 0} handleChange={handlePagination} />
+                    <PaginationTable offset={offset} text='usuarios' quantity={users?.last_page || 1} itemsTotal={users?.total || 0} handleChange={handlePagination} />
                 </div>
                 {
-                    Array.isArray(depositors?.data) ?
+                    Array.isArray(users?.data) ?
                     <table className="table table-striped TableP">
                         <thead></thead>
                         <tbody>
                             {
-                                depositors.data.length > 0 ?
-                                depositors.data.map((_, index) => {
+                                users.data.length > 0 ?
+                                users.data.map((_, index) => {
                                     return <tr key={index}></tr>
                                 }) :
                                 <tr>

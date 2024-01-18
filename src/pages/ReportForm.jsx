@@ -118,12 +118,12 @@ export default function ReportForm() {
 
                     if (countriesResponse && countriesResponse.data) {
 
-                        const countriesOptions = countriesResponse.data.map(({ country_name, shortcode, currency_shortcode, id_country, currency_id, }) => {
+                        const countriesOptions = countriesResponse.data.map(({ name, shortcode, currency, id, }) => {
                             return {
-                                label: country_name.concat(" (", shortcode, ")"),
-                                value: id_country,
-                                currency: currency_shortcode,
-                                currency_id: currency_id,
+                                label: name.concat(" (", shortcode, ")"),
+                                value: id,
+                                currency: currency.shortcode,
+                                currency_id: currency.id,
                             };
                         });
 
@@ -239,6 +239,10 @@ export default function ReportForm() {
         if (report == 4) {
             const expenseReports = filteredReports.slice(1).map(({name, id,}) => ({label: name, value: id}));
             const incomeReports = filteredReports.at(0);
+
+            if (!incomeReports || expenseReports.length === 0) {
+                return [];
+            }
 
             return [
                 {

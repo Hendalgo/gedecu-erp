@@ -10,6 +10,7 @@ import { deleteReportTypes, getReportTypes } from '../helpers/reports'
 import ModalCreateReportType from '../components/ModalCreateReportType'
 import ModalEditReportType from '../components/ModalEditReportType'
 import AlertMessage from '../components/AlertMessage'
+import FilterTableButtons from '../components/FilterTableButtons'
 
 const ReportTypes = () => {
   const { session } = useContext(SessionContext)
@@ -25,6 +26,11 @@ const ReportTypes = () => {
     variant: 'danger',
     text: 'Error al realizar la acción'
   });
+  const movementTypes = [
+    {name: "Ingreso", id: "income"},
+    {name: "Egreso", id: "outcome"},
+    {name: "Neutro", id: "neutro"},
+  ];
 
   if (!useCheckRole(session)) {
     return <Navigate to={"/"}/>
@@ -47,6 +53,12 @@ const ReportTypes = () => {
       getReportTypes(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setTypes(r))
     }
   }
+
+  const handleMovementType = async (option) => {
+    setOffset(1);
+    const reportsTypesResponse = await getReportTypes(`order=created_at&order_by=desc${option ? `&type=${option}` : ""}`);
+  }
+
   const handleDelete = (e)=>{
     deleteReportTypes(e.id).then( e =>{
       if (e.status === 201) {
@@ -69,14 +81,15 @@ const ReportTypes = () => {
   }
   return (
     <div className='container-fluid'>
-      {
+      <Welcome text='Tipos de reportes' showButton={false}/>
+      {/* {
         useCheckRole(session)
         ?<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' />
         :<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' showButton= {false}/>
-      }
+      } */}
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8' />
+          <div className='col-8'><FilterTableButtons data={movementTypes} callback={handleMovementType} /></div>
           <div className='col-4'><SearchBar text='Reporte' /></div>
         </form>
       </div>
@@ -103,7 +116,7 @@ const ReportTypes = () => {
                         <th scope='col'>Tipo</th>
                         
                         <th scope='col'>Nro° de reportes</th>
-                        {useCheckRole(session) && <th />}
+                        {/* {useCheckRole(session) && <th />} */}
                       </tr>
                     </thead>
                     <tbody>
@@ -130,7 +143,7 @@ const ReportTypes = () => {
                         <td>{e.description}</td>
                         <td>{type()}</td>
                         <td>{e.count}</td>
-                        {
+                        {/* {
                           useCheckRole(session)
                           &&
                           <td>
@@ -159,7 +172,7 @@ const ReportTypes = () => {
                               </button>
                             </div>
                           </td>
-                        }
+                        } */}
                       </tr>
                     )
                   }
@@ -174,10 +187,10 @@ const ReportTypes = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateReportType modalShow={modalShow} setModalShow={setModalShow}/>
-        <ModalEditReportType modalShow={modalEdit} setModalShow={setModalEdit} data={type}/>
+        {/* <ModalCreateReportType modalShow={modalShow} setModalShow={setModalShow}/>
+        <ModalEditReportType modalShow={modalEdit} setModalShow={setModalEdit} data={type}/> */}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(type)}/>
+        {/* <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(type)}/> */}
       </div>
     </div>
   )

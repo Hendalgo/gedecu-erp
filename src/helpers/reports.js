@@ -30,7 +30,7 @@ export const updateReport = async (form, id) => {
     return error.response
   }
 }
-export const getReportTypes = async (query) => {
+export const getReportTypes = async (query = "") => {
   try {
     const request = await API_INSTANCE.get(`${REPORTS_TYPE_URL}?${query}`)
 

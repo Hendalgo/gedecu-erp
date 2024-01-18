@@ -58,11 +58,11 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           setAlertType('danger')
           break
       }
-      setLoading(true);
     } catch (error) {
       setErrorMessage('Error actualizando el usuario')
       setAlertType('danger')
     }
+    setLoading(false);
   }
   return (
     user

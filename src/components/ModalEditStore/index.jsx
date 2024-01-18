@@ -10,9 +10,11 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [errorMessage, setErrorMessage] = useState()
   const [users, setUsers] = useState([])
   const [alertType, setAlertType] = useState('danger')
+  const [loading, setLoading] = useState(false);
   const form = useRef()
   
   useEffect(() => {
+    setLoading(true);
     Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
     .then(([countriesResponse, usersResponse]) => {
       setCountries(countriesResponse.map(({name, id}) => ({label: name, value: id})));
@@ -21,10 +23,14 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
     .catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
     });
   }, [])
   
   const handleStore = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current);
       const data = {};
@@ -57,6 +63,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
       setErrorMessage('Error actualizando el local')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -120,7 +127,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
           </Alert>
           : null
       }
-          <button onClick={handleStore} className='btn btn-primary'>Editar local</button>
+          <button onClick={handleStore} className='btn btn-primary' disabled={loading}>Editar local</button>
         </Modal.Footer>
         </Modal>
       : null

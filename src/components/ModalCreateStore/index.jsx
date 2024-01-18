@@ -12,9 +12,11 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [users, setUsers] = useState();
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef()
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([getCountries("paginated=no"), getUsers(`paginated=no&role=3`)])
     .then(([countriesResponse, usersResponse]) => {
       setCountries(countriesResponse.data.map(({name, id, currency}) => ({label: name, value: id, currency: currency.shortcode})));
@@ -23,10 +25,14 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
     .catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
     });
   }, [])
 
   const handleStore = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current);
       formData.set("balance", new Number(formData.get("balance").replace(/\D/g, "")) / 100);
@@ -53,6 +59,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación del Local')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -116,7 +123,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleStore} className='btn btn-primary'>Crear local</button>
+        <button onClick={handleStore} className='btn btn-primary' disabled={loading}>Crear local</button>
       </Modal.Footer>
     </Modal>
   )

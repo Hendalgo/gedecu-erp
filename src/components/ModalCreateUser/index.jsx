@@ -39,11 +39,11 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
           setAlertType('danger')
           break
       }
-      setLoading(false);
     } catch (error) {
       setErrorMessage('Error en la creación del usuario')
       setAlertType('danger')
     }
+    setLoading(false);
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>

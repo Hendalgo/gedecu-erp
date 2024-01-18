@@ -11,9 +11,11 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([getBanks(`paginated=no`), getCurrencies("paginated=no")])
     .then(([banksResponse, currenciesResponse]) => {
       setBanks(banksResponse.map(e => ({ label: `${e.name}`, value: e.id } )));
@@ -22,19 +24,13 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
     .catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
+    }).finally(() => {
+      setLoading(false);
     })
-
-    getBanks(`paginated=no`).then(r =>{
-      setBanks(r.map( e=> {
-        return{
-          label: `${e.name}`,
-          value: e.id
-        }
-      }))
-    }); 
   }, [])
 
   const handleBankAccount = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current);
       const data = {};
@@ -64,6 +60,7 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
       setErrorMessage('Error en la edición del banco')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
   return (
@@ -136,7 +133,7 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
             </Alert>
             : null
         }
-        <button onClick={handleBankAccount} className='btn btn-primary'>Editar cuenta</button>
+        <button onClick={handleBankAccount} className='btn btn-primary' disabled={loading}>Editar cuenta</button>
       </Modal.Footer>
     </Modal>
   )

@@ -8,9 +8,11 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
   const [accountTypes, setAccountTypes] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef()
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([ getCountriesCount(), getBanksTypes("paginated=no"), ])
     .then(([countries, banksTypes,]) => {
       setCountries(countries);
@@ -26,10 +28,14 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
     }).catch(({error, message}) => {
       setErrorMessage(error.message);
       setAlertType("danger");
+    }).finally(() => {
+      setLoading(false);
     })
   }, [])
 
   const handleUser = async () => {
+    setLoading(true);
+
     try {
       const formData = new FormData(form.current)
       const request = await createBank(formData)
@@ -55,6 +61,7 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación del banco')
       setAlertType('danger')
     }
+    setLoading(false);
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -108,7 +115,7 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleUser} className='btn btn-primary'>Crear banco</button>
+        <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Crear banco</button>
       </Modal.Footer>
     </Modal>
   )

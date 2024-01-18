@@ -51,8 +51,8 @@ export const AdminMenus = [
     link: 'users',
     others: [
       {
-        name: 'Depositantes',
-        link: 'users/depositors',
+        name: 'Saldos',
+        link: 'users/balance',
       },
     ],
     isActive: false
