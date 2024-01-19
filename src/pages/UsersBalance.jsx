@@ -1,24 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FilterTableButtons from "../components/FilterTableButtons";
 import SearchBar from "../components/SearchBar";
 import Welcome from "../components/Welcome";
 import TableLoader from "../components/Loaders/TableLoader";
 import PaginationTable from "../components/PaginationTable";
+import { getUsersBalance } from "../helpers/users";
+import { getCountries } from "../helpers/countries";
 
 export default function UsersBalance() {
     const [users, setUsers] = useState(null);
+    const [countries, setCountries] = useState([]);
     const [search, setSearch] = useState("");
     const [offset, setOffset] = useState(1);
+    const [alert, setAlert] = useState({ message: null, variant: "danger" });
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [usersResponse, countriesResponse] = await Promise.all([getUsersBalance("order=created_at"), getCountries("paginated=no")]);
+                setUsers(usersResponse);
+                if (countriesResponse) setCountries(countriesResponse.data);
+            } catch (error) {
+                setAlert({message: [error.message], variant: "danger"});
+            }
+        }
+
+        fetchData();
+    }, []);
 
     const handleSearchSubmit = async (ev) => {
         ev.preventDefault();
         const search = ev.target["search"].value;
 
-        setSearch(search);
+        try {
+            const usersResponse = await getUsersBalance(`order=created_at&search=${search}`);
+    
+            setUsers(usersResponse);
+            setSearch(search);
+        } catch (error) {
+            setAlert({message: [error.message], variant: "danger"});
+        }
     }
 
     const handleCountryChange = async (countryId) => {
-        console.log(countryId);
+        try {
+            const usersResponse = await getUsersBalance(`order=created_at&search=${search}${countryId ? `&country=${countryId}` : ""}`);
+            setUsers(usersResponse);
+        } catch (error) {
+            setAlert({message: [error.message], variant: "danger"});
+        }
     }
 
     const handlePagination = async (page) => {
@@ -32,7 +62,7 @@ export default function UsersBalance() {
             </section>
             <section className="py-4">
                 <form onSubmit={handleSearchSubmit} action='GET' className='form-group row'>
-                    <div className='col-8'><FilterTableButtons data={[]} callback={handleCountryChange} /></div>
+                    <div className='col-8'><FilterTableButtons data={countries} callback={handleCountryChange} /></div>
                     <div className='col-4'><SearchBar text='Usuario' /></div>
                 </form>
             </section>

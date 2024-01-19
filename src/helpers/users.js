@@ -36,3 +36,9 @@ export const deleteUser = async (id) => {
     return error.response
   }
 }
+
+/* Users Balances */
+export const getUsersBalance = async (query = "") => {
+  const response = await API_INSTANCE.get(`${USER_URL}/balances?${query}`);
+  return response.data;
+}
