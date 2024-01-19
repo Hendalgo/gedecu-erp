@@ -10,6 +10,7 @@ import { getCountries } from "../helpers/countries";
 export default function UsersBalance() {
     const [users, setUsers] = useState(null);
     const [countries, setCountries] = useState([]);
+    const [country, setCountry] = useState(false);
     const [search, setSearch] = useState("");
     const [offset, setOffset] = useState(1);
     const [alert, setAlert] = useState({ message: null, variant: "danger" });
@@ -19,7 +20,7 @@ export default function UsersBalance() {
             try {
                 const [usersResponse, countriesResponse] = await Promise.all([getUsersBalance("order=created_at"), getCountries("paginated=no")]);
                 setUsers(usersResponse);
-                if (countriesResponse) setCountries(countriesResponse.data);
+                if (countriesResponse) setCountries(countriesResponse.data.filter(({id}) => id !== 2));
             } catch (error) {
                 setAlert({message: [error.message], variant: "danger"});
             }
@@ -30,29 +31,49 @@ export default function UsersBalance() {
 
     const handleSearchSubmit = async (ev) => {
         ev.preventDefault();
-        const search = ev.target["search"].value;
+
+        setOffset(1);
+        let params = `order=created_at`;
+        if (search) params += `&search=${search}`;
+        if (country) params += `&country=${country}`;
 
         try {
-            const usersResponse = await getUsersBalance(`order=created_at&search=${search}`);
+            const usersResponse = await getUsersBalance(params);
     
             setUsers(usersResponse);
-            setSearch(search);
         } catch (error) {
             setAlert({message: [error.message], variant: "danger"});
         }
     }
 
     const handleCountryChange = async (countryId) => {
+        setOffset(1);
+
         try {
             const usersResponse = await getUsersBalance(`order=created_at&search=${search}${countryId ? `&country=${countryId}` : ""}`);
             setUsers(usersResponse);
+            setCountry(countryId);
         } catch (error) {
             setAlert({message: [error.message], variant: "danger"});
         }
     }
 
-    const handlePagination = async (page) => {
-        console.log(page);
+    const handlePagination = async ({selected}) => {
+        console.log(selected);
+        setOffset(selected + 1);
+
+        let params = `order=created_at&page=${selected + 1}`;
+
+        if (search) params += `&search=${search}`;
+        if (country) params += `&country=${country}`;
+        console.log(params);
+
+        try {
+            const usersResponse = await getUsersBalance(params);
+            setUsers(usersResponse);    
+        } catch (error) {
+            setAlert({message: [error.message], variant: "danger"});
+        }
     }
 
     return (
@@ -63,7 +84,7 @@ export default function UsersBalance() {
             <section className="py-4">
                 <form onSubmit={handleSearchSubmit} action='GET' className='form-group row'>
                     <div className='col-8'><FilterTableButtons data={countries} callback={handleCountryChange} /></div>
-                    <div className='col-4'><SearchBar text='Usuario' /></div>
+                    <div className='col-4'><SearchBar text='Usuario' change={setSearch} /></div>
                 </form>
             </section>
             <section>
@@ -73,15 +94,25 @@ export default function UsersBalance() {
                 {
                     Array.isArray(users?.data) ?
                     <table className="table table-striped TableP">
-                        <thead></thead>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Saldo</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {
                                 users.data.length > 0 ?
-                                users.data.map((_, index) => {
-                                    return <tr key={index}></tr>
+                                users.data.map(({id, user, balance, currency}) => {
+                                    return <tr key={id}>
+                                        <td>{user.name}</td>
+                                        <td>{user.email}</td>
+                                        <td>{`${currency.shortcode} ${balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}`}</td>
+                                    </tr>
                                 }) :
                                 <tr>
-                                    <td>No hay registros</td>
+                                    <td colSpan={3}>No hay registros</td>
                                 </tr>
                             }
                         </tbody>

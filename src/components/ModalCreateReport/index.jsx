@@ -22,7 +22,7 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
     rate: false,
     payment_reference: false,
     store: true,
-    bank: true,
+    // bank: true,
     notes: true,
     duplicated: true,
     bank: false
