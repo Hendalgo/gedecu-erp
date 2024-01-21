@@ -1,5 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import Header from '../components/Header'
+import { useContext, useEffect, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
@@ -16,62 +15,68 @@ import { useCheckRole } from '../hooks/useCheckRole'
 
 const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
-  const [report, setReport] = useState()
   const [offset, setOffset] = useState(1)
+  const [search, setSearch] = useState("");
   
-  const [reportType, setReportType] = useState([
-    { id: 'done', name: 'Correcto' },
-    { id: 'cancel', name: 'Cancelado' }
-  ])
-  const [modalShow, setModalShow] = useState(false)
-  const [modalCreateShow, setModalCreateShow] = useState(false)
-  const [reports, setReports] = useState([])
-  const form = useRef()
-  const formDate = useRef()
+  const reportsTypes = [
+    { id: 'yes', name: 'Correcto' },
+    { id: 'no', name: 'Cancelado' }
+  ]
+  const [reportType, setReportType] = useState(false);
+  const [date, setDate] = useState("");
+
+  const [duplicates, setDuplicates] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {}, []);
 
   const handleChange = (offset) => {
-    setOffset(offset.selected + 1)
-    getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
-  }
+    const newOffset = offset.selected;
+    setOffset(newOffset);
 
-  const handleModal = (id) => {
-    setReport(reports.data.find((el) => el.id === id))
-    setModalShow(true)
+    let params = `order=created_at&order_by=desc&page=${newOffset}`;
+
+    if (date) params += `&date=${date}`;
+    if (search) params += `&search=${search}`;
+    if (reportType) params += `&completed=${reportType}`;
+
+    console.log(params);
   }
 
   const handleType = (e) => {
     setOffset(1);
+    setReportType(e);
 
-    const date = formDate.current.date.value ? `&date=${formDate.current.date.value}` : ''
+    let params = `order=created_at&order_by=desc${e ? `&completed=${e}` : ""}`;
+
+    if (date) params += `&date=${date}`;
+    if (search) params += `&search=${search}`;
+
+    console.log(params);
   }
 
   const handleSearch = (e) => {
     e.preventDefault();
     setOffset(1);
-  }
 
-  const handleDone = (id) => {
-    updateReport({
-      duplicated_status: 'done'
-    }, id)
+    let params = `order=created_at&order_by=desc${search ? `&search=${search}` : ""}`;
 
-    getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
-  }
+    if (date) params += `&date=${date}`;
+    if (reportType) params += `&completed=${reportType}`;
 
-  const handleCancel = (id) => {
-    updateReport({
-      duplicated_status: 'cancel'
-    }, id)
-
-    getReports(`order=created_at&order_by=desc&page=${offset.selected + 1}&duplicated=yes${form.current.filter_type.value !== 'false' ? `&duplicated_status=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setReports(r))
+    console.log(params);
   }
 
   const handleDate = (e) => {
     e.preventDefault();
     setOffset(1);
+
+    let params = `order=created_at&order_by=desc${date ? `&date=${date}` : ""}`;
+
+    if (search) params += `&search=${search}`;
+    if (reportType) params += `&completed=${reportType}`;
+
+    console.log(params);
   }
 
   return (
@@ -79,28 +84,28 @@ const DuplicateReports = () => {
       <div className='container-fluid'>
         <Welcome text='Reportes duplicados' showButton={false} />
         <div className='row mt-4'>
-          <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-            <div className='col-8'><FilterTableButtons data={reportType} callback={handleType} /></div>
-            <div className='col-4'><SearchBar text='Duplicados' /></div>
+          <form onSubmit={handleSearch} action='' className='form-group row'>
+            <div className='col-8'><FilterTableButtons data={reportsTypes} callback={handleType} /></div>
+            <div className='col-4'><SearchBar text='Duplicados' change={setSearch} /></div>
           </form>
         </div>
 
         <div className='row mt-3'>
           <div className='col-3'>
-            <form ref={formDate} onSubmit={(e) => handleDate(e)} className='d-flex' method='post'>
-              <input style={{ borderRadius: '0.25rem 0 0 0.25rem' }} type='date' name='date' className='form-control form-control-sm' id='' />
+            <form onSubmit={(e) => handleDate(e)} className='d-flex' method='post'>
+              <input style={{ borderRadius: '0.25rem 0 0 0.25rem' }} type='date' name='date' onChange={({ target }) => setDate(target.value)} className='form-control form-control-sm' id='' />
               <input style={{ borderRadius: '0 0.25rem 0.25rem 0' }} type='submit' className='btn btn-secondary' value='Filtrar' />
             </form>
           </div>
         </div>
 
         {
-          Array.isArray(reports.data) ? reports.data.length > 0 ?
+          Array.isArray(duplicates?.data) ? duplicates.data.length > 0 ?
           <>
             <div className='row mt-4'>
               <div className='col-12'>
                 <div className='d-flex justify-content-end'>
-                  <PaginationTable offset={offset} itemOffset={offset} quantity={reports.last_page} itemsTotal={reports.total} handleChange={handleChange} />
+                  <PaginationTable offset={offset} itemOffset={offset} quantity={duplicates.last_page} itemsTotal={duplicates.total} handleChange={handleChange} />
                 </div>
               </div>
             </div>

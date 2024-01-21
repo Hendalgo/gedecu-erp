@@ -67,3 +67,8 @@ export const updateReportTypes = async(id,data)=>{
     return error.response
   }
 }
+
+export const getDuplicates = async (query = "") => {
+  const response = await API_INSTANCE.get(`${REPORTS_TYPE_URL}/duplicates?${query}`);
+  return response.data;
+}

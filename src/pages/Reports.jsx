@@ -74,7 +74,7 @@ export const ReportsIndex = () => {
         <div className='row mt-4'>
           <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
             <div className='col-8'><FilterTableButtons data={reportType} callback={handleType} /></div>
-            <div className='col-4'><SearchBar text='reportes' /></div>
+            <div className='col-4'><SearchBar text='Reportes' /></div>
           </form>
         </div>
 
