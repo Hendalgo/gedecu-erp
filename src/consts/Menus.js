@@ -93,7 +93,7 @@ export function NormalUserMenu(session = null, store = null) {
     },
   ];
 
-  if (store) {
+  if (session.role_id === 3 && store) {
     menu.push({
       title: 'Locales',
       src: 'map-marker-home',

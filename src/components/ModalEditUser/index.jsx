@@ -1,26 +1,44 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createUser, getUsersRoles, updateUser } from '../../helpers/users'
+import { getUsersRoles, updateUser } from '../../helpers/users'
 import { getCountriesCount } from '../../helpers/banks'
 
 const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
-  const [roles, setRoles] = useState()
+  const [roles, setRoles] = useState();
+  const allRoles = useRef([]);
   const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const [loading, setLoading] = useState(false);
-  const form = useRef()
+  const form = useRef();
 
   useEffect(() => {
-    getUsersRoles().then(r => setRoles(r))
-    getCountriesCount().then(r => setCountries(r))
+    setLoading(true);
+    Promise.all([ getUsersRoles(), getCountriesCount(), ])
+    .then(([rolesResponse, countriesResponse]) => {
+      allRoles.current = rolesResponse;
+      let roles = [];
+      if (user.country_id == 2) {
+        roles = rolesResponse.filter(({id}) => id == 1 || id == 2);
+      } else {
+        roles = rolesResponse.filter(({id}) => id !== 2);
+      }
+      setCountries(countriesResponse);
+      setRoles(roles);
+    })
+    .catch((error) => {
+      console.log(error);
+      setAlertType("danger");
+      setErrorMessage(error.response.data.error);
+    })
+    .finally(setLoading(false));
   }, [])
 
   const handleUser = async () => {
     setLoading(true);
     try {
       const formData = new FormData(form.current)
-      let userUpdate = []
+      let userUpdate;
       if (form.current.password.value === '') {
         userUpdate = {
           name: user.name,
@@ -64,6 +82,19 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
     }
     setLoading(false);
   }
+
+  const handleCountryChange = ({target}) => {
+    let roles = [];
+
+    if (target.value == 2) {
+      roles = allRoles.current.filter(({id}) => id == 1 || id == 2);
+    } else {
+      roles = allRoles.current.filter(({id}) => id !== 2);
+    }
+    setRoles(roles);
+    setUser((prev) => ({ ...prev, country_id: target.value, role_id: 1 }));
+  }
+
   return (
     user
       ? <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -87,44 +118,44 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
                       <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
-                      <input required onChange={(e) => setUser({ ...user, name: e.target.value })} className='form-control' type='text' name='name' value={user.name} />
+                      <input required onChange={(e) => setUser({ ...user, name: e.target.value })} className='form-control' type='text' id='name' name='name' value={user.name} />
                     </div>
                     <div>
                       <label htmlFor='email'>Email <span className='Required'>*</span></label>
-                      <input readOnly onChange={(e) => setUser({ ...user, email: e.target.value })} className='form-control' type='email' name='email' value={user.email} />
+                      <input readOnly onChange={(e) => setUser({ ...user, email: e.target.value })} className='form-control' type='email' id='email' name='email' value={user.email} />
                     </div>
                   </div>
                   <div className='mb-3'>
                     <label htmlFor='password'>Contraseña </label>
-                    <input required name='password' onChange={(e) => setUser({ ...user, password: e.target.value })} className='form-control' type='password' />
+                    <input required id='password' name='password' onChange={(e) => setUser({ ...user, password: e.target.value })} className='form-control' type='password' />
                   </div>
                   <div className='mb-3'>
                     <label htmlFor='confirm-password'>Confirmar Contraseña</label>
-                    <input required name='password_confirmation' onChange={(e) => setUser({ ...user, password_confirmation: e.target.value })} className='form-control' type='password' />
+                    <input required id='confirm-password' name='password_confirmation' onChange={(e) => setUser({ ...user, password_confirmation: e.target.value })} className='form-control' type='password' />
                   </div>
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
                       <label htmlFor='role'>Rol <span className='Required'>*</span></label>
-                      <select required className='form-select' name='role' id='role'>
+                      <select required className='form-select' value={user.role_id} onChange={({target}) => setUser((prev) => ({...prev, role_id: target.value}))} name='role' id='role'>
                         {
-                  roles
-                    ? roles.map((e) => {
-                      return <option key={e.id} style={{ textTransform: 'capitalize' }} selected={e.id === user.role_id} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
+                          roles
+                          ? roles.map((e) => {
+                            return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                          })
+                          : null
+                        }
                       </select>
                     </div>
                     <div>
                       <label htmlFor='country'>País <span className='Required'>*</span></label>
-                      <select required className='form-select' name='country' id='country'>
+                      <select required className='form-select' name='country' id='country' value={user.country_id} onChange={handleCountryChange}>
                         {
-                  countries
-                    ? countries.map(e => {
-                      return <option key={e.id} selected={e.id === user.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
+                        countries
+                        ? countries.map(e => {
+                          return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
+                        })
+                        : null
+                        }
                       </select>
                     </div>
                   </div>

@@ -27,7 +27,7 @@ export default function ReportForm() {
     const reportTypeAux = useRef(null);
     const [showReportTypeConfirmation, setShowReportTypeConfirmation] = useState(false);
 
-    const [tableData, setTableData] = useState({ header: [], body: [], footer: 0 });
+    const [tableData, setTableData] = useState({ header: [], body: [], footer: [] });
 
     const vzlaReportTypes = useRef([]);
     const intlReportTypes = useRef([]);
@@ -306,7 +306,7 @@ export default function ReportForm() {
     }
 
     const clearTableData = () => {
-        setTableData({ header: [], body: [], });
+        setTableData({ header: [], body: [], footer: [] });
         subreports.current = [];
     }
 
@@ -315,7 +315,6 @@ export default function ReportForm() {
 
         try {
             const newTableEntry = {}; const newEntry = {};
-            let footAmount = 0;
             let headColumns = [...tableData.header];
 
             if (headColumns.length === 0) {
@@ -354,8 +353,26 @@ export default function ReportForm() {
                 newTableEntry["isDuplicated"] = "No";
             }
 
+            let amount = newEntry["amount"];
+            let currency = newEntry["currency"];
+
+            if (newEntry["convert_amount"]) {
+                amount *= newEntry["rate"];
+                currency = newEntry["conversionCurrency"];
+            }
+
+            const footer = [...tableData.footer];
+            const index = footer.findIndex(({currency}) => currency == newEntry["currency"]);
+
+            if (index === -1) {
+                footer.push({ currency, amount });
+            } else {
+                let currentElement = footer.at(index);
+                currentElement.amount += amount;
+            }
+
             subreports.current.push(newEntry);
-            setTableData((prev) => ({ header: headColumns, body: [...prev.body, newTableEntry], footer: prev.footer + footAmount }));
+            setTableData((prev) => ({ header: headColumns, body: [...prev.body, newTableEntry], footer }));
         } catch (error) {
             setError({
                 message: error.message.split(';'),
@@ -370,13 +387,21 @@ export default function ReportForm() {
 
         const newEntries = [...tableData.body];
         let columns = [...tableData.header];
+        let footer = [...tableData.footer];
 
         newEntries.splice(index, 1);
-        subreports.current.splice(index, 1);
+
+        const deleted = subreports.current.splice(index, 1).shift();
+        const footerIndex = footer.findIndex(({currency}) => currency == deleted["currency"]);
+        
+        const currentCurrency = footer.at(footerIndex);
+        currentCurrency.amount -= deleted["amount"];
+
+        if (currentCurrency.amount <= 0) footer.splice(footerIndex, 1);
 
         if (newEntries.length === 0) columns = [];
 
-        setTableData(({header: columns, body: newEntries}));
+        setTableData({header: columns, body: newEntries, footer});
 
         setIsLoading(false);
     }
@@ -528,12 +553,15 @@ export default function ReportForm() {
                             }
                         </tbody>
                         <tfoot>
-                            <tr>
-                                {
-                                    tableData.footer > 0 &&
-                                    <td colSpan={tableData.header.length + 1} className="text-end"><strong>Monto total: {tableData.footer.toLocaleString("es-VE")}</strong></td>
-                                }
-                            </tr>
+                            {
+                                tableData.footer.map(({currency, amount}) => {
+                                    return <tr key={currency}>
+                                        <td colSpan={tableData.header.length + 1} className="text-end fw-semibold">
+                                            Total {currency}: {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}
+                                            </td>
+                                        </tr>
+                                })
+                            }
                         </tfoot>
                     </table>
                 }

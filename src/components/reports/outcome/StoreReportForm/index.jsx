@@ -111,6 +111,7 @@ const StoreReportForm = () => {
                     <label htmlFor="conversion" className="form-label">Monto total en {bankAccount?.currency}</label>
                     <input id="conversion" name="conversion" value={conversionAmount} readOnly className="form-control" />
                     <input type="hidden" name="conversionCurrency_id" defaultValue={2} />
+                    <input type="hidden" name="conversionCurrency" defaultValue={"VES"} />
                     <input type="hidden" name="convert_amount" defaultValue={true} />
                 </div>
             </div>

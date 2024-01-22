@@ -107,11 +107,10 @@ const Stores = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Local</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>Dirección</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Manejador</th>
+                        <th scope='col'>Encargado</th>
                         <th scope='col'>Balance</th>
                         {useCheckRole(session) && <th />}
                       </tr>
@@ -121,11 +120,6 @@ const Stores = () => {
                   stores.data.map(e => {
                     return (
                       <tr key={e.id}>
-                        <td scope='row'>
-                          <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
-                          </div>
-                        </td>
                         <td>{e.name}</td>
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>

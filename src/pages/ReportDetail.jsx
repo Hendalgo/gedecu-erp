@@ -24,6 +24,7 @@ export default function ReportDetail() {
 
     const getSubreportsTable = () => {
         const tableHeaderSet = new Set();
+        let footer = [];
 
         const subreports = report.subreports.map(({ data }) => {
             const newEntry = {};
@@ -49,20 +50,37 @@ export default function ReportDetail() {
                 }
             });
 
+            const footerIndex = footer.findIndex(({currency}) => currency == parsedData["currency"]);
+
+            let amount = parsedData["amount"];
+            let currency = parsedData["currency"];
+
+            if (parsedData["convert_amount"]) {
+                amount *= parsedData["rate"];
+                currency = parsedData["conversionCurrency"];
+            }
+
+            if (footerIndex === -1) {
+                footer.push({currency, amount});
+            } else {
+                const currentElement = footer.at(footerIndex);
+                currentElement.amount += amount;
+            }
+
             return newEntry;
         })
 
         const tableHeader = Array.from(tableHeaderSet);
 
         return {
-            subreports, tableHeader
+            subreports, tableHeader, footer
         }
     }
 
     
     if (!report) return <></>;
     
-    const { subreports, tableHeader } = getSubreportsTable();
+    const { subreports, tableHeader, footer } = getSubreportsTable();
     const reportStyles = JSON.parse(report.type.config)?.styles;
 
     return (
@@ -103,6 +121,13 @@ export default function ReportDetail() {
                             })
                         }
                     </tbody>
+                    <tfoot>
+                        {
+                            footer.map(({currency, amount}) => <tr key={currency}>
+                                <td className="fw-semibold text-end" colSpan={tableHeader.length}>Total {currency}: {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
+                            </tr>)
+                        }
+                    </tfoot>
                 </table>
             </section>
             <section className="p-2 row mt-3 justify-content-end">

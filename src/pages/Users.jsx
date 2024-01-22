@@ -165,7 +165,7 @@ const Users = () => {
       <div className=''>
         <ModalCreateUser modalShow={modalShow} setModalShow={setModalShow} />
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />
+        {modalEditShow && <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el usuario, se eliminarán otros recursos (cuentas de banco) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(editUser)}/>
       </div>
     </div>

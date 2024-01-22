@@ -10,6 +10,8 @@ export default function DepositorOutcomeWalletReportForm() {
     const [user, setUser] = useState(null);
     const { handleSubmit, setError, country, } = useContext(ReportTableContext);
     const { session, } = useContext(SessionContext);
+    const [amount, setAmount] = useState(0);
+    const [rate, setRate] = useState(0);
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -21,6 +23,7 @@ export default function DepositorOutcomeWalletReportForm() {
             if (!user) errors.push("El campo Gestor es obligatorio.");
             if (data.get("deposits_quantity") == 0) errors.push("El campo Cantidad de depósitos es obligatorio.");
             if (data.get("amount") == "0,00") errors.push("El campo Monto es obligatorio.");
+            if (data.get("rate") == "0,00") errors.push("El campo Tasa es obligatorio.");
     
             if (errors.length > 0) throw new Error(errors.join(";"));
     
@@ -35,6 +38,15 @@ export default function DepositorOutcomeWalletReportForm() {
     const handleReset = () => {
         setUser(null);
     }
+
+    const handleAmount = (value) => {
+        setAmount(value);
+    }
+    const handleRate = (value) => {
+        setRate(value);
+    }
+
+    const conversion = (amount * rate).toLocaleString("es-VE", {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     return (
         <form onSubmit={handleLocalSubmit} onReset={handleReset}>
@@ -55,11 +67,23 @@ export default function DepositorOutcomeWalletReportForm() {
                 </div>
             </div>
             <div className="row mb-3">
-            <div className="col-6">
+                <div className="col-6">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
-                    <DecimalInput id="amount" name="amount" />
-                    <input type="hidden" name="currency_id" value={country?.currency_id || session.country.currency.id} />
-                    <input type="hidden" name="currency" value={country?.currency || session.country.currency.shortcode} />
+                    <DecimalInput id="amount" name="amount" onChange={handleAmount} />
+                    <input type="hidden" name="currency_id" value={3} />
+                    <input type="hidden" name="currency" value="USD" />
+                </div>
+                <div className="col-6">
+                    <label htmlFor="rate" className="form-label">Tasa <span className="Required">*</span></label>
+                    <DecimalInput id="rate" name="rate" onChange={handleRate} />
+                </div>
+            </div>
+            <div className="row mb-3">
+                <div className="col-6">
+                    <label htmlFor="conversion" className="form-label">Conversión <span className="Required">*</span></label>
+                    <input type="text" name="conversion" id="conversion" value={conversion} readOnly className="form-control" />
+                    <input type="hidden" name="conversionCurrency_id" value={country?.currency_id || session.country.currency.id} />
+                    <input type="hidden" name="conversionCurrency" value={country?.currency || session.country.currency.shortcode} />
                 </div>
             </div>
             <div className="row mb-3">

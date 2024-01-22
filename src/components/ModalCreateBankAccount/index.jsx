@@ -68,8 +68,8 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
           <div className='container'>
             <div className='row'>
               <div className='d-flex flex-column'>
-                <span className='ModalTopTitle'>Crear nueva cuenta bancaria</span>
-                <span className='ModalTopSubTitle'>Esta pestaña le permite crear una nueva cuenta bancaria o de alguna otra plataforma monetaria.</span>
+                <span className='ModalTopTitle'>Registrar nueva cuenta bancaria</span>
+                <span className='ModalTopSubTitle'>Esta pestaña le permite registrar una nueva cuenta bancaria o de alguna otra plataforma monetaria.</span>
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleBankAccount} className='btn btn-primary' disabled={loading}>Crear cuenta</button>
+        <button onClick={handleBankAccount} className='btn btn-primary' disabled={loading}>Registrar cuenta</button>
       </Modal.Footer>
     </Modal>
   )
