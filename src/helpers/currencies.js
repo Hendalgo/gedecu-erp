@@ -32,3 +32,8 @@ export const deleteCurrency = async (id)=>{
     return error.response;
   }
 }
+
+export const getCurrencyById = async (id, query = "")=>{
+  const response = await API_INSTANCE.get(`${CURRENCIES_URL}/${id}?${query}`);
+  return response;
+}

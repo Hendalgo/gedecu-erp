@@ -33,7 +33,7 @@ const BanksSelect = ({
             <input type="hidden" id={id} name={name} value={value?.label || ""} />
             <Select
                 inputId={`${id}_id`}
-                name={`${name}_id`}
+                name={name && `${name}_id`}
                 options={banks}
                 placeholder={placeholder}
                 value={value}

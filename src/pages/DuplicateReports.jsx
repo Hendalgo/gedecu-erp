@@ -9,6 +9,7 @@ import { useFormatDate } from '../hooks/useFormatDate'
 import Welcome from '../components/Welcome'
 import TableLoader from '../components/Loaders/TableLoader'
 import AlertMessage from '../components/AlertMessage'
+import { DASHBOARD_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from '../consts/Routes'
 
 const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
@@ -152,7 +153,7 @@ const DuplicateReports = () => {
                         <td>{currency.shortcode} {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
                         { session.role_id === 1 && <td>
                           {
-                            !duplicate_status && <button className='btn bton-light border'>Verificar</button>
+                            !duplicate_status && <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>Verificar</button>
                           }
                         </td> }
                       </tr>)
