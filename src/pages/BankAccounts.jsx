@@ -66,7 +66,11 @@ const BankAccounts = () => {
 
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getBankAccounts(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setBanks(r))
+    let params = `order=created_at&order_by=desc&page=${offset.selected + 1}`;
+
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
+    getBankAccounts(params).then(r => setBanks(r))
   }
   const handleBank = (e) => {
     setModalEditShow(true)

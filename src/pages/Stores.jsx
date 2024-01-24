@@ -124,7 +124,7 @@ const Stores = () => {
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>
                         <td>{e.user ? e.user.name : "Sin encargado"}</td>
-                        <td>{e.country.currency.shortcode} {e.account.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
+                        <td>{e.country.currency.shortcode} {e.cash_balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
                         {
                           useCheckRole(session)
                           &&
