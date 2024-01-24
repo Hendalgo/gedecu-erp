@@ -77,3 +77,8 @@ export const getDuplicateById = async (id) => {
   const response = await API_INSTANCE.get(`${REPORTS_URL}/duplicated/${id}`);
   return response.data;
 }
+
+export const updateDuplicate = async (id, data) => {
+  const response = await API_INSTANCE.put(`${REPORTS_URL}/duplicated/${id}`, data);
+  return response.data;
+}

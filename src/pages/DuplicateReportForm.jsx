@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import Welcome from "../components/Welcome";
-import { getDuplicateById } from "../helpers/reports";
+import { getDuplicateById, updateDuplicate } from "../helpers/reports";
 import formsByCurrencyMap from "../consts/DuplicatedFormsByCurrency";
 import DecimalInput from "../components/DecimalInput";
 
@@ -41,7 +41,7 @@ export default function DuplicateReportForm() {
         setCurrency(parseInt(target.value));
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage((prev) => ({...prev, messages: null}));
 
@@ -53,23 +53,33 @@ export default function DuplicateReportForm() {
             if (formData.has("store") && !formData.get("store")) errors.push("El campo Local es obligatorio");
             if (formData.has("account") && !formData.get("account")) errors.push("El campo Cuenta es obligatorio");
             if (formData.has("amount") && formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio");
+            if (!formData.get("payment_date")) errors.push("El campo Fecha de pago es obligatorio");
             
             if (errors.length > 0) throw new Error(errors.join(";"));
 
-            const amount = new Number(formData.get("amount").replace(/\D/g, "")) / 100;
-
-            formData.set("amount", amount);
-
             const data = {};
-
             for (const [key, value] of formData.entries()) {
-                data[key] = value;
+                let formatedValue = value;
+                if (key === "amount") {
+                    formatedValue = new Number(formatedValue.replace(/\D/g, "")) / 100;
+                }
 
+                data[key] = formatedValue;
             }
-            console.log(JSON.stringify(data));
+            // console.log(JSON.stringify(data));
+            const {id} = params;
+            const response = await updateDuplicate(id, data);
+            console.log(response);
 
-        } catch ({ message }) {
-            setMessage({ messages: message.split(";"), variant: "danger" });
+        } catch ({ message, response }) {
+            let errorMessage;
+
+            if (response) {
+                errorMessage = [response.data.message];
+            } else {
+                errorMessage = message.split(";");
+            }
+            setMessage({ messages: errorMessage, variant: "danger" });
         }
     }
 
@@ -100,6 +110,10 @@ export default function DuplicateReportForm() {
                                         <div className="col-6">
                                             <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                                             <DecimalInput id="amount" name="amount" />
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="payment_date" className="form-label">Fecha de pago <span className="Required">*</span></label>
+                                            <input type="date" name="payment_date" id="payment_date" className="form-control" />
                                         </div>
                                     </div>
                                 }

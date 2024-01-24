@@ -104,7 +104,6 @@ export const BanksIndex = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Banco</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>País</th>
                         <th scope='col'>Tipo</th>
@@ -116,11 +115,6 @@ export const BanksIndex = () => {
                   banks.data.map(e => {
                     return (
                       <tr key={e.id}>
-                        <td scope='row'>
-                          <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
-                          </div>
-                        </td>
                         <td>{e.name}</td>
                         <td>{e.country.name}</td>
                         <td>{e.type.name}</td>

@@ -97,8 +97,8 @@ const DuplicateReports = () => {
     if (search) params += `&search=${search}`;
     if (reportType) params += `&completed=${reportType}`;
 
-    console.log(params);
     const duplicatesResponse = await getDuplicates(params);
+    setDuplicates(duplicatesResponse);
   }
 
   return (
@@ -152,9 +152,7 @@ const DuplicateReports = () => {
                         <td>Motivo</td>
                         <td>{currency.shortcode} {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
                         { session.role_id === 1 && <td>
-                          {
-                            !duplicate_status && <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>Verificar</button>
-                          }
+                          <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>{duplicate_status ? "Ver" : "Verificar"}</button>
                         </td> }
                       </tr>)
                     }

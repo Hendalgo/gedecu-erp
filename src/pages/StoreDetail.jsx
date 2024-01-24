@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import { getStore } from "../helpers/stores";
 import Welcome from "../components/Welcome";
+import { Alert } from "react-bootstrap";
 
 export default function StoreDetail() {
     const [store, setStore] = useState(null);
+    const [alert, setAlert] = useState({message: [], variant: "danger"});
     const { session } = useContext(SessionContext);
     const params = useParams();
 
@@ -15,18 +17,11 @@ export default function StoreDetail() {
         const fetchData = async () => {
             try {
                 const storeResponse = await getStore(id);
-    
-                if (!storeResponse) {
-                    // 404
-                }
-    
-                if (storeResponse.user_id !== session.id) {
-                    // forbidden
-                }
-    
                 setStore(storeResponse);
-            } catch (error) {
-                console.log(error);
+            } catch ({response}) {
+                const {message} = response.data;
+                console.log(message);
+                if (message) setAlert((prev) => ({...prev, message: [message]}));
             }
         }
 
@@ -37,7 +32,13 @@ export default function StoreDetail() {
         fetchData();
     }, [session.role_id]);
 
-    if (!store) return <></>;
+    if (!store) return <Alert show={alert.message.length > 0} variant={alert.variant} className="mt-3">
+        <ul>
+            {
+                alert.message.map((message, index) => <li key={index}>{message}</li>)
+            }
+        </ul>
+    </Alert>
 
     return (
         <>
@@ -47,17 +48,33 @@ export default function StoreDetail() {
             <section className="mb-3 card p-2">
                 <div className="row mb-3">
                     <div className="col">
-                        Nombre: {store.name}
+                        <h6>Nombre</h6>
+                        {store.name}
                     </div>
                     <div className="col">
-                        Dirección: {store.location}
+                        <h6>Encargado</h6>
+                        {store.user.name}
                     </div>
                 </div>
                 <div className="row mb-3">
-                <div className="col">
-                    Fecha de creación: {store.created_at}
+                    <div className="col">
+                        <h6>Dirección</h6>
+                        {store.location}
+                    </div>
+                    <div className="col">
+                        <h6>Fecha de creación</h6>
+                        {new Date(store.created_at).toLocaleString("es-VE", {hour12: true, day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}
+                    </div>
                 </div>
-                <div className="col"></div>
+                <div className="row mb-3">
+                    <div className="col">
+                        <h6>País</h6>
+                        {store.country.name}
+                    </div>
+                    <div className="col">
+                        <h6>Balance</h6>
+                        {store.cash_balance.currency.shortcode} {store.cash_balance.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}
+                    </div>
                 </div>
             </section>
             <section>
@@ -74,7 +91,7 @@ export default function StoreDetail() {
                     </thead>
                     <tbody>
                         {
-                            [].length > 0 ?
+                            store.accounts.length > 0 ?
                             <tr></tr> :
                             <tr>
                                 <td colSpan={6} className="text-center">No hay cuentas de banco asociadas a este local</td>

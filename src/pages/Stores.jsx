@@ -12,9 +12,13 @@ import ModalConfirmation from '../components/ModalConfirmation'
 import { useNavigate } from 'react-router-dom'
 import AlertMessage from '../components/AlertMessage'
 import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes'
+import FilterTableButtons from '../components/FilterTableButtons'
+import { getCountries } from '../helpers/countries'
 
 const Stores = () => {
   const { session } = useContext(SessionContext)
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState(false);
   const [store, setStore] = useState()
   const [alert, setAlert] = useState({
     show: false,
@@ -31,8 +35,9 @@ const Stores = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const storesResponse = await getStores(`order=created_at`);
+      const [storesResponse, countriesResponse] = await Promise.all([getStores(`order=created_at`), getCountries("paginated=no")]);
       setStores(storesResponse);
+      setCountries(countriesResponse.data);
     }
 
     if (session.role_id !== 1) {
@@ -41,6 +46,15 @@ const Stores = () => {
 
     fetchData();
   }, [session.role_id])
+
+  const handleCountryChange = async (option) => {
+    setOffset(1);
+    setCountry(option);
+    let params = `order=created_at${option ? `&country=${option}` : ""}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    const storesResponse = await getStores(params);
+    setStores(storesResponse);
+  }
 
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
@@ -53,9 +67,13 @@ const Stores = () => {
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
-    if (form.current.search !== '') {
-      getStores(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setStores(r))
+    let params = "order=created_at&order_by=desc";
+    if (form.current.search.value !== '') {
+      params += `&search=${form.current.search.value}`;
     }
+    if (country) params += `&country=${country}`;
+
+    getStores(params).then(r => setStores(r))
   }
   const handleDelete = (e)=>{
     deleteStore(e.id).then( e=>{
@@ -85,7 +103,7 @@ const Stores = () => {
       }
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8' />
+          <div className='col-8'><FilterTableButtons data={countries} callback={handleCountryChange} /></div>
           <div className='col-4'><SearchBar text='Locales' /></div>
         </form>
       </div>

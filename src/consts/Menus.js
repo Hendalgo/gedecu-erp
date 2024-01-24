@@ -83,12 +83,12 @@ export function NormalUserMenu(session = null) {
       title: 'Reportes',
       src: 'document-white-icon',
       link: `users/${session.id}/reports`,
-      others: [
-        {
-          name: 'Duplicados',
-          link: 'reports/' + REPORTS_DUPLICATE_ROUTE
-        }
-      ],
+      // others: [
+      //   {
+      //     name: 'Duplicados',
+      //     link: 'reports/' + REPORTS_DUPLICATE_ROUTE
+      //   }
+      // ],
       isActive: false
     },
   ];

@@ -45,7 +45,7 @@ const Users = () => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
     }
   }
   const handleChange = (offset) => {
@@ -73,8 +73,7 @@ const Users = () => {
         show: true
       })
     })
-    .catch(e =>{
-    });
+    .catch((e) => console.log(e));
   }
   return (
     <div className='container-fluid'>
