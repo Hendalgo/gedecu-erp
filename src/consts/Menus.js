@@ -83,12 +83,6 @@ export function NormalUserMenu(session = null) {
       title: 'Reportes',
       src: 'document-white-icon',
       link: `users/${session.id}/reports`,
-      // others: [
-      //   {
-      //     name: 'Duplicados',
-      //     link: 'reports/' + REPORTS_DUPLICATE_ROUTE
-      //   }
-      // ],
       isActive: false
     },
   ];
@@ -102,7 +96,7 @@ export function NormalUserMenu(session = null) {
     });
   }
 
-  if ([2,3,4].includes(session.role_id)) {
+  if ([2,4].includes(session.role_id)) {
     menu.push({
       title: 'Cuentas de banco',
       src: 'bank',

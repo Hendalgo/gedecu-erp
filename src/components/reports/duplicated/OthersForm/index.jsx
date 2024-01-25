@@ -26,7 +26,7 @@ export default function OthersForm() {
 
             currenciesResponse.forEach(({name, shortcode, id}) => {
                 if (id !== 2) {
-                    filteredCurrencies.push({label: `${name} (${shortcode})`, value: id});
+                    filteredCurrencies.push({label: `${name} (${shortcode})`, value: id, shortcode: shortcode});
                 }
             });
 
@@ -38,6 +38,7 @@ export default function OthersForm() {
 
     const handleCurrencyChange = async (option) => {
         setStore(null);
+        setCurrency(option);
 
         try {
             const storesResponse = await getCurrencyById(option.value, "stores=yes");
@@ -46,7 +47,6 @@ export default function OthersForm() {
             console.log(error)
         }
 
-        setCurrency(option);
     }
 
     const handleStoreChange = async (option) => {
@@ -74,11 +74,13 @@ export default function OthersForm() {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="paymentMethod" className="form-label">Medio de pago</label>
-                    <Select inputId="paymentMethod" name="paymentMethod" options={paymentMethods.current} value={paymentMethod} onChange={handlePaymentMethodChange} noOptionsMessage={() => "No hay coincidencias"} />
+                    <Select inputId="paymentMethod" name="paymentMethod_id" options={paymentMethods.current} value={paymentMethod} onChange={handlePaymentMethodChange} noOptionsMessage={() => "No hay coincidencias"} />
+                    <input type="hidden" name="paymentMethod" value={paymentMethod.label || ""} />
                 </div>
                 <div className="col">
                     <label htmlFor="currency" className="form-label">Divisa</label>
-                    <Select inputId="currency" name="currency" options={currencies} value={currency} placeholder="Seleccione una divisa" onChange={handleCurrencyChange} noOptionsMessage={() => "No hay coincidencias"} />
+                    <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Seleccione una divisa" onChange={handleCurrencyChange} noOptionsMessage={() => "No hay coincidencias"} />
+                    <input type="hidden" name="currency" value={currency.shortcode || ""} />
                 </div>
             </div>
             <div className="row mb-3">
@@ -93,7 +95,6 @@ export default function OthersForm() {
                 <div className="row mb-3">
                     <div className="col">
                         <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
-                        {/* <BankAccountsSelect id="account" name="account" value={account} onChange={setAccount} query={`&currency=${currency?.value || 0}`} disabled={!currency} /> */}
                         <Select isDisabled={accounts.length === 0} inputId="account_id" name="account_id" options={accounts} value={account} onChange={setAccount} placeholder="Seleccione la cuenta de banco" noOptionsMessage={() => "No hay coincidencias"} />
                         <input type="hidden" name="account" value={account?.label || ""} />
                     </div>

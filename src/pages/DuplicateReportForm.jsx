@@ -6,7 +6,8 @@ import Welcome from "../components/Welcome";
 import { getDuplicateById, updateDuplicate } from "../helpers/reports";
 import formsByCurrencyMap from "../consts/DuplicatedFormsByCurrency";
 import DecimalInput from "../components/DecimalInput";
-import { DASHBOARD_ROUTE, HOME_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from "../consts/Routes";
+import { DASHBOARD_ROUTE, HOME_ROUTE, } from "../consts/Routes";
+import DuplicateInfoCard from "../components/DuplicateInfoCard";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 
 export default function DuplicateReportForm() {
@@ -17,19 +18,23 @@ export default function DuplicateReportForm() {
     const params = useParams();
     const navigate = useNavigate();
 
+    const getDuplicate = async () => {
+        const {id} = params;
+        try {
+            const duplicateResponse = await getDuplicateById(id);
+            setDuplicate(duplicateResponse);
+        } catch ({response}) {
+            const {message, error} = response.data;
+            let errorMessages = [];
+            if (message) errorMessages.push(message);
+            console.log(message, error);
+            setMessage({messages: errorMessages, variant: "danger"});
+        }
+    }
+
     useEffect(() => {
         const fetchData = async () => {
-            const {id} = params;
-            try {
-                const duplicateResponse = await getDuplicateById(id);
-                setDuplicate(duplicateResponse);
-            } catch ({response}) {
-                const {message, error} = response.data;
-                let errorMessages = [];
-                if (message) errorMessages.push(message);
-                console.log(message, error);
-                setMessage({messages: errorMessages, variant: "danger"});
-            }
+            getDuplicate();
         }
 
         if (session.role_id !== 1) {
@@ -37,7 +42,7 @@ export default function DuplicateReportForm() {
         }
 
         fetchData();
-    }, [session.role_id, params]);
+    }, [session.role_id, params,]);
 
     const handleRadioChange = ({ target }) => {
         setMessage((prev) => ({...prev, messages: null}));
@@ -70,8 +75,6 @@ export default function DuplicateReportForm() {
                 data[key] = formatedValue;
             }
 
-            console.log(JSON.stringify(data));
-
             const {id} = params;
 
             const {message} = await updateDuplicate(id, data);
@@ -80,9 +83,8 @@ export default function DuplicateReportForm() {
 
             if (message) {
                 setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
-                navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}`);
+                getDuplicate();
             }
-
         } catch ({ message, response }) {
             let errorMessage;
 
@@ -98,34 +100,21 @@ export default function DuplicateReportForm() {
     if (!duplicate) return <></>;
 
     const duplicateData = JSON.parse(duplicate.duplicate_data);
-    
-    const rows = [];
-    if (duplicateData) {
-        const filteredFields = [];
+    const reportData = JSON.parse(duplicate.data);
+    const filteredRows = []; const reportRows = [];
 
-        Object.entries(duplicateData).forEach(([key, value]) => {
-            if (reportsColumnsMap.has(key)) {
-
-                let formatedValue = value;
-
-                if (key === "amount") {
-                    formatedValue = formatedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
-                }
-
-                if (key === "date") {
-                    formatedValue = new Date(formatedValue).toLocaleString("es-VE");
-                }
-
-                filteredFields.push([reportsColumnsMap.get(key), formatedValue]);
-            }
-        })
-
-        const segments = Math.floor(filteredFields.length / 2);
-
-        for (let index = 0; index <= segments; index++) {
-            const doubleIndex = index * 2;
-            rows.push(filteredFields.slice(doubleIndex, doubleIndex + 2));
+    Object.entries(reportData).forEach(([key, value]) => {
+        if (!["isDuplicated", "amount", "currency"].includes(key) && reportsColumnsMap.has(key)) {
+            let formatedValue = value;
+            filteredRows.push([reportsColumnsMap.get(key), formatedValue]);
         }
+    })
+
+    const segments = Math.floor(filteredRows.length / 2);
+
+    for (let index = 0; index <= segments; index++) {
+        const doubleIndex = index * 2;
+        reportRows.push(filteredRows.slice(doubleIndex, doubleIndex + 2));
     }
 
     return (
@@ -137,48 +126,62 @@ export default function DuplicateReportForm() {
                 <div className="col-7">
                     <Card>
                         <Card.Header>Datos de recuperación</Card.Header>
-                        <form onSubmit={handleSubmit}>
-                            <Card.Body>
-                                <div className="row">
-                                    <div className="col">
-                                        <Form.Check type="radio" id="bolivars" name="currencies" value={1} label="Bolívares" inline onChange={handleRadioChange} />
-                                        <Form.Check type="radio" id="others" name="currencies" value={2} label="Otros" inline onChange={handleRadioChange} />
-                                    </div>
-                                </div>
-                                {
-                                    formsByCurrencyMap.has(currency) && formsByCurrencyMap.get(currency)
-                                }
-                                {
-                                    currency > 0 && <div className="row">
-                                        <div className="col-6">
-                                            <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
-                                            <DecimalInput id="amount" name="amount" />
-                                        </div>
-                                        <div className="col-6">
-                                            <label htmlFor="date" className="form-label">Fecha de pago <span className="Required">*</span></label>
-                                            <input type="date" name="date" id="date" className="form-control" />
+                        {
+                            duplicate.duplicate_status ?
+                            <DuplicateInfoCard data={duplicateData} /> :
+                            <form onSubmit={handleSubmit}>
+                                <Card.Body>
+                                    <div className="row">
+                                        <div className="col">
+                                            <Form.Check type="radio" id="bolivars" name="currencies" value={1} label="Bolívares" inline onChange={handleRadioChange} />
+                                            <Form.Check type="radio" id="others" name="currencies" value={2} label="Otros" inline onChange={handleRadioChange} />
                                         </div>
                                     </div>
-                                }
-                                <Alert show={message.messages?.length > 0} variant={message.variant} className="mt-3">
-                                    <ul>
-                                        {
-                                            message.messages?.map((message, index) => {
-                                                return <li key={index}>{message}</li>
-                                            })
-                                        }
-                                    </ul>
-                                </Alert>
-                            </Card.Body>
-                            <Card.Footer className="text-end">
-                                <input type="submit" value="Verificar" className="col-4 btn btn-success" disabled={currency == 0 || duplicate.duplicate_status} />
-                            </Card.Footer>
-                        </form>
+                                    {
+                                        formsByCurrencyMap.has(currency) && formsByCurrencyMap.get(currency)
+                                    }
+                                    {
+                                        currency > 0 && <div className="row">
+                                            <div className="col-6">
+                                                <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
+                                                <DecimalInput id="amount" name="amount" />
+                                            </div>
+                                            <div className="col-6">
+                                                <label htmlFor="date" className="form-label">Fecha de pago <span className="Required">*</span></label>
+                                                <input type="date" name="date" id="date" className="form-control" />
+                                            </div>
+                                        </div>
+                                    }
+                                    <Alert show={message.messages?.length > 0} variant={message.variant} className="mt-3">
+                                        <ul>
+                                            {
+                                                message.messages?.map((message, index) => {
+                                                    return <li key={index}>{message}</li>
+                                                })
+                                            }
+                                        </ul>
+                                    </Alert>
+                                </Card.Body>
+                                <Card.Footer className="text-end">
+                                    <input type="submit" value="Verificar" className="col-4 btn btn-success" disabled={currency == 0 || duplicate.duplicate_status} />
+                                </Card.Footer>
+                            </form>
+                        }
                     </Card>
                 </div>
                 <div className="col-5">
                     <Card>
                         <Card.Body>
+                            {
+                                reportRows.map((row, index) => <div key={index} className="row">
+                                    {
+                                        row.map(([key, value]) => <div key={key} className="col">
+                                            <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600, textTransform: "uppercase"}}>{key}:</h6>
+                                            <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{value}</p>
+                                        </div>)
+                                    }
+                                </div>)
+                            }
                             <div className="row">
                                 <div className="col">
                                     <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>RESPONSABLE:</h6>
@@ -213,18 +216,6 @@ export default function DuplicateReportForm() {
                         </Card.Body>
                     </Card>
                 </div>
-            </section>
-            <section>
-                {
-                    duplicateData && rows.map((row, index) => <div key={index} className="row mb-3">
-                        {
-                            row.map(([key, value]) => <div key={key} className="col">
-                                <h6>{key}</h6>
-                                {value}
-                            </div>)
-                        }
-                    </div>)
-                }
             </section>
         </>
     )
