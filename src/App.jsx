@@ -23,6 +23,7 @@ import ReportDetail from './pages/ReportDetail'
 import DuplicateReportForm from './pages/DuplicateReportForm'
 import StoreDetail from './pages/StoreDetail'
 import UsersBalance from './pages/UsersBalance'
+import BankAccountForm from './pages/BankAccountForm'
 
 function App () {
   const { session, verifySession } = useContext(SessionContext)
@@ -59,6 +60,7 @@ function App () {
               <Route path={`${STORES_ROUTE}`} >
                 <Route index element={<Stores />} />
                 <Route path={`:id`} element={<StoreDetail />} />
+                <Route path={`:storeId/${BANK_ACCOUNTS_ROUTE}`} element={<BankAccountForm />} />
               </Route>
               <Route path={`${BANKS_ROUTE}`} element={<Banks/>}>
                 <Route index element={<BanksIndex/>}/>

@@ -1,15 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import { getStore } from "../helpers/stores";
 import Welcome from "../components/Welcome";
 import { Alert } from "react-bootstrap";
+import FilterTableButtons from "../components/FilterTableButtons";
+import PaginationTable from "../components/PaginationTable";
 
 export default function StoreDetail() {
     const [store, setStore] = useState(null);
     const [alert, setAlert] = useState({message: [], variant: "danger"});
     const { session } = useContext(SessionContext);
     const params = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const { id } = params;
@@ -43,41 +46,36 @@ export default function StoreDetail() {
     return (
         <>
             <section className="mb-3">
-                <Welcome showButton={false} text="Local" />
+                <Welcome showButton={false} text={store.name} />
             </section>
-            <section className="mb-3 card p-2">
-                <div className="row mb-3">
-                    <div className="col">
-                        <h6>Nombre</h6>
-                        {store.name}
+            <section className="mb-3 p-2">
+                <h5 style={{ color: "var(--blue-800)" }}>Información</h5>
+                <div className="row justify-content-start">
+                    <div className="col-3 text-center card py-3">
+                        <p style={{color: "var(--bs-gray-600)"}}>{store.country.name} - {store.country.shortcode}</p>
                     </div>
-                    <div className="col">
-                        <h6>Encargado</h6>
-                        {store.user.name}
+                    <div className="col-3 card mx-4 py-3">
+                        <p style={{color: "var(--bs-gray-600)"}}>Dirección</p>
+                        <p className="fw-semibold">{store.location}</p>
                     </div>
-                </div>
-                <div className="row mb-3">
-                    <div className="col">
-                        <h6>Dirección</h6>
-                        {store.location}
-                    </div>
-                    <div className="col">
-                        <h6>Fecha de creación</h6>
-                        {new Date(store.created_at).toLocaleString("es-VE", {hour12: true, day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}
-                    </div>
-                </div>
-                <div className="row mb-3">
-                    <div className="col">
-                        <h6>País</h6>
-                        {store.country.name}
-                    </div>
-                    <div className="col">
-                        <h6>Balance</h6>
-                        {store.cash_balance.currency.shortcode} {store.cash_balance.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}
+                    <div className="col-3 card py-3">
+                        <p style={{color: "var(--bs-gray-600)"}}>Efectivo</p>
+                        <p className="fw-semibold">{store.cash_balance.currency.shortcode} {store.cash_balance.balance.toLocaleString("es-VE")}</p>
                     </div>
                 </div>
             </section>
             <section>
+                <div className="row justify-content-between mb-3">
+                    <div className="col-8">
+                        <FilterTableButtons />
+                    </div>
+                    <div className="col-4 text-end">
+                        <button type="button" className="btn btn-outline-primary" onClick={() => navigate(`/dashboard/stores/10/accounts`)}>Registrar cuenta</button>
+                    </div>
+                </div>
+                <div className="row mb-3">
+                        <PaginationTable handleChange={() => null} itemOffset={1} itemsTotal={0} text="cuentas" />
+                </div>
                 <table className="table table-striped tableP">
                     <thead>
                         <tr>
