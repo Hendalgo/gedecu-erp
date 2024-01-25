@@ -30,7 +30,7 @@ const DuplicateReports = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const duplicatesResponse = await getDuplicates();
+        const duplicatesResponse = await getDuplicates(`order=created_at&order_by=desc`);
         setDuplicates(duplicatesResponse);
       } catch ({response}) {
         let errorMessage = "";

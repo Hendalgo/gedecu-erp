@@ -1,11 +1,13 @@
 import { Alert, Card, Form } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import Welcome from "../components/Welcome";
 import { getDuplicateById, updateDuplicate } from "../helpers/reports";
 import formsByCurrencyMap from "../consts/DuplicatedFormsByCurrency";
 import DecimalInput from "../components/DecimalInput";
+import { DASHBOARD_ROUTE, HOME_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from "../consts/Routes";
+import reportsColumnsMap from "../consts/ReportsColumnsMap";
 
 export default function DuplicateReportForm() {
     const [duplicate, setDuplicate] = useState(null);
@@ -13,6 +15,7 @@ export default function DuplicateReportForm() {
     const [message, setMessage] = useState({messages: null, variant: "danger"});
     const { session } = useContext(SessionContext);
     const params = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,7 +33,7 @@ export default function DuplicateReportForm() {
         }
 
         if (session.role_id !== 1) {
-            // redirect
+            navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
         }
 
         fetchData();
@@ -53,7 +56,7 @@ export default function DuplicateReportForm() {
             if (formData.has("store") && !formData.get("store")) errors.push("El campo Local es obligatorio");
             if (formData.has("account") && !formData.get("account")) errors.push("El campo Cuenta es obligatorio");
             if (formData.has("amount") && formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio");
-            if (!formData.get("payment_date")) errors.push("El campo Fecha de pago es obligatorio");
+            if (!formData.get("date")) errors.push("El campo Fecha de pago es obligatorio");
             
             if (errors.length > 0) throw new Error(errors.join(";"));
 
@@ -66,10 +69,19 @@ export default function DuplicateReportForm() {
 
                 data[key] = formatedValue;
             }
-            // console.log(JSON.stringify(data));
+
+            console.log(JSON.stringify(data));
+
             const {id} = params;
-            const response = await updateDuplicate(id, data);
-            console.log(response);
+
+            const {message} = await updateDuplicate(id, data);
+
+            console.log(message);
+
+            if (message) {
+                setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
+                navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}`);
+            }
 
         } catch ({ message, response }) {
             let errorMessage;
@@ -84,6 +96,37 @@ export default function DuplicateReportForm() {
     }
 
     if (!duplicate) return <></>;
+
+    const duplicateData = JSON.parse(duplicate.duplicate_data);
+    
+    const rows = [];
+    if (duplicateData) {
+        const filteredFields = [];
+
+        Object.entries(duplicateData).forEach(([key, value]) => {
+            if (reportsColumnsMap.has(key)) {
+
+                let formatedValue = value;
+
+                if (key === "amount") {
+                    formatedValue = formatedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
+                }
+
+                if (key === "date") {
+                    formatedValue = new Date(formatedValue).toLocaleString("es-VE");
+                }
+
+                filteredFields.push([reportsColumnsMap.get(key), formatedValue]);
+            }
+        })
+
+        const segments = Math.floor(filteredFields.length / 2);
+
+        for (let index = 0; index <= segments; index++) {
+            const doubleIndex = index * 2;
+            rows.push(filteredFields.slice(doubleIndex, doubleIndex + 2));
+        }
+    }
 
     return (
         <>
@@ -112,8 +155,8 @@ export default function DuplicateReportForm() {
                                             <DecimalInput id="amount" name="amount" />
                                         </div>
                                         <div className="col-6">
-                                            <label htmlFor="payment_date" className="form-label">Fecha de pago <span className="Required">*</span></label>
-                                            <input type="date" name="payment_date" id="payment_date" className="form-control" />
+                                            <label htmlFor="date" className="form-label">Fecha de pago <span className="Required">*</span></label>
+                                            <input type="date" name="date" id="date" className="form-control" />
                                         </div>
                                     </div>
                                 }
@@ -170,6 +213,18 @@ export default function DuplicateReportForm() {
                         </Card.Body>
                     </Card>
                 </div>
+            </section>
+            <section>
+                {
+                    duplicateData && rows.map((row, index) => <div key={index} className="row mb-3">
+                        {
+                            row.map(([key, value]) => <div key={key} className="col">
+                                <h6>{key}</h6>
+                                {value}
+                            </div>)
+                        }
+                    </div>)
+                }
             </section>
         </>
     )

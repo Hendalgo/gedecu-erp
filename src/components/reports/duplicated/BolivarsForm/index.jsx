@@ -10,13 +10,20 @@ export default function BolivarsForm() {
 
     const handleBankChange = async (option) => {
         setBank(option);
-        const accountsResponse = await getBankAccounts(`paginated=no&bank=${option.value}`);
-        setAccounts(accountsResponse.map(({id, name}) => ({label: name, value: id})));
+        setAccounts([]);
+        setAccount(null);
+
+        if (option) {
+            const accountsResponse = await getBankAccounts(`paginated=no&bank=${option.value}`);
+            setAccounts(accountsResponse.map(({id, name, identifier}) => ({label: `${identifier} - ${name}`, value: id})));
+        }
     }
 
     return (
         <>
             <div className="row mb-3">
+                <input type="hidden" name="currency_id" value={2} />
+                <input type="hidden" name="currency" value={"VES"} />
                 <div className="col">
                     <label htmlFor="bank_id" className="form-label">Banco</label>
                     <BanksSelect id="bank" name="bank" query="&country=2" value={bank} onChange={handleBankChange} />

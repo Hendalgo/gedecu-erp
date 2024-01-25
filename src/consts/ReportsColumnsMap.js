@@ -19,5 +19,6 @@ reportsColumnsMap.set("currency", "Moneda");
 reportsColumnsMap.set("conversionCurrency", "Moneda conversión");
 reportsColumnsMap.set("paymentMethod", "Medio de pago");
 reportsColumnsMap.set("deposits_quantity", "Cantidad de depósitos");
+reportsColumnsMap.set("date", "Fecha");
 
 export default reportsColumnsMap;
