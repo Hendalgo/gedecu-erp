@@ -13,6 +13,7 @@ import { getBanks } from '../helpers/banks';
 import FilterTableButtons from '../components/FilterTableButtons';
 import { useNavigate } from 'react-router-dom';
 import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes';
+import { formatAmount } from '../utils/amount';
 
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
@@ -144,7 +145,7 @@ const BankAccounts = () => {
                         </td>
                         <th>{e.user.name}</th>
                         <td>{e.name}</td>
-                        <td>{`${e.currency.shortcode} ${e.balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}`}</td>
+                        <td>{formatAmount(e.balance, e.currency.shortcode)}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
                         <td>

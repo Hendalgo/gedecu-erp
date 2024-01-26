@@ -9,6 +9,7 @@ import DecimalInput from "../components/DecimalInput";
 import { DASHBOARD_ROUTE, HOME_ROUTE, } from "../consts/Routes";
 import DuplicateInfoCard from "../components/DuplicateInfoCard";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
+import { formatAmount } from "../utils/amount";
 
 export default function DuplicateReportForm() {
     const [duplicate, setDuplicate] = useState(null);
@@ -195,7 +196,7 @@ export default function DuplicateReportForm() {
                             <div className="row">
                                 <div className="col">
                                     <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MONTO:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{duplicate.currency.shortcode} {duplicate.amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</p>
+                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{formatAmount(duplicate.amount, duplicate.currency.shortcode)}</p>
                                 </div>
                                 <div className="col">
                                     <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ID REPORTE:</h6>

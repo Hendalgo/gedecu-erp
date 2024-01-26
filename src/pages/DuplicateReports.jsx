@@ -4,12 +4,12 @@ import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
 import { useNavigate } from 'react-router-dom'
-import { getDuplicates, getReportTypes, getReports, updateReport } from '../helpers/reports'
-import { useFormatDate } from '../hooks/useFormatDate'
+import { getDuplicates, } from '../helpers/reports'
 import Welcome from '../components/Welcome'
 import TableLoader from '../components/Loaders/TableLoader'
 import AlertMessage from '../components/AlertMessage'
 import { DASHBOARD_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from '../consts/Routes'
+import { formatAmount } from '../utils/amount'
 
 const DuplicateReports = () => {
   const { session } = useContext(SessionContext)
@@ -27,46 +27,9 @@ const DuplicateReports = () => {
   const [duplicates, setDuplicates] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const duplicatesResponse = await getDuplicates(`order=created_at&order_by=desc`);
-        setDuplicates(duplicatesResponse);
-      } catch ({response}) {
-        let errorMessage = "";
-        const {error} = response.data;
-        if (error) errorMessage = error;
-        setAlert({message: errorMessage, variant: "danger"});
-      }
-    }
-    fetchData();
-  }, []);
-
-  const handleChange = async (offset) => {
-    const newOffset = offset.selected;
-    setOffset(newOffset);
-
-    let params = `order=created_at&order_by=desc&page=${newOffset}`;
-
-    if (date) params += `&date=${date}`;
-    if (search) params += `&search=${search}`;
-    if (reportType) params += `&completed=${reportType}`;
-
-    const duplicatesResponse = await getDuplicates(params);
-  }
-
-  const handleType = async (e) => {
-    setOffset(1);
-    setReportType(e);
-
-    let params = `order=created_at&order_by=desc${e ? `&completed=${e}` : ""}`;
-
-    if (date) params += `&date=${date}`;
-    if (search) params += `&search=${search}`;
-
+  const fetchDuplicates = async (query = "") => {
     try {
-      const duplicatesResponse = await getDuplicates(params);
-      setDuplicates(duplicatesResponse);
+      return await getDuplicates(`order=created_at&order_by=desc${query}`);
     } catch ({response}) {
       let errorMessage = "";
       const {error} = response.data;
@@ -75,30 +38,61 @@ const DuplicateReports = () => {
     }
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setDuplicates(await fetchDuplicates());
+    }
+
+    fetchData();
+  }, []);
+
+  const handleChange = async (offset) => {
+    const newOffset = offset.selected;
+    setOffset(newOffset);
+
+    let params = `&page=${newOffset}`;
+
+    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
+    if (search) params += `&search=${search}`;
+    if (reportType) params += `&completed=${reportType}`;
+
+    setDuplicates(await fetchDuplicates(params));
+  }
+
+  const handleType = async (e) => {
+    setOffset(1);
+    setReportType(e);
+
+    let params = `${e ? `&completed=${e}` : ""}`;
+
+    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
+    if (search) params += `&search=${search}`;
+
+    setDuplicates(await fetchDuplicates(params));
+  }
+
   const handleSearch = async (e) => {
     e.preventDefault();
     setOffset(1);
 
-    let params = `order=created_at&order_by=desc${search ? `&search=${search}` : ""}`;
+    let params = `${search ? `&search=${search}` : ""}`;
 
-    if (date) params += `&date=${date}`;
+    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
     if (reportType) params += `&completed=${reportType}`;
 
-    const duplicatesResponse = await getDuplicates(params);
-    setDuplicates(duplicatesResponse);
+    setDuplicates(await fetchDuplicates(params));
   }
 
   const handleDate = async (e) => {
     e.preventDefault();
     setOffset(1);
 
-    let params = `order=created_at&order_by=desc${date ? `&date=${date}` : ""}`;
+    let params = `${date ? `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}` : ""}`;
 
     if (search) params += `&search=${search}`;
     if (reportType) params += `&completed=${reportType}`;
 
-    const duplicatesResponse = await getDuplicates(params);
-    setDuplicates(duplicatesResponse);
+    setDuplicates(await fetchDuplicates(params));
   }
 
   return (
@@ -146,21 +140,19 @@ const DuplicateReports = () => {
                   </thead>
                   <tbody>
                     {
-                      duplicates.data.map(({id, report, created_at, currency, amount, duplicate_status}) => <tr key={id}>
-                        <td>{report.user.name} ({report.user.email})</td>
-                        <td>{new Date(created_at).toLocaleString("es-VE", {hour12: true, year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}</td>
-                        <td>{report.type.name}</td>
-                        <td>{currency.shortcode} {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
-                        { session.role_id === 1 && <td>
-                          <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>{duplicate_status ? "Ver" : "Verificar"}</button>
-                        </td> }
-                      </tr>)
+                      duplicates.data.map(({id, report, created_at, currency, amount, duplicate_status}) => {
+                        const reportTypeStyle = JSON.parse(report.type.config);
+                        return <tr key={id}>
+                          <td>{report.user.name} ({report.user.email})</td>
+                          <td>{new Date(created_at).toLocaleString("es-VE", {hour12: true, year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}</td>
+                          <td><span style={{...reportTypeStyle.styles}} className='p-1 rounded'>{report.type.name}</span></td>
+                          <td>{formatAmount(amount, currency.shortcode)}</td>
+                          { session.role_id === 1 && <td>
+                            <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>{duplicate_status ? "Ver" : "Verificar"}</button>
+                          </td> }
+                        </tr>
+                      })
                     }
-                    {/* {
-                      reports.data.map(e => {
-                    const color = JSON.parse(e.type.config).styles
-                    let currency = e.bank_account.bank.currency.symbol
-                } */}
                   </tbody>
                 </table>
               </div>

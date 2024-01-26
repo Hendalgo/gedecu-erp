@@ -25,9 +25,17 @@ export const ReportsIndex = () => {
   const form = useRef()
   const navigate = useNavigate();
 
+  const fetchReports = async (query = ``) => {
+    try {
+      return await getReports(`order=created_at&order_by=desc${query}`);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
-      const [reportTypesResponse, reportsResponse] = await Promise.all([getReportTypes(`paginated=no`), getReports('order=created_at&order_by=desc'),]);
+      const [reportTypesResponse, reportsResponse] = await Promise.all([getReportTypes(`paginated=no`), fetchReports(),]);
       if (reportTypesResponse) setReportType(reportTypesResponse);
       if (reportsResponse) setReports(reportsResponse);
     }
@@ -61,8 +69,11 @@ export const ReportsIndex = () => {
   const handleDate = (e) => {
     e.preventDefault()
     setOffset(1);
+    let params = `${date ? `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}` : ""}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    if (form.current.filter_type.value != "false") params += `&type_id=${form.current.filter_type.value}`;
 
-    getReports(`date=${date}&search=${form.current.search.value}${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}`)
+    fetchReports(params)
     .then(r => setReports(r))
     .catch(e => console.error(e))
   }

@@ -53,7 +53,8 @@ export default function OthersForm() {
         setStore(option);
         if (paymentMethod.value === 2) {
             try {
-                await getBankAccounts(`currency=${currency.value}&store=${option.value}`);
+                const accountsResponse = await getBankAccounts(`paginated=no&currency=${currency.value}&store=${option.value}`);
+                setAccounts(accountsResponse.map(({name, identifier, id}) => ({label: `${name} - ${identifier}`, value: id})));
             } catch (error) {
                 console.log(error)
             }
@@ -80,7 +81,7 @@ export default function OthersForm() {
                 <div className="col">
                     <label htmlFor="currency" className="form-label">Divisa</label>
                     <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Seleccione una divisa" onChange={handleCurrencyChange} noOptionsMessage={() => "No hay coincidencias"} />
-                    <input type="hidden" name="currency" value={currency.shortcode || ""} />
+                    <input type="hidden" name="currency" value={currency?.shortcode || ""} />
                 </div>
             </div>
             <div className="row mb-3">
