@@ -3,7 +3,7 @@ import { SessionContext } from '../context/SessionContext'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getDuplicates, getReportTypes, getReports, updateReport } from '../helpers/reports'
 import { useFormatDate } from '../hooks/useFormatDate'
 import Welcome from '../components/Welcome'
@@ -18,8 +18,8 @@ const DuplicateReports = () => {
   const [alert, setAlert] = useState({message: "", variant: "danger"});
   
   const reportsTypes = [
-    { id: 'yes', name: 'Correcto' },
-    { id: 'no', name: 'Cancelado' }
+    { id: 'yes', name: 'Verificados' },
+    { id: 'no', name: 'Sin verificar' }
   ]
   const [reportType, setReportType] = useState(false);
   const [date, setDate] = useState("");
@@ -149,7 +149,7 @@ const DuplicateReports = () => {
                       duplicates.data.map(({id, report, created_at, currency, amount, duplicate_status}) => <tr key={id}>
                         <td>{report.user.name} ({report.user.email})</td>
                         <td>{new Date(created_at).toLocaleString("es-VE", {hour12: true, year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}</td>
-                        <td>Motivo</td>
+                        <td>{report.type.name}</td>
                         <td>{currency.shortcode} {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
                         { session.role_id === 1 && <td>
                           <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>{duplicate_status ? "Ver" : "Verificar"}</button>

@@ -5,12 +5,8 @@ export const getBankAccounts = async (querys = "")=>{
   return request.data
 }
 export const createBankAccount = async(form)=>{
-  try {
-    const request = await API_INSTANCE.post(BANK_ACCOUNTS_URL, form)
-    return request
-  } catch (error) {
-    return error.response
-  }
+  const request = await API_INSTANCE.post(BANK_ACCOUNTS_URL, form);
+  return request;
 }
 
 export const updateBankAccount = async(id, form)=>{
