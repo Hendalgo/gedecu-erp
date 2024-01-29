@@ -77,8 +77,8 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
             <div className='container'>
               <div className='row'>
                 <div className='d-flex flex-column'>
-                  <span className='ModalTopTitle'>Editar usuario</span>
-                  <span className='ModalTopSubTitle'>Esta pestaña le permite editar un usuario existente</span>
+                  <span className='ModalTopTitle'>Editar banco</span>
+                  <span className='ModalTopSubTitle'>Esta pestaña le permite editar un banco existente</span>
                 </div>
               </div>
             </div>
