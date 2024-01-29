@@ -1,4 +1,4 @@
-import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, REPORTS_TYPE_ROUTE, CURRENCIES_ROUTE } from "./Routes"
+import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, CURRENCIES_ROUTE } from "./Routes"
 
 export const AdminMenus = [
   {
@@ -20,10 +20,6 @@ export const AdminMenus = [
         name: 'Inconsistencias',
         link: 'reports/' + REPORTS_MISS_ROUTE
       },
-      {
-        name: 'Tipos de reportes',
-        link: 'reports/' + REPORTS_TYPE_ROUTE
-      }
     ],
     isActive: false
   },
