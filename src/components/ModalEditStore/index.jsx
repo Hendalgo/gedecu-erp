@@ -36,7 +36,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
       const data = {};
 
       for (const [key, val] of formData.entries()) {
-        data[key] = val;
+        data[key] = val.trim();
       }
 
       const request = await updateStore(store.id, data);

@@ -35,7 +35,12 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
     setLoading(true);
     try {
       const formData = new FormData(form.current);
+
+      const name = formData.get("name").trim();
+      formData.set("name", name);
+
       formData.set("balance", new Number(formData.get("balance").replace(/\D/g, "")) / 100);
+
       const request = await createStore(formData);
 
       switch (request.status) {
