@@ -67,25 +67,36 @@ export default function DuplicateReportForm() {
             if (errors.length > 0) throw new Error(errors.join(";"));
 
             const data = {};
+
             for (const [key, value] of formData.entries()) {
                 let formatedValue = value;
+
                 if (key === "amount") {
                     formatedValue = new Number(formatedValue.replace(/\D/g, "")) / 100;
+                }
+                if (key === "date") {
+                    const date = new Date(formatedValue);
+                    console.log(date, date.toISOString());
+                    const minutes = date.getUTCMinutes();
+                    const timeZoneOffset = date.getTimezoneOffset();
+                    date.setMinutes(minutes + timeZoneOffset);
+                    console.log(date, date.toISOString());
+                    formatedValue = date.toISOString();
                 }
 
                 data[key] = formatedValue;
             }
 
-            const {id} = params;
+            // const {id} = params;
 
-            const {message} = await updateDuplicate(id, data);
+            // const {message} = await updateDuplicate(id, data);
 
-            console.log(message);
+            // console.log(message);
 
-            if (message) {
-                setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
-                getDuplicate();
-            }
+            // if (message) {
+            //     setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
+            //     getDuplicate();
+            // }
         } catch ({ message, response }) {
             let errorMessage;
 

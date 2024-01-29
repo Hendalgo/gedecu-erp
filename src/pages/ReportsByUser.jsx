@@ -6,6 +6,7 @@ import Welcome from "../components/Welcome";
 import PaginationTable from "../components/PaginationTable";
 import { useNavigate, useParams } from "react-router-dom";
 import { DASHBOARD_ROUTE, REPORTS_ROUTE } from "../consts/Routes";
+import { useFormatDate } from "../hooks/useFormatDate";
 
 export default function ReportsByUser() {
     const [reports, setReports] = useState(null);
@@ -106,7 +107,7 @@ export default function ReportsByUser() {
                                     : reports.data.map(({ id, created_at, type }) => {
                                         return <tr key={id}>
                                             <td>#{id.toString().padStart(6, "0")}</td>
-                                            <td>{new Date(created_at).toLocaleString("es-VE")}</td>
+                                            <td>{useFormatDate(created_at)}</td>
                                             <td>{type.name}</td>
                                             <td>
                                                 <button className='btn' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${id}`)}>

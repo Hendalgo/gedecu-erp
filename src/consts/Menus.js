@@ -96,7 +96,7 @@ export function NormalUserMenu(session = null) {
     });
   }
 
-  if ([2,4].includes(session.role_id)) {
+  if ([2,].includes(session.role_id)) {
     menu.push({
       title: 'Cuentas de banco',
       src: 'bank',

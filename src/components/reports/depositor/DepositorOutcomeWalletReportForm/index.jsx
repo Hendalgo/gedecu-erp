@@ -37,6 +37,8 @@ export default function DepositorOutcomeWalletReportForm() {
 
     const handleReset = () => {
         setUser(null);
+        setAmount(0);
+        setRate(0);
     }
 
     const handleAmount = (value) => {
@@ -80,10 +82,11 @@ export default function DepositorOutcomeWalletReportForm() {
             </div>
             <div className="row mb-3">
                 <div className="col-6">
-                    <label htmlFor="conversion" className="form-label">Conversión <span className="Required">*</span></label>
+                    <label htmlFor="conversion" className="form-label">Conversión</label>
                     <input type="text" name="conversion" id="conversion" value={conversion} readOnly className="form-control" />
                     <input type="hidden" name="conversionCurrency_id" value={country?.currency_id || session.country.currency.id} />
                     <input type="hidden" name="conversionCurrency" value={country?.currency || session.country.currency.shortcode} />
+                    <input type="hidden" name="convert_amount" defaultValue={true} />
                 </div>
             </div>
             <div className="row mb-3">

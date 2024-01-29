@@ -46,7 +46,7 @@ const TypeTwoIncomeTransferenceReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query={`&country=${country?.value || session.country_id}`}
+                        query={`&type=1${country?.value ? `&country=${country.value}` : ""}`}
                         onChange={setBankAccount}
                         onError={setError} />
                 </div>

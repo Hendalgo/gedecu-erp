@@ -210,11 +210,11 @@ export default function ReportForm() {
             return !metaData || metaData?.type == report;
         })
 
-        if (report == 1 || report == 3 || report == 5) {
+        if (report == 1 || report == 3) {
             return filteredReports.map(({ name, id, }) => ({ label: name, value: id }));
         }
         
-        if (report == 2) {
+        if ([2,5].includes(report)) {
             const incomeReports = []; const expenseReports = [];
 
             filteredReports.forEach((type) => {
@@ -408,7 +408,6 @@ export default function ReportForm() {
 
     const postReport = async () => {
         setIsLoading(true);
-        console.log(reportType.value, subreports.current);
 
         try {
             const response = await createReport({
@@ -428,7 +427,6 @@ export default function ReportForm() {
             }
         } catch ({message, error, response}) {
             let errorsMessages = [];
-            console.log(message, error, response);
             if (error) {
                 errorsMessages = Object.values(error).flat();
             }
@@ -477,7 +475,7 @@ export default function ReportForm() {
                 </div>
                 <div className="row justify-content-end py-2">
                     {
-                        ((country && country.value !== 2) || (!country && session.country_id !== 2)) &&
+                        ((country && country.value !== 2) || (!country && session.role_id == 3)) &&
                         <Select
                             inputId="reportTypes"
                             name="reportTypes"

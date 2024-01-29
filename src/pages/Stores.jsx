@@ -14,6 +14,7 @@ import AlertMessage from '../components/AlertMessage'
 import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes'
 import FilterTableButtons from '../components/FilterTableButtons'
 import { getCountries } from '../helpers/countries'
+import { formatAmount } from '../utils/amount'
 
 const Stores = () => {
   const { session } = useContext(SessionContext)
@@ -142,7 +143,7 @@ const Stores = () => {
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>
                         <td>{e.user ? e.user.name : "Sin encargado"}</td>
-                        <td>{e.country.currency.shortcode} {e.cash_balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
+                        <td>{formatAmount(e.cash_balance, e.country.currency.shortcode)}</td>
                         {
                           useCheckRole(session)
                           &&

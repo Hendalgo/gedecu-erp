@@ -21,7 +21,7 @@ export default function BankAccountForm() {
     useEffect(() => {
         const fetchData = async () => {
             const [banksResponse, currenciesResponse] = await Promise.all([getBanks("paginated=no"), getCurrencies("paginated=no")]);
-            setBanks(banksResponse.map(({id, name}) => ({label: name, value: id})));
+            setBanks(banksResponse.map(({id, name, country, type}) => ({label: `${name} - ${country.name} (${type.name})`, value: id})));
             setCurrencies(currenciesResponse.map(({id, name, shortcode}) => ({label: `${name} (${shortcode})`, value: id})));
         }
 
@@ -30,7 +30,7 @@ export default function BankAccountForm() {
         }
 
         fetchData();
-    }, [session.role_id]);
+    }, []);
 
     const handleSubmit = async (ev) => {
         ev.preventDefault();

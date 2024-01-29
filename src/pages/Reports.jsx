@@ -4,12 +4,14 @@ import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { getReportTypes, getReports } from '../helpers/reports'
+import { getReports } from '../helpers/reports'
 import { useFormatDate } from '../hooks/useFormatDate'
 import Welcome from '../components/Welcome'
 import ModalCreateReport from '../components/ModalCreateReport'
 import TableLoader from '../components/Loaders/TableLoader'
 import { DASHBOARD_ROUTE, REPORTS_ROUTE, USERS_ROUTE } from '../consts/Routes'
+import { getUsersRoles } from '../helpers/users'
+import AlertMessage from '../components/AlertMessage'
 
 const Reports = () => {
   return <Outlet />
@@ -18,9 +20,11 @@ const Reports = () => {
 export const ReportsIndex = () => {
   const { session } = useContext(SessionContext);
   const [offset, setOffset] = useState(1);
-  const [reportType, setReportType] = useState([])
+  const [roles, setRoles] = useState([]);
+  const [role, setRole] = useState(false);
   const [date, setDate] = useState("")
   const [modalCreateShow, setModalCreateShow] = useState(false)
+  const [alert, setAlert] = useState({message: "", variant: "danger"});
   const [reports, setReports] = useState([])
   const form = useRef()
   const navigate = useNavigate();
@@ -29,14 +33,25 @@ export const ReportsIndex = () => {
     try {
       return await getReports(`order=created_at&order_by=desc${query}`);
     } catch (error) {
-      console.log(error)
+      let errorMessages = [];
+      if (error.response) {
+        const {errors, message} = error.response.data;
+
+        if (errors) errorMessages.push(errors);
+        else errorMessages.push(message);
+
+      } else {
+        errorMessages.push(error.message);
+      }
+
+      setAlert({message: errorMessages.join("."), variant: "danger"});
     }
   }
 
   useEffect(() => {
     const fetchData = async () => {
-      const [reportTypesResponse, reportsResponse] = await Promise.all([getReportTypes(`paginated=no`), fetchReports(),]);
-      if (reportTypesResponse) setReportType(reportTypesResponse);
+      const [rolesResponse, reportsResponse] = await Promise.all([getUsersRoles(), fetchReports(),]);
+      if (rolesResponse) setRoles(rolesResponse);
       if (reportsResponse) setReports(reportsResponse);
     }
 
@@ -53,23 +68,33 @@ export const ReportsIndex = () => {
 
   const handleType = (e) => {
     setOffset(1);
-    const queryDate = date ? `&date=${date}` : '';
-    getReports(`order=created_at${queryDate}&order_by=desc${e ? `&type_id=${e}` : ''}&search=${form.current.search.value}`)
-    .then(r => setReports(r))
+
+    setRole(e);
+
+    let params = e ? `&role=${e}` : "";
+
+    if (date) params += `&date=${date}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
+    fetchReports(params).then((response) => setReports(response));
   }
 
   const handleSearch = (e) => {
-    e.preventDefault()
-    const queryDate = date ? `&date=${date}` : '';
-    getReports(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&type_id=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}${queryDate}`)
-    .then(r => setReports(r))
+    e.preventDefault();
     setOffset(1);
+
+    let params = form.current.search.value ? `&search=${form.current.search.value}` : "";
+
+    if (date) params += `&date=${date}`;
+    if (role) params += `&role=${role}`;
+
+    fetchReports(params).then((response) => setReports(response));
   }
 
   const handleDate = (e) => {
     e.preventDefault()
     setOffset(1);
-    let params = `${date ? `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}` : ""}`;
+    let params = `${date ? `&date=${date}` : ""}`;
     if (form.current.search.value) params += `&search=${form.current.search.value}`;
     if (form.current.filter_type.value != "false") params += `&type_id=${form.current.filter_type.value}`;
 
@@ -84,7 +109,7 @@ export const ReportsIndex = () => {
         <Welcome text='Reportes' add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)} textButton='Reporte' />
         <div className='row mt-4'>
           <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-            <div className='col-8'><FilterTableButtons data={reportType} callback={handleType} /></div>
+            <div className='col-8'><FilterTableButtons data={roles} callback={handleType} /></div>
             <div className='col-4'><SearchBar text='Reportes' /></div>
           </form>
         </div>
@@ -159,6 +184,7 @@ export const ReportsIndex = () => {
           }
         </div>
       </div>
+      <AlertMessage show={alert.message.length > 0} setShow={() => setAlert((prev) => ({...prev, message: ""}))} message={alert.message} variant={alert.variant} />
     </>
   )
 }

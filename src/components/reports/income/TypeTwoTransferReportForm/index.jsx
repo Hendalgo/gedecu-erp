@@ -18,7 +18,7 @@ const TypeTwoTransferReportForm = () => { // Reporte de traspaso Tipo 2
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [banksAccountsResponse] = await Promise.all([ getBankAccounts(`paginated=no&country=${country?.value || session.country_id}`), ]);
+                const [banksAccountsResponse] = await Promise.all([ getBankAccounts(`paginated=no${country?.value ? `&country=${country?.value}`: ""}`), ]);
 
                 if (banksAccountsResponse) {
                     bankAccounts.current = banksAccountsResponse;

@@ -6,7 +6,6 @@ import TableLoader from '../components/Loaders/TableLoader';
 import { deleteBankAccount, getBankAccounts } from '../helpers/banksAccounts';
 import PaginationTable from '../components/PaginationTable';
 import ModalCreateBankAccount from '../components/ModalCreateBankAccount';
-import ModalEditBankAccount from '../components/ModalEditBankAccount';
 import ModalConfirmation from '../components/ModalConfirmation';
 import AlertMessage from '../components/AlertMessage'
 import { getBanks } from '../helpers/banks';
@@ -18,7 +17,6 @@ import { formatAmount } from '../utils/amount';
 const BankAccounts = () => {  
   const { session } = useContext(SessionContext)
   const [modalShow, setModalShow] = useState(false)
-  const [modalEditShow, setModalEditShow] = useState(false)
   const [banks, setBanks] = useState([]);
   const [banksFilter, setBanksFilter] = useState([]);
   const [offset, setOffset] = useState(1)
@@ -45,23 +43,23 @@ const BankAccounts = () => {
     }
 
     if ([5,6].includes(session.role_id)) {
-      navigate(`?${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+      navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
     }
 
     fetchData();
-  }, [session.role_id])
+  }, [])
 
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&country=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
+      getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&bank=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
     }
   }
 
   const handleBankChange = async (bankId) => {
     setOffset(1);
-    const accountsResponse = await getBankAccounts(`order=created_at${bankId ? `&bank=${bankId}` : ""}`);
+    const accountsResponse = await getBankAccounts(`order=created_at${bankId ? `&bank=${bankId}` : ""}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`);
     setBanks(accountsResponse);
   }
 
@@ -73,10 +71,7 @@ const BankAccounts = () => {
 
     getBankAccounts(params).then(r => setBanks(r))
   }
-  const handleBank = (e) => {
-    setModalEditShow(true)
-    setBankAccount(e)
-  }
+
   const handleDelete = (e)=>{
     deleteBankAccount(e.id).then( e=>{
       if (e.status === 201) {
@@ -143,25 +138,13 @@ const BankAccounts = () => {
                             <span>{e.identifier}</span>
                           </div>
                         </td>
-                        <th>{e.user.name}</th>
+                        <th>{e.user ? e.user.name : e.store.user.name}</th>
                         <td>{e.name}</td>
                         <td>{formatAmount(e.balance, e.currency.shortcode)}</td>
                         <td>{e.bank.name}</td>
                         <td>{e.bank.country.name}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
-                            <button onClick={() => handleBank(e)} className='TableActionButtons'>
-                              <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'>
-                                <g clipPath='url(#clip0_156_194122)'>
-                                  <path d='M15.216 0.783999C14.7065 0.2971 14.0288 0.0253906 13.324 0.0253906C12.6192 0.0253906 11.9416 0.2971 11.432 0.783999L1.07401 11.142C0.732617 11.4815 0.46192 11.8853 0.277573 12.3301C0.0932258 12.7749 -0.00111372 13.2519 9.9204e-06 13.7333V15C9.9204e-06 15.2652 0.105367 15.5196 0.292903 15.7071C0.48044 15.8946 0.734793 16 1.00001 16H2.26668C2.74838 16.0013 3.22556 15.907 3.67059 15.7227C4.11562 15.5383 4.51967 15.2676 4.85934 14.926L15.216 4.568C15.7171 4.06582 15.9985 3.3854 15.9985 2.676C15.9985 1.9666 15.7171 1.28617 15.216 0.783999ZM3.44401 13.512C3.13093 13.823 2.708 13.9984 2.26668 14H2.00001V13.7333C2.00138 13.2916 2.1767 12.8681 2.48801 12.5547L10.2 4.84467L11.1553 5.8L3.44401 13.512ZM13.8 3.154L12.5693 4.38667L11.6133 3.43067L12.8467 2.2C12.9753 2.07705 13.1464 2.00844 13.3243 2.00844C13.5023 2.00844 13.6734 2.07705 13.802 2.2C13.9277 2.32704 13.9981 2.49867 13.9977 2.67741C13.9974 2.85615 13.9263 3.02749 13.8 3.154Z' fill='#495057' />
-                                </g>
-                                <defs>
-                                  <clipPath id='clip0_156_194122'>
-                                    <rect width='16' height='16' fill='white' />
-                                  </clipPath>
-                                </defs>
-                              </svg>
-                            </button>
                               <button onClick={()=>{
                                 setBankAccount(e);
                                 setModalConfirmShow(true);
@@ -190,7 +173,6 @@ const BankAccounts = () => {
       <div className=''>
         {modalShow && <ModalCreateBankAccount setModalShow={setModalShow} modalShow={modalShow} />}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        {modalEditShow && <ModalEditBankAccount setModalShow={setModalEditShow} modalShow={modalEditShow} bankAccount ={bankAccount}/>}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Cuenta de banco"} action={()=>handleDelete(bankAccount)}/>
       </div>
     </div>

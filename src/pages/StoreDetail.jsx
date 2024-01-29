@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import { getStore } from "../helpers/stores";
@@ -7,12 +7,17 @@ import { Alert } from "react-bootstrap";
 import FilterTableButtons from "../components/FilterTableButtons";
 import PaginationTable from "../components/PaginationTable";
 import { ReactSVG } from "react-svg";
-import { BANK_ACCOUNTS_ROUTE, DASHBOARD_ROUTE, STORES_ROUTE } from "../consts/Routes";
+import { BANK_ACCOUNTS_ROUTE, DASHBOARD_ROUTE, HOME_ROUTE, STORES_ROUTE } from "../consts/Routes";
 import { formatAmount } from "../utils/amount";
+import { useFormatDate } from "../hooks/useFormatDate";
+import { getBanks } from "../helpers/banks";
 
 export default function StoreDetail() {
     const [store, setStore] = useState(null);
     const [alert, setAlert] = useState({message: [], variant: "danger"});
+    const [banks, setBanks] = useState([]);
+    const [bank, setBank] = useState(false);
+    const [offset, setOffset] = useState(1);
     const { session } = useContext(SessionContext);
     const params = useParams();
     const navigate = useNavigate();
@@ -22,21 +27,41 @@ export default function StoreDetail() {
 
         const fetchData = async () => {
             try {
-                const storeResponse = await getStore(id);
+                const [storeResponse, banksResponse] = await Promise.all([getStore(id), getBanks("paginated=no")]);
                 setStore(storeResponse);
+                setBanks(banksResponse);
             } catch ({response}) {
                 const {message} = response.data;
-                console.log(message);
                 if (message) setAlert((prev) => ({...prev, message: [message]}));
             }
         }
 
         if (![1,3].includes(session.role_id)) {
-            //redirect
+            navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
         }
 
         fetchData();
-    }, [session.role_id]);
+    }, []);
+
+    const handleBankChange = async (option) => {
+        setOffset(1);
+        setBank(option);
+
+        let params = `${option ? `bank=${option}` : ""}`;
+
+        console.log(params);
+    }
+
+    const handlePagination = async ({selected}) => {
+        const newOffset = selected + 1;
+        setOffset(newOffset);
+
+        let params = `page=${newOffset}`;
+
+        if (bank) params += `&bank=${bank}`;
+
+        console.log(params);
+    }
 
     if (!store) return <Alert show={alert.message.length > 0} variant={alert.variant} className="mt-3">
         <ul>
@@ -64,21 +89,21 @@ export default function StoreDetail() {
                     </div>
                     <div className="col-3 card py-3">
                         <p style={{color: "var(--bs-gray-600)"}}><img src="/imoney.png" alt="cash icon" width={18} height={18} /> Efectivo</p>
-                        <p className="fw-semibold" style={{color: "var(--blue-800, #052C65)"}}>{store.cash_balance.currency.shortcode} {store.cash_balance.balance.toLocaleString("es-VE")}</p>
+                        <p className="fw-semibold" style={{color: "var(--blue-800, #052C65)"}}>{formatAmount(store.cash_balance.balance, store.cash_balance.currency.shortcode)}</p>
                     </div>
                 </div>
             </section>
             <section>
                 <div className="row justify-content-between mb-3">
                     <div className="col-8">
-                        <FilterTableButtons />
+                        <FilterTableButtons data={banks} callback={handleBankChange} />
                     </div>
                     <div className="col-4 text-end">
                         <button type="button" className="btn btn-outline-primary" onClick={() => navigate(`/${DASHBOARD_ROUTE}/${STORES_ROUTE}/${params.id}/${BANK_ACCOUNTS_ROUTE}`)}>Registrar cuenta</button>
                     </div>
                 </div>
                 <div className="row mb-3">
-                        <PaginationTable handleChange={() => null} itemOffset={1} itemsTotal={0} text="cuentas" />
+                    <PaginationTable handleChange={handlePagination} offset={offset} itemsTotal={store.accounts.length} quantity={Math.ceil(store.accounts.length / 10)} text="cuentas" />
                 </div>
                 <table className="table table-striped tableP">
                     <thead>
@@ -98,7 +123,7 @@ export default function StoreDetail() {
                                 <td>{name}</td>
                                 <td>{formatAmount(balance, currency.shortcode)}</td>
                                 <td>{bank.name}</td>
-                                <td>{created_at}</td>
+                                <td>{useFormatDate(created_at)}</td>
                             </tr>) :
                             <tr>
                                 <td colSpan={5} className="text-center">No hay cuentas de banco asociadas a este local</td>

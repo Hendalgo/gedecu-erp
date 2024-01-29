@@ -51,9 +51,9 @@ export default function SupplierOutcomeReportForm() {
                 try {
                     const accountsResponse = await getBankAccounts(`paginated=no&country=2&user=${option.value}`);
 
-                    if (accountsResponse) setBankAccounts(accountsResponse.map(({ name, identifier, bank, id, }) => {
+                    if (accountsResponse) setBankAccounts(accountsResponse.map(({ name, identifier, bank, id, currency, }) => {
                         const label = name.concat(" - ", identifier, " (", bank.name, ")");
-                        return { label: label, value: id };
+                        return { label: label, value: id, currency: currency.shortcode, currency_id: currency.id };
                     }));
                 } catch ({ message, error, }) {
                     setError({ show: true, message: [error.message], variant: "danger", });
@@ -88,33 +88,33 @@ export default function SupplierOutcomeReportForm() {
 
     return (
         <>
-            <div className="row mb-3">
-                <div className="col">
-                    <label htmlFor="bank_id" className="form-label">Banco</label>
-                    <BanksSelect
-                        id="bank"
-                        name="bank"
-                        query="&country=2"
-                        value={bank}
-                        onChange={handleBankChange}
-                        onError={setError} />
-                </div>
-                <div className="col">
-                    <label htmlFor="user" className="form-label">Gestor</label>
-                    <Select
-                        inputId="user"
-                        name="user"
-                        value={user}
-                        options={users}
-                        isDisabled={users.length === 0}
-                        placeholder="Selecciona el gestor"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                        onChange={handleUserChange}
-                    />
-                </div>
-            </div>
-
             <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
+                <div className="row mb-3">
+                    <div className="col">
+                        <label htmlFor="bank_id" className="form-label">Banco</label>
+                        <BanksSelect
+                            id="bank"
+                            name="bank"
+                            query="&country=2"
+                            value={bank}
+                            onChange={handleBankChange}
+                            onError={setError} />
+                    </div>
+                    <div className="col">
+                        <label htmlFor="user" className="form-label">Gestor</label>
+                        <input type="hidden" name="user_id" value={user?.label || 0} />
+                        <Select
+                            inputId="user"
+                            name="user"
+                            value={user}
+                            options={users}
+                            isDisabled={users.length === 0}
+                            placeholder="Selecciona el gestor"
+                            noOptionsMessage={() => "No hay coincidencias"}
+                            onChange={handleUserChange}
+                        />
+                    </div>
+                </div>
                 <div className="row mb-3">
                     <div className="col">
                         <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
@@ -134,6 +134,8 @@ export default function SupplierOutcomeReportForm() {
                         <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
                         <DecimalInput id="amount" name="amount" />
                     </div>
+                    <input type="hidden" name="currency_id" value={bankAccount?.currency_id || 0} />
+                    <input type="hidden" name="currency" value={bankAccount?.currency || ""} />
                 </div>
                 <div className="row mb-3">
                     <div className="col-6">

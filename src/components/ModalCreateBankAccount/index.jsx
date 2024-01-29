@@ -18,7 +18,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
     setLoading(true);
     Promise.all([getBanks(`paginated=no`), getCurrencies("paginated=no")])
     .then(([banksResponse, currenciesResponse]) => {
-      setBanks(banksResponse.map(e => ({ label: `${e.name} - ${e.country.name}`, value: e.id } )));
+      setBanks(banksResponse.map(e => ({ label: `${e.name} - ${e.country.name} (${e.type.name})`, value: e.id } )));
       setCurrencies(currenciesResponse.map(({ name, shortcode, id }) => ({ label: name.concat(" (", shortcode, ")"), value: id })));
     })
     .catch(({error, message}) => {
@@ -95,7 +95,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
                   placeholder="Seleccione un banco"
                   noOptionsMessage={()=> "No hay coincidencias"}
                   inputId='bank'
-                  name='bank'
+                  name='bank_id'
                   options={banks}
                 />
               </div>

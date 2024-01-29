@@ -13,12 +13,8 @@ export const createUser = async (form) => {
 }
 
 export const getUsersRoles = async () => {
-  try {
-    const request = await API_INSTANCE.get(USER_URL + '/roles')
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  const request = await API_INSTANCE.get(USER_URL + '/roles');
+  return request.data;
 }
 export const updateUser = async (id, formData) => {
   try {

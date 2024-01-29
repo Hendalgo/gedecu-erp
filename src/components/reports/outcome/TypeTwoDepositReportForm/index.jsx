@@ -42,7 +42,7 @@ const TypeTwoDepositReportForm = () => {
             <div className="row mb-3">
                 <div className="col">
                     <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
-                    <UsersSelect id="user" name="user" value={user} onChange={setUser} onError={setError} query="&role=5" />
+                    <UsersSelect id="user" name="user" value={user} onChange={setUser} onError={setError} query="&role=7" />
                 </div>
                 <div className="col">
                     <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>

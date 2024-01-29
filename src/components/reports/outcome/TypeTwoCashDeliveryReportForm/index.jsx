@@ -42,12 +42,13 @@ const TypeTwoCashDeliveryReportForm = () => {
             <input type="hidden" name="country_id" value={country?.id || session.country_id} />
             <div className="row mb-3">
                 <div className="col">
-                    <label htmlFor="user_id" className="form-label">Gestor <span className="Required">*</span></label>
+                    <label htmlFor="user_id" className="form-label">Depositante <span className="Required">*</span></label>
                     <UsersSelect
                         id="user"
                         name="user"
                         value={user}
                         query={`&role=5&country=${country?.value || session.country_id}`}
+                        placeholder="Seleccione el depositante"
                         onError={setError}
                         onChange={setUser} />
                 </div>

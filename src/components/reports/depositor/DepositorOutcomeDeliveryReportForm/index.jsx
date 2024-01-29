@@ -43,7 +43,7 @@ export default function DepositorOutcomeDeliveryReportForm() {
                         id="supplier"
                         name="supplier"
                         value={supplier}
-                        query={`&role=4&country=${country?.value || session.country_id}`}
+                        query={`&role=6&country=${country?.value || session.country_id}`}
                         onChange={setSupplier}
                         onError={setError} />
                 </div>

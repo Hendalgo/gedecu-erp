@@ -8,7 +8,7 @@ import { getDuplicates, } from '../helpers/reports'
 import Welcome from '../components/Welcome'
 import TableLoader from '../components/Loaders/TableLoader'
 import AlertMessage from '../components/AlertMessage'
-import { DASHBOARD_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from '../consts/Routes'
+import { DASHBOARD_ROUTE, HOME_ROUTE, REPORTS_DUPLICATE_ROUTE, REPORTS_ROUTE } from '../consts/Routes'
 import { formatAmount } from '../utils/amount'
 
 const DuplicateReports = () => {
@@ -43,6 +43,10 @@ const DuplicateReports = () => {
       setDuplicates(await fetchDuplicates());
     }
 
+    if (session.role_id != 1) {
+      navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+    }
+
     fetchData();
   }, []);
 
@@ -52,7 +56,7 @@ const DuplicateReports = () => {
 
     let params = `&page=${newOffset}`;
 
-    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
+    if (date) params += `&date=${date}`;
     if (search) params += `&search=${search}`;
     if (reportType) params += `&completed=${reportType}`;
 
@@ -65,7 +69,7 @@ const DuplicateReports = () => {
 
     let params = `${e ? `&completed=${e}` : ""}`;
 
-    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
+    if (date) params += `&date=${date}`;
     if (search) params += `&search=${search}`;
 
     setDuplicates(await fetchDuplicates(params));
@@ -77,7 +81,7 @@ const DuplicateReports = () => {
 
     let params = `${search ? `&search=${search}` : ""}`;
 
-    if (date) params += `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}`;
+    if (date) params += `&date=${date}`;
     if (reportType) params += `&completed=${reportType}`;
 
     setDuplicates(await fetchDuplicates(params));
@@ -87,7 +91,7 @@ const DuplicateReports = () => {
     e.preventDefault();
     setOffset(1);
 
-    let params = `${date ? `&date=${date}&timeZoneOffset=${new Date().getTimezoneOffset()}` : ""}`;
+    let params = `${date ? `&date=${date}` : ""}`;
 
     if (search) params += `&search=${search}`;
     if (reportType) params += `&completed=${reportType}`;

@@ -46,7 +46,7 @@ const TaxReportForm = () => { // => Reporte de comisiones
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query={`&country=${session.country.id}`}
+                        query={`${session.country.id == 2 ? `&country=${session.country.id}`: ""}`}
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>

@@ -70,8 +70,8 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
           <div className='container'>
             <div className='row'>
               <div className='d-flex flex-column'>
-                <span className='ModalTopTitle'>Crear Nuevo banco</span>
-                <span className='ModalTopSubTitle'>Esta pestaña le permite crear un nuevo banco</span>
+                <span className='ModalTopTitle'>Registrar banco</span>
+                <span className='ModalTopSubTitle'>Esta pestaña le permite registrar un banco</span>
               </div>
             </div>
           </div>
@@ -115,7 +115,7 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Crear banco</button>
+        <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Registrar banco</button>
       </Modal.Footer>
     </Modal>
   )

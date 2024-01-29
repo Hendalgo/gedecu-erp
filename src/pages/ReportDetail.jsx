@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getReportById } from "../helpers/reports";
 import { Alert, Card } from "react-bootstrap";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
+import { useFormatDate } from "../hooks/useFormatDate";
 
 export default function ReportDetail() {
     const [report, setReport] = useState(null);
@@ -147,7 +148,7 @@ export default function ReportDetail() {
                         <div className="row">
                             <div className="col-6">
                                 <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>FECHA Y HORA:</h6>
-                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{new Date(report.created_at).toLocaleString("es-VE")}</p>
+                                <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{useFormatDate(report.created_at)}</p>
                             </div>
                             <div className="col-6">
                                 <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ID REPORTE:</h6>
@@ -155,9 +156,9 @@ export default function ReportDetail() {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-6">
+                            <div className="col">
                                 <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MOTIVO:</h6>
-                                <span style={reportStyles}>{report.type.name}</span>
+                                <span className="rounded" style={reportStyles}>{report.type.name}</span>
                             </div>
                         </div>
                     </Card.Body>

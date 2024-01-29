@@ -6,6 +6,7 @@ import TableLoader from "../components/Loaders/TableLoader";
 import PaginationTable from "../components/PaginationTable";
 import { getUsersBalance } from "../helpers/users";
 import { getCountries } from "../helpers/countries";
+import { formatAmount } from "../utils/amount";
 
 export default function UsersBalance() {
     const [users, setUsers] = useState(null);
@@ -108,7 +109,7 @@ export default function UsersBalance() {
                                     return <tr key={id}>
                                         <td>{user.name}</td>
                                         <td>{user.email}</td>
-                                        <td>{`${currency.shortcode} ${balance.toLocaleString("es-VE", {minimumFractionDigits: 2})}`}</td>
+                                        <td>{formatAmount(balance, currency.shortcode)}</td>
                                     </tr>
                                 }) :
                                 <tr>

@@ -1,7 +1,7 @@
 import DecimalInput from "../../../DecimalInput";
 import StoresSelect from "../../../StoresSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
@@ -11,8 +11,6 @@ const TypeTwoHelpReportForm = () => {
     const [bankAccount, setBankAccount] = useState(null);
     const { handleSubmit, setError, country, } = useContext(ReportTableContext);
     const { session } = useContext(SessionContext);
-
-    // useEffect();
 
     const handleLocalSubmit = (e) => {
         e.preventDefault();
@@ -62,7 +60,7 @@ const TypeTwoHelpReportForm = () => {
                         id="account"
                         name="account"
                         value={bankAccount}
-                        query={`&country=${country?.value || session.country_id}`}
+                        query={`${country?.value ? `&country=${country.value}` : ""}`}
                         onError={setError}
                         onChange={setBankAccount} />
                 </div>

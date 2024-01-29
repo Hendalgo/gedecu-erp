@@ -1,38 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { getUsersRoles, updateUser } from '../../helpers/users'
-import { getCountriesCount } from '../../helpers/banks'
+import { updateUser } from '../../helpers/users'
 
 const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
-  const [roles, setRoles] = useState();
-  const allRoles = useRef([]);
-  const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
   const [loading, setLoading] = useState(false);
   const form = useRef();
-
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([ getUsersRoles(), getCountriesCount(), ])
-    .then(([rolesResponse, countriesResponse]) => {
-      allRoles.current = rolesResponse;
-      let roles = [];
-      if (user.country_id == 2) {
-        roles = rolesResponse.filter(({id}) => id == 1 || id == 2);
-      } else {
-        roles = rolesResponse.filter(({id}) => id !== 2);
-      }
-      setCountries(countriesResponse);
-      setRoles(roles);
-    })
-    .catch((error) => {
-      console.log(error);
-      setAlertType("danger");
-      setErrorMessage(error.response.data.error);
-    })
-    .finally(setLoading(false));
-  }, [])
 
   const handleUser = async () => {
     setLoading(true);
@@ -43,8 +17,6 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
         userUpdate = {
           name: user.name,
           email: user.email,
-          country_id: form.current.country.value,
-          role_id: form.current.role.value
         }
       }
       else{
@@ -53,10 +25,10 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           email: user.email,
           password: form.current.password.value,
           password_confirmation: form.current.password_confirmation.value,
-          country_id: form.current.country.value,
-          role_id: form.current.role.value
         }
       }
+      userUpdate["country_id"] = user.country_id;
+      userUpdate["role_id"] = user.role_id;
       const request = await updateUser(user.id, userUpdate)
 
       switch (request.status) {
@@ -81,18 +53,6 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
       setAlertType('danger')
     }
     setLoading(false);
-  }
-
-  const handleCountryChange = ({target}) => {
-    let roles = [];
-
-    if (target.value == 2) {
-      roles = allRoles.current.filter(({id}) => id == 1 || id == 2);
-    } else {
-      roles = allRoles.current.filter(({id}) => id !== 2);
-    }
-    setRoles(roles);
-    setUser((prev) => ({ ...prev, country_id: target.value, role_id: 1 }));
   }
 
   return (
@@ -132,32 +92,6 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                   <div className='mb-3'>
                     <label htmlFor='confirm-password'>Confirmar Contraseña</label>
                     <input required id='confirm-password' name='password_confirmation' onChange={(e) => setUser({ ...user, password_confirmation: e.target.value })} className='form-control' type='password' />
-                  </div>
-                  <div className='d-flex mb-3'>
-                    <div className='me-4'>
-                      <label htmlFor='role'>Rol <span className='Required'>*</span></label>
-                      <select required className='form-select' value={user.role_id} onChange={({target}) => setUser((prev) => ({...prev, role_id: target.value}))} name='role' id='role'>
-                        {
-                          roles
-                          ? roles.map((e) => {
-                            return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                          })
-                          : null
-                        }
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor='country'>País <span className='Required'>*</span></label>
-                      <select required className='form-select' name='country' id='country' value={user.country_id} onChange={handleCountryChange}>
-                        {
-                        countries
-                        ? countries.map(e => {
-                          return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                        })
-                        : null
-                        }
-                      </select>
-                    </div>
                   </div>
                 </form>
               </div>
