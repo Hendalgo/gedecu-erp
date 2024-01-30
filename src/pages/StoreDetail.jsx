@@ -11,9 +11,12 @@ import { BANK_ACCOUNTS_ROUTE, DASHBOARD_ROUTE, HOME_ROUTE, STORES_ROUTE } from "
 import { formatAmount } from "../utils/amount";
 import { useFormatDate } from "../hooks/useFormatDate";
 import { getBanks } from "../helpers/banks";
+import { getBankAccounts } from "../helpers/banksAccounts";
+import TableLoader from "../components/Loaders/TableLoader";
 
 export default function StoreDetail() {
     const [store, setStore] = useState(null);
+    const [accounts, setAccounts] = useState(null);
     const [alert, setAlert] = useState({message: [], variant: "danger"});
     const [banks, setBanks] = useState([]);
     const [bank, setBank] = useState(false);
@@ -22,13 +25,34 @@ export default function StoreDetail() {
     const params = useParams();
     const navigate = useNavigate();
 
+    const fetchBankAccounts = async (query = "") => {
+        try {
+            return await getBankAccounts(`order=created_at&order_by=desc${query}`);
+        } catch (err) {
+            const errorMessages = [];
+
+            const {errors, message} = err;
+
+            if (message) {
+                errorMessages.push(message);
+            }
+
+            setAlert((prev) => ({...prev, message: errorMessages}));
+        }
+    }
+
     useEffect(() => {
         const { id } = params;
 
         const fetchData = async () => {
             try {
                 const [storeResponse, banksResponse] = await Promise.all([getStore(id), getBanks("paginated=no")]);
-                setStore(storeResponse);
+                if (storeResponse) {
+                    setStore(storeResponse);
+                    const accountsResponse = await fetchBankAccounts();
+                    setAccounts(accountsResponse);
+                }
+
                 setBanks(banksResponse);
             } catch ({response}) {
                 const {message} = response.data;
@@ -47,20 +71,20 @@ export default function StoreDetail() {
         setOffset(1);
         setBank(option);
 
-        let params = `${option ? `bank=${option}` : ""}`;
+        let params = `${option ? `&bank=${option}` : ""}`;
 
-        console.log(params);
+        setAccounts(await fetchBankAccounts(params));
     }
 
     const handlePagination = async ({selected}) => {
         const newOffset = selected + 1;
         setOffset(newOffset);
 
-        let params = `page=${newOffset}`;
+        let params = `&page=${newOffset}`;
 
         if (bank) params += `&bank=${bank}`;
 
-        console.log(params);
+        setAccounts(await fetchBankAccounts(params));
     }
 
     if (!store) return <Alert show={alert.message.length > 0} variant={alert.variant} className="mt-3">
@@ -102,35 +126,41 @@ export default function StoreDetail() {
                         <button type="button" className="btn btn-outline-primary" onClick={() => navigate(`/${DASHBOARD_ROUTE}/${STORES_ROUTE}/${params.id}/${BANK_ACCOUNTS_ROUTE}`)}>Registrar cuenta</button>
                     </div>
                 </div>
-                <div className="row mb-3">
-                    <PaginationTable handleChange={handlePagination} offset={offset} itemsTotal={store.accounts.length} quantity={Math.ceil(store.accounts.length / 10)} text="cuentas" />
-                </div>
-                <table className="table table-striped tableP">
-                    <thead>
-                        <tr>
-                            <th>Identificador</th>
-                            <th>Propietario</th>
-                            <th>Balance</th>
-                            <th>Banco</th>
-                            <th>Fecha de creación</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            store.accounts.length > 0 ?
-                            store.accounts.map(({id, identifier, name, balance, currency, bank, created_at}) => <tr key={id}>
-                                <td>{identifier}</td>
-                                <td>{name}</td>
-                                <td>{formatAmount(balance, currency.shortcode)}</td>
-                                <td>{bank.name}</td>
-                                <td>{useFormatDate(created_at)}</td>
-                            </tr>) :
-                            <tr>
-                                <td colSpan={5} className="text-center">No hay cuentas de banco asociadas a este local</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                {
+                    accounts ?
+                    <>
+                        <div className="d-flex justify-content-end mb-3">
+                            <PaginationTable handleChange={handlePagination} offset={offset} itemsTotal={accounts.total} quantity={accounts.last_page} text="cuentas" />
+                        </div>
+                        <table className="table table-striped tableP">
+                            <thead>
+                                <tr>
+                                    <th>Identificador</th>
+                                    <th>Propietario</th>
+                                    <th>Balance</th>
+                                    <th>Banco</th>
+                                    <th>Fecha de creación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    accounts.data.length > 0 ?
+                                    accounts.data.map(({id, identifier, name, balance, currency, bank, created_at}) => <tr key={id}>
+                                        <td>{identifier}</td>
+                                        <td>{name}</td>
+                                        <td>{formatAmount(balance, currency.shortcode)}</td>
+                                        <td>{bank.name}</td>
+                                        <td>{useFormatDate(created_at)}</td>
+                                    </tr>) :
+                                    <tr>
+                                        <td colSpan={5} className="text-center">No hay cuentas de banco asociadas a este local</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </> :
+                    <TableLoader />
+                }
             </section>
         </>
     );
