@@ -49,7 +49,7 @@ export default function SupplierOutcomeReportForm() {
 
             if (option) {
                 try {
-                    const accountsResponse = await getBankAccounts(`paginated=no&country=2&user=${option.value}`);
+                    const accountsResponse = await getBankAccounts(`paginated=no&country=2&user=${option.value}&bank=${bank.value}`);
 
                     if (accountsResponse) setBankAccounts(accountsResponse.map(({ name, identifier, bank, id, currency, }) => {
                         const label = name.concat(" - ", identifier, " (", bank.name, ")");
@@ -101,11 +101,10 @@ export default function SupplierOutcomeReportForm() {
                             onError={setError} />
                     </div>
                     <div className="col">
-                        <label htmlFor="user" className="form-label">Gestor</label>
-                        <input type="hidden" name="user_id" value={user?.label || 0} />
+                        <label htmlFor="user_id" className="form-label">Gestor</label>
                         <Select
-                            inputId="user"
-                            name="user"
+                            inputId="user_id"
+                            name="user_id"
                             value={user}
                             options={users}
                             isDisabled={users.length === 0}
@@ -113,6 +112,7 @@ export default function SupplierOutcomeReportForm() {
                             noOptionsMessage={() => "No hay coincidencias"}
                             onChange={handleUserChange}
                         />
+                        <input type="hidden" name="user" value={user?.label || ""} />
                     </div>
                 </div>
                 <div className="row mb-3">

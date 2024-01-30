@@ -362,7 +362,7 @@ export default function ReportForm() {
             }
 
             const footer = [...tableData.footer];
-            const index = footer.findIndex(({currency}) => currency == newEntry["currency"]);
+            const index = footer.findIndex((total) => total.currency == currency);
 
             if (index === -1) {
                 footer.push({ currency, amount });
@@ -392,10 +392,19 @@ export default function ReportForm() {
         newEntries.splice(index, 1);
 
         const deleted = subreports.current.splice(index, 1).shift();
-        const footerIndex = footer.findIndex(({currency}) => currency == deleted["currency"]);
+        
+        let amount = deleted["amount"];
+        let currency = deleted["currency"];
+        
+        if (deleted["convert_amount"]) {
+            amount *= deleted["rate"];
+            currency = deleted["conversionCurrency"];
+        }
+
+        const footerIndex = footer.findIndex((total) => total.currency == currency);
         
         const currentCurrency = footer.at(footerIndex);
-        currentCurrency.amount -= deleted["amount"];
+        currentCurrency.amount -= amount;
 
         if (currentCurrency.amount <= 0) footer.splice(footerIndex, 1);
 
