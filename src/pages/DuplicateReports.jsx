@@ -51,7 +51,7 @@ const DuplicateReports = () => {
   }, []);
 
   const handleChange = async (offset) => {
-    const newOffset = offset.selected;
+    const newOffset = offset.selected + 1;
     setOffset(newOffset);
 
     let params = `&page=${newOffset}`;
