@@ -4,6 +4,7 @@ import { getReportById } from "../helpers/reports";
 import { Alert, Card } from "react-bootstrap";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import { useFormatDate } from "../hooks/useFormatDate";
+import { formatAmount } from "../utils/amount";
 
 export default function ReportDetail() {
     const [report, setReport] = useState(null);
@@ -24,69 +25,66 @@ export default function ReportDetail() {
     }, [id]);
 
     const getSubreportsTable = () => {
-        const tableHeaderSet = new Set();
         let footer = [];
 
-        const subreports = report.subreports.map(({ data }) => {
-            const newEntry = {};
-            const parsedData = JSON.parse(data);
+        const jsonData = Object.keys(JSON.parse(report.subreports.at(0).data));
+        const fields = []; const titles = [];
 
-            Object.entries(parsedData).forEach(([key, value]) => {
-                if (reportsColumnsMap.has(key)) {
-                    tableHeaderSet.add(reportsColumnsMap.get(key));
-                    let formattedValue = value;
-
-                    if (["amount", "rate", "conversion"].includes(key)) {
-                        formattedValue = formattedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
-                    }
-
-                    if (key === "isDuplicated") {
-                        formattedValue = "No";
-                        if (value) {
-                            formattedValue = "Sí";
-                        }
-                    }
-
-                    newEntry[key] = formattedValue;
-                }
-            });
-
-            const footerIndex = footer.findIndex(({currency}) => currency == parsedData["currency"]);
-
-            let amount = parsedData["amount"];
-            let currency = parsedData["currency"];
-
-            if (parsedData["convert_amount"]) {
-                amount *= parsedData["rate"];
-                currency = parsedData["conversionCurrency"];
+        for (const [key, val] of reportsColumnsMap.entries()) {
+            if (jsonData.includes(key)) {
+                fields.push(key);
+                titles.push(val);
             }
+        }
+
+        const subreports = report.subreports.map(({ data }) => {
+            const parsed = JSON.parse(data);
+            let amount = parsed["amount"];
+            let currency = parsed["currency"];
+
+            if (parsed["convert_amount"]) {
+                amount *= parsed["rate"];
+                currency = parsed["conversionCurrency"];
+            }
+
+            const footerIndex = footer.findIndex((total) => total.currency == currency);
 
             if (footerIndex === -1) {
                 footer.push({currency, amount});
             } else {
-                const currentElement = footer.at(footerIndex);
-                currentElement.amount += amount;
+                footer.at(footerIndex).amount += amount;
             }
 
-            return newEntry;
-        })
+            const values = fields.map((key) => {
+                let formated = parsed[key];
+                if (key == "isDuplicated") {
+                    formated = "No";
+                    if (parsed[key]) {
+                        formated = "Sí"
+                    }
+                }
 
-        const tableHeader = Array.from(tableHeaderSet);
+                if (["amount", "rate", "conversion"].includes(key)) {
+                    formated = formatAmount(formated);
+                }
 
-        return {
-            subreports, tableHeader, footer
-        }
+                return formated;
+            });
+
+            return values;
+        });
+
+        return { subreports, titles, footer };
     }
 
     
     if (!report) return <></>;
-    
-    const { subreports, tableHeader, footer } = getSubreportsTable();
+
+    const { subreports, titles, footer } = getSubreportsTable();
     const reportStyles = JSON.parse(report.type.config)?.styles;
 
     return (
         <>
-            {/* Breadcrumb */}
             <section className="p-2 mb-4">
                 <div className="WelcomeContainer">
                     <h6 className="welcome">Información detallada</h6>
@@ -105,7 +103,7 @@ export default function ReportDetail() {
                     <thead>
                         <tr>
                             {
-                                tableHeader.map((column, index) => <th key={index}>{column}</th>)
+                                titles.map((title, index) => <th key={index}>{title}</th>)
                             }
                         </tr>
                     </thead>
@@ -114,9 +112,7 @@ export default function ReportDetail() {
                             subreports.map((row, index) => {
                                 return <tr key={`row-${index}`}>
                                     {
-                                        Object.values(row).map((value, colIndex) => {
-                                            return <td key={`col-${colIndex}`}>{value}</td>
-                                        })
+                                        row.map((cell, childIndex) => <td key={childIndex}>{cell}</td>)
                                     }
                                 </tr>
                             })
@@ -125,7 +121,7 @@ export default function ReportDetail() {
                     <tfoot>
                         {
                             footer.map(({currency, amount}) => <tr key={currency}>
-                                <td className="fw-semibold text-end" colSpan={tableHeader.length}>Total {currency}: {amount.toLocaleString("es-VE", {minimumFractionDigits: 2})}</td>
+                                <td className="fw-semibold text-end" colSpan={titles.length}>Total {currency}: {formatAmount(amount)}</td>
                             </tr>)
                         }
                     </tfoot>

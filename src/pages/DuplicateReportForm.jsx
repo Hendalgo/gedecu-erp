@@ -10,6 +10,7 @@ import { DASHBOARD_ROUTE, HOME_ROUTE, } from "../consts/Routes";
 import DuplicateInfoCard from "../components/DuplicateInfoCard";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import { formatAmount } from "../utils/amount";
+import { divideInGroups } from "../utils/array";
 
 export default function DuplicateReportForm() {
     const [duplicate, setDuplicate] = useState(null);
@@ -21,6 +22,7 @@ export default function DuplicateReportForm() {
 
     const getDuplicate = async () => {
         const {id} = params;
+
         try {
             const duplicateResponse = await getDuplicateById(id);
             setDuplicate(duplicateResponse);
@@ -74,6 +76,7 @@ export default function DuplicateReportForm() {
                 if (key === "amount") {
                     formatedValue = new Number(formatedValue.replace(/\D/g, "")) / 100;
                 }
+
                 if (key === "date") {
                     const date = new Date(formatedValue);
                     const minutes = date.getUTCMinutes();
@@ -88,8 +91,6 @@ export default function DuplicateReportForm() {
             const {id} = params;
 
             const {message} = await updateDuplicate(id, data);
-
-            console.log(message);
 
             if (message) {
                 setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
@@ -111,21 +112,19 @@ export default function DuplicateReportForm() {
 
     const duplicateData = JSON.parse(duplicate.duplicate_data);
     const reportData = JSON.parse(duplicate.data);
-    const filteredRows = []; const reportRows = [];
+    const filteredRows = []; let reportRows = [];
 
-    Object.entries(reportData).forEach(([key, value]) => {
-        if (!["isDuplicated", "amount", "currency"].includes(key) && reportsColumnsMap.has(key)) {
-            let formatedValue = value;
-            filteredRows.push([reportsColumnsMap.get(key), formatedValue]);
+    for (const key of reportsColumnsMap.keys()) {
+        if (!["isDuplicated"].includes(key)) {
+            if (Object.keys(reportData).includes(key)) {
+                let formated = reportData[key];
+                if (["amount", "rate", "conversion"].includes(key)) formated = formatAmount(formated);
+                filteredRows.push([reportsColumnsMap.get(key), formated]);
+            }
         }
-    })
-
-    const segments = Math.floor(filteredRows.length / 2);
-
-    for (let index = 0; index <= segments; index++) {
-        const doubleIndex = index * 2;
-        reportRows.push(filteredRows.slice(doubleIndex, doubleIndex + 2));
     }
+
+    reportRows = divideInGroups(filteredRows);
 
     return (
         <>
@@ -204,25 +203,14 @@ export default function DuplicateReportForm() {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MONTO:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{formatAmount(duplicate.amount, duplicate.currency.shortcode)}</p>
-                                </div>
-                                <div className="col">
                                     <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ID REPORTE:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>#{duplicate.id.toString().padStart(6, "0")}</p>
+                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>#{duplicate.report.id.toString().padStart(6, "0")}</p>
                                 </div>
-                            </div>
-                            <div className="row">
                                 <div className="col">
                                     <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MOTIVO:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}></p>
+                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{duplicate.report.type.name}</p>
                                 </div>
-                                {/* <div className="col"></div> */}
                             </div>
-                            {/* <div className="row">
-                                <div className="col"></div>
-                                <div className="col"></div>
-                            </div> */}
                         </Card.Body>
                     </Card>
                 </div>

@@ -135,7 +135,8 @@ const DuplicateReports = () => {
                 <table className='table TableP table-borderless align-middle'>
                   <thead className=''>
                     <tr className='pt-4'>
-                      <th scope='col'>Realizado por:</th>
+                      <th scope='col'>Realizado por</th>
+                      <th scope='col'>Rol</th>
                       <th scope='col'>Fecha - Hora</th>
                       <th scope='col'>Motivo</th>
                       <th scope='col'>Monto</th>
@@ -148,8 +149,9 @@ const DuplicateReports = () => {
                         const reportTypeStyle = JSON.parse(report.type.config);
                         return <tr key={id}>
                           <td>{report.user.name} ({report.user.email})</td>
+                          <td>{report.user.role.name}</td>
                           <td>{new Date(created_at).toLocaleString("es-VE", {hour12: true, year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric"})}</td>
-                          <td><span style={{...reportTypeStyle.styles}} className='p-1 rounded'>{report.type.name}</span></td>
+                          <td><span style={{...reportTypeStyle.styles}} className='p-1 rounded'>{report.type.name}{report.type.type == "income" ? " - Ingreso" : " - Egreso"}</span></td>
                           <td>{formatAmount(amount, currency.shortcode)}</td>
                           { session.role_id === 1 && <td>
                             <button className='btn bton-light border' onClick={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`)}>{duplicate_status ? "Ver" : "Verificar"}</button>

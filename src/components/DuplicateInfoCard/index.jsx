@@ -1,37 +1,22 @@
 import { Card } from "react-bootstrap";
 import reportsColumnsMap from "../../consts/ReportsColumnsMap";
+import { formatAmount } from "../../utils/amount";
+import { divideInGroups } from "../../utils/array";
 
-export default function DuplicateInfoCard({
-    data = null
-}) {
-    const rows = [];
+export default function DuplicateInfoCard({ data = null }) {
+    let rows = [];
 
     if (data) {
         const filteredFields = [];
-
-        Object.entries(data).forEach(([key, value]) => {
-            if (reportsColumnsMap.has(key)) {
-
-                let formatedValue = value;
-
-                if (key === "amount") {
-                    formatedValue = formatedValue.toLocaleString("es-VE", {minimumFractionDigits: 2});
-                }
-
-                if (key === "date") {
-                    formatedValue = new Date(formatedValue).toLocaleString("es-VE", {day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "numeric", second: "numeric"});
-                }
-
-                filteredFields.push([reportsColumnsMap.get(key), formatedValue]);
+        for (const key of reportsColumnsMap.keys()) {
+            if (Object.keys(data).includes(key)) {
+                let formated = data[key];
+                if (key === "amount") formated = formatAmount(formated);
+                filteredFields.push([reportsColumnsMap.get(key), formated]);
             }
-        })
-
-        const segments = Math.floor(filteredFields.length / 2);
-
-        for (let index = 0; index <= segments; index++) {
-            const doubleIndex = index * 2;
-            rows.push(filteredFields.slice(doubleIndex, doubleIndex + 2));
         }
+
+        rows = divideInGroups(filteredFields);
     }
 
     return (
