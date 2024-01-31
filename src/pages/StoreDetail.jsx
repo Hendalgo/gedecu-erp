@@ -101,10 +101,12 @@ export default function StoreDetail() {
                 <Welcome showButton={false} text={store.name} />
             </section>
             <section className="mb-3 p-2">
-                
                 <h5 className="mb-3"><ReactSVG src="/info-circle.svg" wrapper="span" className="bg-white px-1 rounded" /> <span style={{ color: "var(--blue-800, #052C65)" }}>Información</span> <ReactSVG src="/info.svg" wrapper="span" /></h5>
                 <div className="row justify-content-start">
                     <div className="col-3 text-center card py-3">
+                        <div className="mb-2">
+                            <img src={store.country.img ? store.country.img : "/world.svg"} width={56} height={56} />
+                        </div>
                         <p style={{color: "var(--bs-gray-600)"}} className="text-nowrap text-truncate"><ReactSVG src="/world.svg" wrapper="span" /> {store.country.name} - {store.country.shortcode}</p>
                     </div>
                     <div className="col-4 card mx-4 py-3">
