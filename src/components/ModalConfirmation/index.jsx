@@ -6,7 +6,7 @@ const ModalConfirmation = ({show, setModalShow, action, text = "", warning = "",
       <Modal.Header>
         <Modal.Title style={{textAlign: 'center'}}>
           {
-            warning ? warning : <span>Estas seguro de querer eliminar este {text}</span>
+            warning ? warning : <span>¿Está seguro de querer eliminar este {text}?</span>
           }
           
         </Modal.Title>

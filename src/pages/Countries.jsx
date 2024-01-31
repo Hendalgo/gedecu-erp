@@ -55,7 +55,7 @@ export const CountriesIndex = () => {
     }
   }
   const handleDelete = (e)=>{
-    deleteCountry(e.id_country).then( e=>{
+    deleteCountry(e.id).then( e=>{
       if (e.status === 201) {
         getCountries(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setCountries(r))
         setAlert({
