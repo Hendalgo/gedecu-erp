@@ -568,79 +568,81 @@ export default function ReportForm() {
       </section>
       <section className="overflow-x-auto">
         {tableData && tableData.header.length > 0 && (
-          <table className="table TableP table-striped">
-            <thead>
-              <tr>
-                {tableData.header.map((header, hIndex) => (
-                  <th key={hIndex}>{header}</th>
-                ))}
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.body.map((entry, rowIndex) => {
-                return (
-                  <tr key={rowIndex}>
-                    {Object.values(entry)
-                      .concat("delete")
-                      .map((value, cellIndex) => {
-                        return (
-                          <td key={cellIndex}>
-                            {value === "delete" ? (
-                              <button
-                                className="TableActionButtons"
-                                disabled={isLoading}
-                                onClick={() => handleDelete(rowIndex)}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
+          <div className="w-100 overflow-hidden border rounded mb-4">
+            <table className="m-0 table table-striped">
+              <thead>
+                <tr>
+                  {tableData.header.map((header, hIndex) => (
+                    <th key={hIndex}>{header}</th>
+                  ))}
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.body.map((entry, rowIndex) => {
+                  return (
+                    <tr key={rowIndex}>
+                      {Object.values(entry)
+                        .concat("delete")
+                        .map((value, cellIndex) => {
+                          return (
+                            <td key={cellIndex}>
+                              {value === "delete" ? (
+                                <button
+                                  className="TableActionButtons"
+                                  disabled={isLoading}
+                                  onClick={() => handleDelete(rowIndex)}
                                 >
-                                  <path
-                                    d="M15.3332 3C15.3332 2.44772 14.8855 2 14.3332 2H11.8158C11.3946 0.804906 10.267 0.0040625 8.99985 0H6.99985C5.73269 0.0040625 4.6051 0.804906 4.18385 2H1.6665C1.11422 2 0.666504 2.44772 0.666504 3C0.666504 3.55228 1.11422 4 1.6665 4H1.99985V12.3333C1.99985 14.3584 3.64147 16 5.6665 16H10.3332C12.3582 16 13.9998 14.3584 13.9998 12.3333V4H14.3332C14.8855 4 15.3332 3.55228 15.3332 3ZM11.9998 12.3333C11.9998 13.2538 11.2537 14 10.3332 14H5.6665C4.74604 14 3.99985 13.2538 3.99985 12.3333V4H11.9998V12.3333Z"
-                                    fill="#495057"
-                                  />
-                                  <path
-                                    d="M6.33301 12C6.88529 12 7.33301 11.5523 7.33301 11V7C7.33301 6.44772 6.88529 6 6.33301 6C5.78073 6 5.33301 6.44772 5.33301 7V11C5.33301 11.5523 5.78073 12 6.33301 12Z"
-                                    fill="#495057"
-                                  />
-                                  <path
-                                    d="M9.6665 12C10.2188 12 10.6665 11.5523 10.6665 11V7C10.6665 6.44772 10.2188 6 9.6665 6C9.11422 6 8.6665 6.44772 8.6665 7V11C8.6665 11.5523 9.11422 12 9.6665 12Z"
-                                    fill="#495057"
-                                  />
-                                </svg>
-                              </button>
-                            ) : (
-                              value
-                            )}
-                          </td>
-                        );
-                      })}
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              {tableData.footer.map(({ currency, amount }) => {
-                return (
-                  <tr key={currency}>
-                    <td
-                      colSpan={tableData.header.length + 1}
-                      className="text-end fw-semibold"
-                    >
-                      Total {currency}:{" "}
-                      {amount.toLocaleString("es-VE", {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tfoot>
-          </table>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 16 16"
+                                    fill="none"
+                                  >
+                                    <path
+                                      d="M15.3332 3C15.3332 2.44772 14.8855 2 14.3332 2H11.8158C11.3946 0.804906 10.267 0.0040625 8.99985 0H6.99985C5.73269 0.0040625 4.6051 0.804906 4.18385 2H1.6665C1.11422 2 0.666504 2.44772 0.666504 3C0.666504 3.55228 1.11422 4 1.6665 4H1.99985V12.3333C1.99985 14.3584 3.64147 16 5.6665 16H10.3332C12.3582 16 13.9998 14.3584 13.9998 12.3333V4H14.3332C14.8855 4 15.3332 3.55228 15.3332 3ZM11.9998 12.3333C11.9998 13.2538 11.2537 14 10.3332 14H5.6665C4.74604 14 3.99985 13.2538 3.99985 12.3333V4H11.9998V12.3333Z"
+                                      fill="#495057"
+                                    />
+                                    <path
+                                      d="M6.33301 12C6.88529 12 7.33301 11.5523 7.33301 11V7C7.33301 6.44772 6.88529 6 6.33301 6C5.78073 6 5.33301 6.44772 5.33301 7V11C5.33301 11.5523 5.78073 12 6.33301 12Z"
+                                      fill="#495057"
+                                    />
+                                    <path
+                                      d="M9.6665 12C10.2188 12 10.6665 11.5523 10.6665 11V7C10.6665 6.44772 10.2188 6 9.6665 6C9.11422 6 8.6665 6.44772 8.6665 7V11C8.6665 11.5523 9.11422 12 9.6665 12Z"
+                                      fill="#495057"
+                                    />
+                                  </svg>
+                                </button>
+                              ) : (
+                                value
+                              )}
+                            </td>
+                          );
+                        })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                {tableData.footer.map(({ currency, amount }) => {
+                  return (
+                    <tr key={currency}>
+                      <td
+                        colSpan={tableData.header.length + 1}
+                        className="text-end fw-semibold"
+                      >
+                        Total {currency}:{" "}
+                        {amount.toLocaleString("es-VE", {
+                          minimumFractionDigits: 2,
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tfoot>
+            </table>
+          </div>
         )}
       </section>
       <ModalConfirmation

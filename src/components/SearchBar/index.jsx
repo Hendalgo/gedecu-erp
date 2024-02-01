@@ -10,13 +10,13 @@ const SearchBar = ({ text = "", search, change = () => null }) => {
         name="search"
         type="text"
         id=""
-        className="form-control"
+        className="form-control rounded-0 rounded-start"
         onChange={({ target }) => change(target.value)}
         placeholder={text.concat("...")}
         autoComplete="none"
       />
       {/* <input name='search' type='text' id='' className='form-control' placeholder={`${text.replace(/\b\w/g, function (m) { return m.toUpperCase() })}...`} autoComplete='none' /> */}
-      <input type="submit" className="btn btn-primary" value={`Buscar`} />
+      <input type="submit" className="btn btn-primary rounded-0 rounded-end" value={`Buscar`} />
     </div>
   );
 };

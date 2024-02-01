@@ -89,17 +89,14 @@ const Currencies = () => {
           showButton={false}
         />
       )}
-      <div className="row mt-4">
+      <div className="d-flex mt-4 justify-content-end">
         <form
           onSubmit={handleSearch}
           action=""
           ref={form}
           className="form-group row"
         >
-          <div className="col-8" />
-          <div className="col-4">
-            <SearchBar text="Moneda" />
-          </div>
+          <SearchBar text="Moneda" />
         </form>
       </div>
       {Array.isArray(currencies.data) ? (
@@ -120,7 +117,8 @@ const Currencies = () => {
             </div>
             <div className="row mt-2">
               <div className="d-flex">
-                <table className="table TableP table-striped">
+              <div className="w-100 overflow-hidden border rounded mb-4">
+                <table className="m-0 table table-striped">
                   <thead>
                     <tr className="pt-4">
                       <th scope="col">Nombre</th>
@@ -211,6 +209,7 @@ const Currencies = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
               </div>
             </div>
           </>
