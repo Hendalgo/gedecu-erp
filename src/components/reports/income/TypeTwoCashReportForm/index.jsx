@@ -1,7 +1,6 @@
 import DecimalInput from "../../../DecimalInput";
 import { useContext } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
-import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoCashReportForm = () => {
@@ -51,11 +50,6 @@ const TypeTwoCashReportForm = () => {
         name="currency"
         value={country?.currency || session.country.currency.shortcode}
       />
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
-        </div>
-      </div>
       <div className="row text-end">
         <div className="col">
           <button type="submit" className="btn btn-outline-primary">

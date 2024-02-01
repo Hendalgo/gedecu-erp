@@ -3,8 +3,6 @@ import { getBankAccounts } from "../../../../helpers/banksAccounts";
 import Select from "react-select";
 import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
-import { Form } from "react-bootstrap";
-import { SessionContext } from "../../../../context/SessionContext";
 
 const TypeTwoTransferReportForm = () => {
   // Reporte de traspaso Tipo 2
@@ -14,7 +12,6 @@ const TypeTwoTransferReportForm = () => {
   const [selectedReceiverAccount, setSelectedReceiverAccount] = useState(null);
   const bankAccounts = useRef([]);
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
-  const { session } = useContext(SessionContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -212,11 +209,6 @@ const TypeTwoTransferReportForm = () => {
         name="currency"
         value={selectedSenderAccount?.currency || ""}
       />
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
-        </div>
-      </div>
       <div className="row text-end">
         <div className="col">
           <button type="submit" className="btn btn-outline-primary">

@@ -4,7 +4,6 @@ import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { Form } from "react-bootstrap";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -142,11 +141,6 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           name="conversionCurrency_id"
           value={country?.currency_id || session.country.currency.id}
         />
-      </div>
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
-        </div>
       </div>
       <div className="row text-end">
         <div className="col">

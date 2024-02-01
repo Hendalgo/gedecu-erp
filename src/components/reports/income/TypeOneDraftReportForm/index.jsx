@@ -4,7 +4,6 @@ import NumberInput from "../../../NumberInput";
 import BanksSelect from "../../../BanksSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
-import { Form } from "react-bootstrap";
 import Select from "react-select";
 import { getUsers } from "../../../../helpers/users";
 
@@ -210,16 +209,6 @@ const TypeOneDraftReportForm = () => {
             value={conversionAmount}
             readOnly
             className="form-control"
-          />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
           />
         </div>
       </div>

@@ -3,7 +3,6 @@ import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
-import { Form } from "react-bootstrap";
 
 const TypeOneWalletReportForm = () => {
   const [amount, setAmount] = useState(0);
@@ -144,16 +143,6 @@ const TypeOneWalletReportForm = () => {
           name="currency"
           value={country?.currency || session.country.currency.shortcode}
         />
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
-          />
-        </div>
       </div>
       <div className="row text-end">
         <div className="col">
