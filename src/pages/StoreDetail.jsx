@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SessionContext } from "../context/SessionContext";
 import { getStore } from "../helpers/stores";
@@ -16,23 +16,28 @@ import {
 import { formatAmount } from "../utils/amount";
 import { useFormatDate } from "../hooks/useFormatDate";
 import { getBanks } from "../helpers/banks";
-import { getBankAccounts } from "../helpers/banksAccounts";
+import { deleteBankAccount, getBankAccounts } from "../helpers/banksAccounts";
 import TableLoader from "../components/Loaders/TableLoader";
 import "./StoreDetail.css";
 import Title from "../components/Title";
+import ModalConfirmation from "../components/ModalConfirmation";
 
 export default function StoreDetail() {
   const [store, setStore] = useState(null);
   const [accounts, setAccounts] = useState(null);
+  const account_id = useRef(null);
   const [alert, setAlert] = useState({ message: [], variant: "danger" });
   const [banks, setBanks] = useState([]);
   const [bank, setBank] = useState(false);
   const [offset, setOffset] = useState(1);
+  const [show, setShow] = useState(false);
   const { session } = useContext(SessionContext);
   const params = useParams();
   const navigate = useNavigate();
 
   const fetchBankAccounts = async (query = "") => {
+    setAlert((prev) => ({...prev, message: []}));
+
     try {
       return await getBankAccounts(`order=created_at&order_by=desc${query}`);
     } catch (err) {
@@ -40,6 +45,9 @@ export default function StoreDetail() {
 
       const { errors, message } = err;
 
+      if (errors) {
+        errorMessages.push([...errors]);
+      }
       if (message) {
         errorMessages.push(message);
       }
@@ -96,6 +104,35 @@ export default function StoreDetail() {
 
     setAccounts(await fetchBankAccounts(params));
   };
+
+  const handleDeleteAccount = (id) => {
+    account_id.current = id;
+    setShow(true);
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await deleteBankAccount(account_id.current);
+
+      if (response.status === 201) {
+        setAccounts(await fetchBankAccounts());
+        setAlert({message: ["Se ha eliminado la cuenta de banco"], variant: "success"});
+      }
+
+    } catch (err) {
+      let errorMessages = [];
+
+      if (err.response) {
+        const {message} = err.response.data;
+
+        if (message) errorMessages = [message];
+      } else {
+        errorMessages = [err.message];
+      }
+
+      setAlert((prev) => ({...prev, message: errorMessages}));
+    }
+  }
 
   if (!store)
     return (
@@ -192,6 +229,13 @@ export default function StoreDetail() {
             </button>
           </div>
         </div>
+        <Alert show={alert.message.length > 0} variant={alert.variant}>
+          <ul>
+            {
+              alert.message.map((message, index) => <li key={index}>{message}</li>)
+            }
+          </ul>
+        </Alert>
         {accounts ? (
           <>
             <div className="d-flex justify-content-end mb-3">
@@ -235,7 +279,7 @@ export default function StoreDetail() {
                         <td>
                           <div className="d-flex justify-content-evenly align-items-center">
                             <button
-                              onClick={() => null}
+                              onClick={() => handleDeleteAccount(id)}
                               className="TableActionButtons ms-2"
                             >
                               <svg
@@ -278,6 +322,7 @@ export default function StoreDetail() {
           <TableLoader />
         )}
       </section>
+      <ModalConfirmation show={show} setModalShow={setShow} warning="¿Está seguro de eliminar esta cuenta de banco?" action={handleDeleteConfirm} />
     </>
   );
 }

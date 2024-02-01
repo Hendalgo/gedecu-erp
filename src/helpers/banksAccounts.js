@@ -18,10 +18,6 @@ export const updateBankAccount = async (id, form) => {
   }
 };
 export const deleteBankAccount = async (id) => {
-  try {
-    const request = await API_INSTANCE.delete(BANK_ACCOUNTS_URL + "/" + id);
-    return request;
-  } catch (error) {
-    return error.response;
-  }
+  const request = await API_INSTANCE.delete(BANK_ACCOUNTS_URL + "/" + id);
+  return request;
 };
