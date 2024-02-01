@@ -66,7 +66,7 @@ const Users = () => {
         })
         return;
       }
-      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setUsers(r));
+      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`).then( r=> setUsers(r.data));
       setAlert({
         text: "Usuario eliminado con éxito.",
         variant: "success",

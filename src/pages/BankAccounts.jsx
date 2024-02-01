@@ -53,7 +53,7 @@ const BankAccounts = () => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&bank=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setBanks(r))
+      getBankAccounts(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&bank=${form.current.filter_type.value}` : ''}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`).then(r => setBanks(r))
     }
   }
 
@@ -75,7 +75,7 @@ const BankAccounts = () => {
   const handleDelete = (e)=>{
     deleteBankAccount(e.id).then( e=>{
       if (e.status === 201) {
-        getBankAccounts(`order=created_at&order_by=desc&page=${offset}&search=${form.current.search.value}`).then( r=> setBanks(r))
+        getBankAccounts(`order=created_at&order_by=desc&page=${offset}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`).then( r=> setBanks(r))
         setAlert({
           text: "Cuenta eliminada con éxito.",
           variant: "success",
@@ -138,7 +138,7 @@ const BankAccounts = () => {
                             <span>{e.identifier}</span>
                           </div>
                         </td>
-                        <th>{e.user ? e.user.name : e.store.user.name}</th>
+                        <th>{e.user ? e.user.name : (e.store.user ? e.store.user.name : "Sin encargado")}</th>
                         <td>{e.name}</td>
                         <td>{formatAmount(e.balance, e.currency.shortcode)}</td>
                         <td>{e.bank.name}</td>
