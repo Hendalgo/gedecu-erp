@@ -4,11 +4,11 @@ import './SideBar.css'
 import { ReactSVG } from 'react-svg'
 import { SessionContext } from '../../context/SessionContext'
 import { Accordion } from 'react-bootstrap'
-import { REPORTS_ROUTE} from '../../consts/Routes'
 import { logout } from '../../helpers/logout'
 import { AdminMenus, NormalUserMenu } from '../../consts/Menus'
 import { useCheckRole } from '../../hooks/useCheckRole'
 import useScreenSize from '../../hooks/useScreenSize'
+import { getStores } from '../../helpers/stores'
 
 const SideBar = ({ children }) => {
   const location = useLocation();
@@ -16,11 +16,12 @@ const SideBar = ({ children }) => {
   const {width, maxHeight} = useScreenSize() 
   let menus = [];
   const {session, setSession } = useContext(SessionContext)
+
   if (useCheckRole(session)) {
     menus = AdminMenus;
   }
   else{
-    menus = NormalUserMenu;
+    menus = NormalUserMenu(session);
   }
   return width > 1440 
     ?<SideBarBig menus={menus} setSession={setSession} isActive={isActive}>{children}</SideBarBig>
@@ -174,7 +175,7 @@ const SideBarBig = ({menus, setSession, children})=>{
                       {Menu.title}
                     </NavLink>
                     : <Accordion>
-                      <Accordion.Item className={Menu.isActive ? "active" : ""}>
+                      <Accordion.Item className={Menu.isActive ? "active" : ""} eventKey={index}>
                         <Accordion.Header>
                           <NavLink
 

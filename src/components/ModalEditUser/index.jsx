@@ -1,28 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createUser, getUsersRoles, updateUser } from '../../helpers/users'
-import { getCountriesCount } from '../../helpers/banks'
+import { updateUser } from '../../helpers/users'
 
 const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
-  const [roles, setRoles] = useState()
-  const [countries, setCountries] = useState()
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
-  const form = useRef()
-  useEffect(() => {
-    getUsersRoles().then(r => setRoles(r))
-    getCountriesCount().then(r => setCountries(r))
-  }, [])
+  const [loading, setLoading] = useState(false);
+  const form = useRef();
+
   const handleUser = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current)
-      let userUpdate = []
+      let userUpdate;
       if (form.current.password.value === '') {
         userUpdate = {
           name: user.name,
           email: user.email,
-          country_id: form.current.country.value,
-          role_id: form.current.role.value
         }
       }
       else{
@@ -31,10 +25,10 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           email: user.email,
           password: form.current.password.value,
           password_confirmation: form.current.password_confirmation.value,
-          country_id: form.current.country.value,
-          role_id: form.current.role.value
         }
       }
+      userUpdate["country_id"] = user.country_id;
+      userUpdate["role_id"] = user.role_id;
       const request = await updateUser(user.id, userUpdate)
 
       switch (request.status) {
@@ -58,7 +52,9 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
       setErrorMessage('Error actualizando el usuario')
       setAlertType('danger')
     }
+    setLoading(false);
   }
+
   return (
     user
       ? <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -82,46 +78,20 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
                   <div className='d-flex mb-3'>
                     <div className='me-4'>
                       <label htmlFor='name'>Nombre <span className='Required'>*</span></label>
-                      <input required onChange={(e) => setUser({ ...user, name: e.target.value })} className='form-control' type='text' name='name' value={user.name} />
+                      <input required onChange={(e) => setUser({ ...user, name: e.target.value })} className='form-control' type='text' id='name' name='name' value={user.name} />
                     </div>
                     <div>
                       <label htmlFor='email'>Email <span className='Required'>*</span></label>
-                      <input readOnly onChange={(e) => setUser({ ...user, email: e.target.value })} className='form-control' type='email' name='email' value={user.email} />
+                      <input readOnly onChange={(e) => setUser({ ...user, email: e.target.value })} className='form-control' type='email' id='email' name='email' value={user.email} />
                     </div>
                   </div>
                   <div className='mb-3'>
                     <label htmlFor='password'>Contraseña </label>
-                    <input required name='password' onChange={(e) => setUser({ ...user, password: e.target.value })} className='form-control' type='password' />
+                    <input required id='password' name='password' onChange={(e) => setUser({ ...user, password: e.target.value })} className='form-control' type='password' />
                   </div>
                   <div className='mb-3'>
                     <label htmlFor='confirm-password'>Confirmar Contraseña</label>
-                    <input required name='password_confirmation' onChange={(e) => setUser({ ...user, password_confirmation: e.target.value })} className='form-control' type='password' />
-                  </div>
-                  <div className='d-flex mb-3'>
-                    <div className='me-4'>
-                      <label htmlFor='role'>Rol <span className='Required'>*</span></label>
-                      <select required className='form-select' name='role' id='role'>
-                        {
-                  roles
-                    ? roles.map((e) => {
-                      return <option key={e.id} style={{ textTransform: 'capitalize' }} selected={e.id === user.role_id} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor='country'>País <span className='Required'>*</span></label>
-                      <select required className='form-select' name='country' id='country'>
-                        {
-                  countries
-                    ? countries.map(e => {
-                      return <option key={e.id} selected={e.id === user.country_id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
-                      </select>
-                    </div>
+                    <input required id='confirm-password' name='password_confirmation' onChange={(e) => setUser({ ...user, password_confirmation: e.target.value })} className='form-control' type='password' />
                   </div>
                 </form>
               </div>
@@ -136,7 +106,7 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
           </Alert>
           : null
       }
-          <button onClick={handleUser} className='btn btn-primary'>Editar Usuario</button>
+          <button onClick={handleUser} className='btn btn-primary' disabled={loading}>Editar Usuario</button>
         </Modal.Footer>
         </Modal>
       : null

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react'
+import { useRef, useState, useEffect, useContext } from 'react'
 import Welcome from '../components/Welcome'
 import FilterTableButtons from '../components/FilterTableButtons'
 import SearchBar from '../components/SearchBar'
@@ -35,22 +35,22 @@ const Users = () => {
   }
   useEffect(() => {
     getUsersRoles('order=created_at&order_by=desc').then(r => setUserRoles(r))
-    getUsers().then(r => setUsers(r))
+    getUsers().then(r => setUsers(r.data))
   }, [])
   const handleType = (e) => {
     setOffset(1)
-    getUsers(`order=created_at&order_by=desc${e ? `&role=${e}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+    getUsers(`order=created_at&order_by=desc${e ? `&role=${e}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
   }
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
     if (form.current.search !== '') {
-      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
     }
   }
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getUsers(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r))
+    getUsers(`order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&search=${form.current.search.value}`).then(r => setUsers(r.data))
   }
   const handleUser = (user) => {
     setModalEditShow(true)
@@ -66,15 +66,14 @@ const Users = () => {
         })
         return;
       }
-      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setUsers(r));
+      getUsers(`order=created_at&order_by=desc${form.current.filter_type.value !== 'false' ? `&role=${form.current.filter_type.value}` : ''}&page=${offset}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`).then( r=> setUsers(r.data));
       setAlert({
         text: "Usuario eliminado con éxito.",
         variant: "success",
         show: true
       })
     })
-    .catch(e =>{
-    });
+    .catch((e) => console.log(e));
   }
   return (
     <div className='container-fluid'>
@@ -165,8 +164,8 @@ const Users = () => {
       <div className=''>
         <ModalCreateUser modalShow={modalShow} setModalShow={setModalShow} />
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"usuario"} action={()=>handleDelete(editUser)}/>
+        {modalEditShow && <ModalEditUser modalShow={modalEditShow} setModalShow={setModalEditShow} setUser={setEditUser} user={editUser} />}
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el usuario, se eliminarán otros recursos (cuentas de banco) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(editUser)}/>
       </div>
     </div>
   )

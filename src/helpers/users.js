@@ -1,12 +1,7 @@
 import { API_INSTANCE, USER_URL } from '../consts/ApiUrl'
 
 export const getUsers = async (querys) => {
-  try {
-    const request = await API_INSTANCE.get(USER_URL + '?' + querys)
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  return API_INSTANCE.get(USER_URL + '?' + querys);
 }
 export const createUser = async (form) => {
   try {
@@ -18,12 +13,8 @@ export const createUser = async (form) => {
 }
 
 export const getUsersRoles = async () => {
-  try {
-    const request = await API_INSTANCE.get(USER_URL + '/roles')
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  const request = await API_INSTANCE.get(USER_URL + '/roles');
+  return request.data;
 }
 export const updateUser = async (id, formData) => {
   try {
@@ -40,4 +31,10 @@ export const deleteUser = async (id) => {
   } catch (error) {
     return error.response
   }
+}
+
+/* Users Balances */
+export const getUsersBalance = async (query = "") => {
+  const response = await API_INSTANCE.get(`${USER_URL}/balances?${query}`);
+  return response.data;
 }

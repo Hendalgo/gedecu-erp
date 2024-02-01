@@ -51,3 +51,8 @@ export const getCountriesCount = async () => {
     return []
   }
 }
+
+export const getBanksTypes = async () => {
+  const response = await API_INSTANCE.get(`${BANKS_URL}/types`);
+  return response.data;
+}

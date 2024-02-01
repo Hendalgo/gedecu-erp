@@ -1,19 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
-import { createCountry, updateCountry } from '../../helpers/countries'
+import { updateCountry } from '../../helpers/countries'
 
 const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   const handleCountry = async () => {
+    setLoading(true);
     try {
       const formData = new FormData(form.current)
-      const request = await updateCountry(country.id_country, {
-        country_name: formData.get("country_name"),
-        country_shortcode: formData.get("country_shortcode")
-      });
+      const data = {};
+
+      for (const [key, val] of formData.entries()) {
+        data[key] = val;
+      }
+
+      const request = await updateCountry(country.id, data);
 
       switch (request.status) {
         case 201:
@@ -36,6 +41,7 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
       setErrorMessage('Error en la edicion del país')
       setAlertType('danger')
     }
+    setLoading(false);
   }
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -60,11 +66,17 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
             <div className='row mb-3'>
               <div className='col'>
                 <label htmlFor='name' className='form-label'>Nombre del país <span className='Required'>*</span></label>
-                <input defaultValue={country.country_name} required className='form-control' type='text' name='country_name' placeholder='Venezuela'/>
+                <input defaultValue={country.name} required className='form-control' type='text' id='name' name='country_name' placeholder='Venezuela'/>
               </div>
               <div className='col'>
                 <label htmlFor='identifier'  className='form-label'>Código del país <span className='Required'>*</span></label>
-                <input defaultValue={country.shortcode} required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
+                <input defaultValue={country.shortcode} required className='form-control' type='text' id='identifier' name='country_shortcode' placeholder='VE'/>
+              </div>
+            </div>
+            <div className='row'>
+              <div className='col-6'>
+                <label htmlFor='locale' className='form-label'>Código local <span className='Required'>*</span></label>
+                <input defaultValue={country.locale} required className='form-control' type='text' id='locale' name='locale' />
               </div>
             </div>
           </div>
@@ -79,7 +91,7 @@ const ModalEditCountry = ({ modalShow, setModalShow, country }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCountry} className='btn btn-primary'>Editar país</button>
+        <button onClick={handleCountry} className='btn btn-primary' disabled={loading}>Editar país</button>
       </Modal.Footer>
     </Modal>
   )

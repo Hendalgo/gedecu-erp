@@ -1,36 +1,47 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getUsers } from '../../helpers/users'
-import { getCountriesCount } from '../../helpers/banks'
 import { createStore } from '../../helpers/stores'
 import Select from 'react-select'
+import DecimalInput from '../DecimalInput'
+import { getCountries } from '../../helpers/countries'
 
 const ModalCreateStore = ({ modalShow, setModalShow }) => {
   const [countries, setCountries] = useState();
+  const [country, setCountry] = useState(null);
   const [users, setUsers] = useState();
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef()
+
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getUsers(`paginated=no`).then(r =>{
-      setUsers(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.email}`,
-          value: e.id
-        }
-      }))
-    }); 
+    setLoading(true);
+    Promise.all([getCountries("paginated=no"), getUsers(`paginated=no&role=3`)])
+    .then(([countriesResponse, usersResponse]) => {
+      setCountries(countriesResponse.data.map(({name, id, currency}) => ({label: name, value: id, currency: currency.shortcode})));
+      setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
+    })
+    .catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   }, [])
+
   const handleStore = async () => {
+    setLoading(true);
     try {
-      const formData = form.current
-      const request = await createStore({
-        name: formData.name.value,
-        location: formData.location.value,
-        country_id: formData.country_id.value,
-        user_id: formData.user.value
-      })
+      const formData = new FormData(form.current);
+
+      const name = formData.get("name").trim();
+      formData.set("name", name);
+
+      formData.set("balance", new Number(formData.get("balance").replace(/\D/g, "")) / 100);
+
+      const request = await createStore(formData);
 
       switch (request.status) {
         case 201:
@@ -53,7 +64,9 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación del Local')
       setAlertType('danger')
     }
+    setLoading(false);
   }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -69,38 +82,40 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='container' action='' ref={form}>
+        <form className='container' action='' ref={form} autoComplete='off'>
           <div className='row mb-3'>
             <div className=' col '>
               <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
-              <input required className='form-control' type='text' name='name' />
+              <input required className='form-control' type='text' name='name' id='name' />
             </div>
             <div className='col'>
               <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
-              <input required className='form-control' type='text' name='location' />
+              <input required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
-          <div className='row'>
-            <div className='col'>
+          <div className='row mb-3'>
+            <div className='col-6'>
               <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
-              <select required className='form-select' name='country_id' id=''>
-                {
-              countries
-                ? countries.map(e => {
-                  return <option key={e.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                })
-                : null
-            }
-              </select>
+              <Select inputId='country_id' name='country_id' options={countries} value={country} onChange={setCountry} placeholder="Seleccione un país" noOptionsMessage={() => "No hay coincidencias"} />
             </div>
             <div className='col '>
-              <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span></label>
+              <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
               <Select
                 placeholder="Seleccione un manejador"
                 noOptionsMessage={()=> "No hay coincidencias"}
-                name='user'
+                inputId='user_id'
+                name='user_id'
                 options={users}
               />
+            </div>
+          </div>
+          <div className='row'>
+            <div className='col-6'>
+              <label htmlFor='balance'>Monto inicial</label>
+              <div className="input-group">
+                <span className="input-group-text">{country?.currency || ""}</span>
+                <DecimalInput id='balance' name='balance' />
+              </div>
             </div>
           </div>
         </form>
@@ -113,7 +128,7 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleStore} className='btn btn-primary'>Crear local</button>
+        <button onClick={handleStore} className='btn btn-primary' disabled={loading}>Crear local</button>
       </Modal.Footer>
     </Modal>
   )

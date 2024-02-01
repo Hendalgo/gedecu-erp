@@ -1,37 +1,45 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getCountriesCount} from '../../helpers/banks'
 import { getUsers } from '../../helpers/users'
 import { updateStore } from '../../helpers/stores'
-import SearchSelect from '../SearchSelect'
 import Select from 'react-select'
 
 const ModalEditStore = ({ modalShow, setModalShow, store }) => {
   const [countries, setCountries] = useState()
   const [errorMessage, setErrorMessage] = useState()
   const [users, setUsers] = useState([])
-  const [display, setDisplay] = useState('hidden')
   const [alertType, setAlertType] = useState('danger')
+  const [loading, setLoading] = useState(false);
   const form = useRef()
+  
   useEffect(() => {
-    getCountriesCount().then(r => setCountries(r))
-    getUsers(`paginated=no`).then(r =>{
-      setUsers(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.email}`,
-          value: e.id
-        }
-      }))
-    }); 
+    setLoading(true);
+    Promise.all([getCountriesCount(), getUsers(`paginated=no&role=3`)])
+    .then(([countriesResponse, usersResponse]) => {
+      setCountries(countriesResponse.map(({name, id}) => ({label: name, value: id})));
+      setUsers(usersResponse.data.map(e => ({ label: `${e.name} - ${e.email}`, value: e.id })));
+    })
+    .catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   }, [])
+  
   const handleStore = async () => {
+    setLoading(true);
     try {
-      const request = await updateStore(store.id, {
-        name: form.current.name.value,
-        location: form.current.location.value,
-        country_id: form.current.country.value,
-        user_id: form.current.user.value
-      })
+      const formData = new FormData(form.current);
+      const data = {};
+
+      for (const [key, val] of formData.entries()) {
+        data[key] = val.trim();
+      }
+
+      const request = await updateStore(store.id, data);
 
       switch (request.status) {
         case 201:
@@ -55,17 +63,9 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
       setErrorMessage('Error actualizando el local')
       setAlertType('danger')
     }
+    setLoading(false);
   }
 
-  
-  const handleSearch = async(e) => {
-    try {
-      const users = await getUsers(`search=${e}`);
-      return users.data;
-    } catch (error) {
-      
-    }
-  }
   return (
     store
       ? <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
@@ -85,39 +85,34 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
         <form className='container' action='' ref={form}>
           <div className='row mb-3'>
             <div className=' col '>
-              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span> <span className='Required'>*</span></label>
-              <input defaultValue={store.name} required className='form-control' type='text' name='name' />
+              <label htmlFor='name' className='form-label'>Nombre <span className='Required'>*</span></label>
+              <input defaultValue={store.name} required className='form-control' type='text' name='name' id='name' />
             </div>
             <div className='col'>
-              <label htmlFor='location'  className='form-label'>Dirección  <span className='Required'>*</span><span className='Required'>*</span></label>
-              <input defaultValue={store.location} required className='form-control' type='text' name='location' />
+              <label htmlFor='location'  className='form-label'>Dirección <span className='Required'>*</span></label>
+              <input defaultValue={store.location} required className='form-control' type='text' name='location' id='location' />
             </div>
           </div>
-          <div className='row'>
+          <div className='row mb-3'>
             <div className='col'>
-              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span> <span className='Required'>*</span></label>
-              <select required className='form-select' name='country' id=''>
-                {
-                  countries
-                    ? countries.map(e => {
-                      return <option key={e.id} defaultValue={e.id === store.country.id} style={{ textTransform: 'capitalize' }} value={e.id}>{e.name}</option>
-                    })
-                    : null
-                }
-              </select>
+              <label htmlFor='country_id'  className='form-label'>País <span className='Required'>*</span></label>
+              <Select isDisabled inputId='country_id' name='country_id' options={countries} defaultValue={{label: store.country.name, value: store.country.id}} />
             </div>
             <div className='col '>
-            <label htmlFor="store" className='form-label'>Manejador <span className='Required'>*</span> <span className='Required'>*</span></label>
+            <label htmlFor="user_id" className='form-label'>Manejador <span className='Required'>*</span></label>
               <Select
-                name={"user"}
+                inputId={"user_id"}
+                name={"user_id"}
                 placeholder="Seleccione un manejador"
                 noOptionsMessage={()=> "No hay coincidencias"}
                 options={users}
                 defaultValue={
+                  store.user ?
                   {
                     label: `${store.user.name} - ${store.user.email}`,
                     value: store.user.id
-                  }
+                  } :
+                  null
                 }
               />
             </div>
@@ -132,7 +127,7 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
           </Alert>
           : null
       }
-          <button onClick={handleStore} className='btn btn-primary'>Editar local</button>
+          <button onClick={handleStore} className='btn btn-primary' disabled={loading}>Editar local</button>
         </Modal.Footer>
         </Modal>
       : null

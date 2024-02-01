@@ -1,44 +1,43 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { getBanks} from '../../helpers/banks'
 import { updateBankAccount } from '../../helpers/banksAccounts'
 import { useEffect } from 'react'
 import Select from 'react-select'
-import { getUsers } from '../../helpers/users'
+import { getCurrencies } from '../../helpers/currencies'
 
 const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
   const [banks, setBanks] = useState([]);
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
-  const [users, setUsers] = useState();
+  const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(false);
   const form = useRef();
+
   useEffect(() => {
-    getBanks(`paginated=no`).then(r =>{
-      setBanks(r.map( e=> {
-        return{
-          label: `${e.name}`,
-          value: e.id
-        }
-      }))
-    });  
-    getUsers(`paginated=no`).then(r =>{
-      setUsers(r.map( e=> {
-        return{
-          label: `${e.name} - ${e.email}`,
-          value: e.id
-        }
-      }))
-    }); 
+    setLoading(true);
+    Promise.all([getBanks(`paginated=no`), getCurrencies("paginated=no")])
+    .then(([banksResponse, currenciesResponse]) => {
+      setBanks(banksResponse.map(e => ({ label: `${e.name}`, value: e.id } )));
+      setCurrencies(currenciesResponse.map(({ name, shortcode, id }) => ({ label: name.concat(" (", shortcode, ")"), value: id })));
+    })
+    .catch(({error, message}) => {
+      setErrorMessage(error.message);
+      setAlertType("danger");
+    }).finally(() => {
+      setLoading(false);
+    })
   }, [])
+
   const handleBankAccount = async () => {
+    setLoading(true);
     try {
-      const formData = form.current;
-      const request = await updateBankAccount(bankAccount.id,{
-        name: formData.name.value,
-        identifier: formData.identifier.value,
-        bank: formData.bank.value,
-        user: formData.user.value
-      });
+      const formData = new FormData(form.current);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+      const request = await updateBankAccount(bankAccount.id, data);
 
       switch (request.status) {
         case 201:
@@ -61,15 +60,9 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
       setErrorMessage('Error en la edición del banco')
       setAlertType('danger')
     }
+    setLoading(false);
   }
-  const handleSearch = async (e)=>{
-    try {
-      const banks = await getBanks(`search=${e}`);
-      return banks.data;
-    } catch (error) {
-      
-    }
-  }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -97,36 +90,33 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
                 </div>
                 <div className='col'>
                   <label htmlFor='identifier'  className='form-label'>Identificador <span className='Required'>*</span></label>
-                  <input defaultValue={bankAccount.identifier} required className='form-control' type='text' name='identifier' />
+                  <input defaultValue={bankAccount.identifier} required className='form-control' type='text' id='identifier' name='identifier' />
                 </div>
               </div>
-              <div className="row">
+              <div className="row mb-3">
                 <div className='col'>
-                  <label htmlFor="bank" className='form-label'>Banco <span className='Required'>*</span></label>
+                  <label htmlFor="bank_id" className='form-label'>Banco <span className='Required'>*</span></label>
                   <Select
                     placeholder="Seleccione un banco"
                     noOptionsMessage={()=> "No hay coincidencias"}
-                    name='bank'
+                    inputId='bank_id'
+                    name='bank_id'
                     options={banks}
                     defaultValue={{
-                      label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name} -`,
+                      label: `${bankAccount.bank.name} - ${bankAccount.bank.country.name}`,
                       value: bankAccount.bank.id
                     }}
                   />
                 </div>
                 <div className="col">
-                  <label htmlFor="store" className='form-label'>Encargado <span className='Required'>*</span></label>
+                  <label htmlFor="currency_id" className='form-label'>Moneda <span className='Required'>*</span></label>
                   <Select
-                    placeholder="Seleccione un manejador"
+                    placeholder="Seleccione una moneda"
                     noOptionsMessage={()=> "No hay coincidencias"}
-                    name='user'
-                    options={users}
-                    defaultValue={
-                      {
-                        label: `${bankAccount.user.name} - ${bankAccount.user.email} -`,
-                        value: bankAccount.user.id
-                      }
-                    }
+                    inputId='currency_id'
+                    name='currency_id'
+                    options={currencies}
+                    defaultValue={{label: `${bankAccount.currency.name} (${bankAccount.currency.shortcode})`, value: bankAccount.currency.id}}
                   />
                 </div>
               </div>
@@ -143,7 +133,7 @@ const ModalEditBankAccount = ({ modalShow, setModalShow, bankAccount }) => {
             </Alert>
             : null
         }
-        <button onClick={handleBankAccount} className='btn btn-primary'>Editar banco</button>
+        <button onClick={handleBankAccount} className='btn btn-primary' disabled={loading}>Editar cuenta</button>
       </Modal.Footer>
     </Modal>
   )

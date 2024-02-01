@@ -104,10 +104,9 @@ export const BanksIndex = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Banco</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Monto</th>
+                        <th scope='col'>Tipo</th>
                         <th />
                       </tr>
                     </thead>
@@ -116,14 +115,9 @@ export const BanksIndex = () => {
                   banks.data.map(e => {
                     return (
                       <tr key={e.id}>
-                        <td scope='row'>
-                          <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
-                          </div>
-                        </td>
                         <td>{e.name}</td>
                         <td>{e.country.name}</td>
-                        <td>{e.currency.symbol} {e.amount.toLocaleString('de-DE', { minimumFractionDigits: 2 })}</td>
+                        <td>{e.type.name}</td>
                         <td>
                           <div className='d-flex justify-content-evenly align-items-center'>
                             <button onClick={() => handleBank(e)} className='TableActionButtons'>
@@ -164,10 +158,12 @@ export const BanksIndex = () => {
           : <div className='mt-4'><TableLoader /></div>
       }
       <div className=''>
-        <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />
+        {
+          modalShow && <ModalCreateBank setModalShow={setModalShow} modalShow={modalShow} />
+        }
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />
-        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"banco"} action={()=>handleDelete(bank)}/>
+        {modalEditShow && <ModalEditBank setModalShow={setModalEditShow} modalShow={modalEditShow} bank={bank} setBank={setEditBank} />}
+        <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} warning='Si elimina el banco, se eliminarán recursos (cuentas de banco) asociados al mismo. ¿Desea continuar?' action={()=>handleDelete(bank)}/>
       </div>
     </div>
   )

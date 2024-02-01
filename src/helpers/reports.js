@@ -1,12 +1,7 @@
 import { REPORTS_URL, API_INSTANCE, REPORTS_TYPE_URL } from '../consts/ApiUrl'
 export const getReports = async (query) => {
-  try {
-    const request = await API_INSTANCE.get(REPORTS_URL + '?' + query)
-
-    return request.data
-  } catch (error) {
-    return error.response
-  }
+  const request = await API_INSTANCE.get(REPORTS_URL + '?' + query);
+  return request.data
 }
 export const getInconsistences = async (query) => {
   try {
@@ -17,14 +12,14 @@ export const getInconsistences = async (query) => {
     return error.response
   }
 }
-export const createReport = async (form) => {
-  try {
-    const request = await API_INSTANCE.post(REPORTS_URL, form)
 
-    return request
-  } catch (error) {
-    return error.response
-  }
+export const getReportById = async (id) => {
+  const response = await API_INSTANCE.get(`${REPORTS_URL}/${id}`);
+  return response.data;
+}
+
+export const createReport = async (data) => {
+  return API_INSTANCE.post(REPORTS_URL, data);
 }
 export const updateReport = async (form, id) => {
   try {
@@ -35,7 +30,7 @@ export const updateReport = async (form, id) => {
     return error.response
   }
 }
-export const getReportTypes = async (query) => {
+export const getReportTypes = async (query = "") => {
   try {
     const request = await API_INSTANCE.get(`${REPORTS_TYPE_URL}?${query}`)
 
@@ -71,4 +66,19 @@ export const updateReportTypes = async(id,data)=>{
   } catch (error) {
     return error.response
   }
+}
+
+export const getDuplicates = async (query = "") => {
+  const response = await API_INSTANCE.get(`${REPORTS_URL}/duplicated?${query}`);
+  return response.data;
+}
+
+export const getDuplicateById = async (id) => {
+  const response = await API_INSTANCE.get(`${REPORTS_URL}/duplicated/${id}`);
+  return response.data;
+}
+
+export const updateDuplicate = async (id, data) => {
+  const response = await API_INSTANCE.put(`${REPORTS_URL}/duplicated/${id}`, data);
+  return response.data;
 }

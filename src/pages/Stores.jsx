@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { SessionContext } from '../context/SessionContext'
 import SearchBar from '../components/SearchBar'
 import PaginationTable from '../components/PaginationTable'
@@ -9,11 +9,17 @@ import TableLoader from '../components/Loaders/TableLoader'
 import ModalEditStore from '../components/ModalEditStore'
 import { useCheckRole } from '../hooks/useCheckRole'
 import ModalConfirmation from '../components/ModalConfirmation'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AlertMessage from '../components/AlertMessage'
+import { DASHBOARD_ROUTE, HOME_ROUTE } from '../consts/Routes'
+import FilterTableButtons from '../components/FilterTableButtons'
+import { getCountries } from '../helpers/countries'
+import { formatAmount } from '../utils/amount'
 
 const Stores = () => {
   const { session } = useContext(SessionContext)
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState(false);
   const [store, setStore] = useState()
   const [alert, setAlert] = useState({
     show: false,
@@ -26,13 +32,31 @@ const Stores = () => {
   const [modalEdit, setModalEdit] = useState(false)
   const [stores, setStores] = useState([])
   const form = useRef()
+  const navigate = useNavigate();
 
-  if (!useCheckRole(session)) {
-    return <Navigate to={"/"}/>
-  }
   useEffect(() => {
-    getStores('order=created_at&order_by=desc').then(r => setStores(r))
-  }, [])
+    const fetchData = async () => {
+      const [storesResponse, countriesResponse] = await Promise.all([getStores(`order=created_at`), getCountries("paginated=no")]);
+      setStores(storesResponse);
+      setCountries(countriesResponse.data);
+    }
+
+    if (session.role_id !== 1) {
+      navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+    }
+
+    fetchData();
+  }, [session.role_id])
+
+  const handleCountryChange = async (option) => {
+    setOffset(1);
+    setCountry(option);
+    let params = `order=created_at${option ? `&country=${option}` : ""}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    const storesResponse = await getStores(params);
+    setStores(storesResponse);
+  }
+
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
     getStores(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setStores(r))
@@ -44,9 +68,13 @@ const Stores = () => {
   const handleSearch = (e) => {
     e.preventDefault()
     setOffset(1)
-    if (form.current.search !== '') {
-      getStores(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setStores(r))
+    let params = "order=created_at&order_by=desc";
+    if (form.current.search.value !== '') {
+      params += `&search=${form.current.search.value}`;
     }
+    if (country) params += `&country=${country}`;
+
+    getStores(params).then(r => setStores(r))
   }
   const handleDelete = (e)=>{
     deleteStore(e.id).then( e=>{
@@ -76,7 +104,7 @@ const Stores = () => {
       }
       <div className='row mt-4'>
         <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8' />
+          <div className='col-8'><FilterTableButtons data={countries} callback={handleCountryChange} /></div>
           <div className='col-4'><SearchBar text='Locales' /></div>
         </form>
       </div>
@@ -98,11 +126,11 @@ const Stores = () => {
                   <table className='table TableP table-striped'>
                     <thead>
                       <tr className='pt-4'>
-                        <th scope='col'>ID Local</th>
                         <th scope='col'>Nombre</th>
                         <th scope='col'>Dirección</th>
                         <th scope='col'>País</th>
-                        <th scope='col'>Manejador</th>
+                        <th scope='col'>Encargado</th>
+                        <th scope='col'>Balance</th>
                         {useCheckRole(session) && <th />}
                       </tr>
                     </thead>
@@ -111,15 +139,11 @@ const Stores = () => {
                   stores.data.map(e => {
                     return (
                       <tr key={e.id}>
-                        <td scope='row'>
-                          <div className='d-flex justify-content-between align-items-center'>
-                            <span>{e.id}</span>
-                          </div>
-                        </td>
                         <td>{e.name}</td>
                         <td>{e.location}</td>
                         <td>{e.country.name}</td>
-                        <td>{e.user.name}</td>
+                        <td>{e.user ? e.user.name : "Sin encargado"}</td>
+                        <td>{formatAmount(e.cash_balance, e.country.currency.shortcode)}</td>
                         {
                           useCheckRole(session)
                           &&
@@ -164,9 +188,9 @@ const Stores = () => {
           : <div className='mt-4'><TableLoader /></div>
         }
       <div className=''>
-        <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />
+        {modalShow && <ModalCreateStore setModalShow={setModalShow} modalShow={modalShow} />}
         <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
-        <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />
+        {modalEdit && <ModalEditStore setModalShow={setModalEdit} modalShow={modalEdit} store={store} setStore={setStore} />}
         <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"Local"} action={()=>handleDelete(store)}/>
       </div>
     </div>

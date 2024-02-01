@@ -9,6 +9,12 @@ export const getStores = async (query) => {
     return error.response
   }
 }
+
+export const getStore = async (id) => {
+  const request = await API_INSTANCE.get(`${STORES_URL}/${id}`);
+  return request.data;
+}
+
 export const updateStore = async (id, data) => {
   try {
     const request = await API_INSTANCE.put(STORES_URL + '/' + id, data)

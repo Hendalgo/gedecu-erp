@@ -1,37 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
-const DecimalInput = ({ defaultValue = '0,00', name }) => {
-  const [value, setValue] = useState(defaultValue);
+const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => null, readOnly = false, }) => {
   const inputRef = useRef();
-
-  const formatNumber = (num) => {
-    return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  };
+  const prevNumber = useRef("0,00");
 
   const handleInputChange = (e) => {
     let { value } = e.target;
-    value = value.replace(/,/g, '').replace(/\./g, '');
-    value = value.padStart(3, '0');
-    const decimalPart = value.slice(-2);
-    let integerPart = value.slice(0, -2);
-    integerPart = parseInt(integerPart, 10).toString(); // Elimina los ceros a la izquierda
-    integerPart = formatNumber(integerPart);
-    setValue(`${integerPart},${decimalPart}`);
+
+    value = value.replace(/[.,]/gi, '');
+
+    if (value.match(/\D/gi)) {
+      e.target.value = prevNumber.current;
+    } else {
+      const number = new Number(value) / 100;
+
+      onChange(number);
+
+      e.target.value = number.toLocaleString("es-VE", {
+        useGrouping: true,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      prevNumber.current = e.target.value;
+    }
   };
 
   useEffect(() => {
-    inputRef.current.selectionStart = inputRef.current.selectionEnd = value.length;
-  }, [value]);
+    inputRef.current.selectionStart = inputRef.current.selectionEnd = prevNumber.current.length;
+  }, [prevNumber]);
 
   return (
     <input
+      id={id}
       name={name}
       className='form-control'
       ref={inputRef}
       type="text"
-      value={value}
-      onClick={(e) => e.target.setSelectionRange(value.length, value.length)}
+      defaultValue={defaultValue}
+      onClick={({ target }) => target.setSelectionRange(target.value.length, target.value.length)}
       onChange={handleInputChange}
+      readOnly={readOnly}
     />
   );
 };

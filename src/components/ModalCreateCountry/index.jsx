@@ -1,13 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Alert, Modal } from 'react-bootstrap'
 import { createCountry } from '../../helpers/countries'
 
 const ModalCreateCountry = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState('danger')
   const [errorMessage, setErrorMessage] = useState()
+  const [loading, setLoading] = useState(false);
   const form = useRef();
 
   const handleCountry = async () => {
+    setLoading(true);
     try {
       const request = await createCountry(form.current);
 
@@ -32,7 +34,9 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
       setErrorMessage('Error en la creación del país')
       setAlertType('danger')
     }
+    setLoading(false);
   }
+
   return (
     <Modal show={modalShow} size='lg' onHide={() => setModalShow(false)}>
       <Modal.Header closeButton>
@@ -48,16 +52,22 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form className='FormContainer' action='' ref={form}>
+        <form className='FormContainer' ref={form} autoComplete='off'>
           <div className="container">
             <div className='row mb-3'>
               <div className='col'>
-                <label htmlFor='name' className='form-label'>Nombre del país <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='country_name' placeholder='Venezuela'/>
+                <label htmlFor='country_name' className='form-label'>Nombre del país <span className='Required'>*</span></label>
+                <input required className='form-control' type='text' id='country_name' name='country_name' placeholder='Venezuela'/>
               </div>
               <div className='col'>
-                <label htmlFor='identifier'  className='form-label'>Código del país <span className='Required'>*</span></label>
-                <input required className='form-control' type='text' name='country_shortcode' placeholder='VE'/>
+                <label htmlFor='country_shortcode' className='form-label'>Código del país <span className='Required'>*</span></label>
+                <input required className='form-control' type='text' id='country_shortcode' name='country_shortcode' placeholder='VE'/>
+              </div>
+            </div>
+            <div className='row'>
+              <div className='col-6'>
+                <label htmlFor='locale' className='form-label'>Código local <span className='Required'>*</span></label>
+                <input required className='form-control' type='text' id='locale' name='locale' placeholder='es-VE'/>
               </div>
             </div>
           </div>
@@ -71,7 +81,7 @@ const ModalCreateCountry = ({ modalShow, setModalShow }) => {
             </Alert>
             : null
         }
-        <button onClick={handleCountry} className='btn btn-primary'>Crear país</button>
+        <button onClick={handleCountry} className='btn btn-primary' disabled={loading}>Crear país</button>
       </Modal.Footer>
     </Modal>
   )
