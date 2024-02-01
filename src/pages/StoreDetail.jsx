@@ -13,6 +13,8 @@ import { useFormatDate } from "../hooks/useFormatDate";
 import { getBanks } from "../helpers/banks";
 import { getBankAccounts } from "../helpers/banksAccounts";
 import TableLoader from "../components/Loaders/TableLoader";
+import './StoreDetail.css';
+import Title from "../components/Title";
 
 export default function StoreDetail() {
     const [store, setStore] = useState(null);
@@ -101,21 +103,21 @@ export default function StoreDetail() {
                 <Welcome showButton={false} text={store.name} />
             </section>
             <section className="mb-3 p-2">
-                <h5 className="mb-3"><ReactSVG src="/info-circle.svg" wrapper="span" className="bg-white px-1 rounded" /> <span style={{ color: "var(--blue-800, #052C65)" }}>Información</span> <ReactSVG src="/info.svg" wrapper="span" /></h5>
-                <div className="row justify-content-start">
-                    <div className="col-3 text-center card py-3">
+                <Title title="Información" icon="/info-circle.svg" description="Información respecto al local"/>
+                <div className="d-flex mt-3 justify-content-start">
+                    <div className="text-center card p-3">
                         <div className="mb-2">
-                            <img src={store.country.img ? store.country.img : "/world.svg"} width={56} height={56} />
+                            <img src={store.country.img ? store.country.img : "/world.svg"} width={40} height={40} />
                         </div>
-                        <p style={{color: "var(--bs-gray-600)"}} className="text-nowrap text-truncate"><ReactSVG src="/world.svg" wrapper="span" /> {store.country.name} - {store.country.shortcode}</p>
+                        <p style={{color: "var(--bs-gray-600)"}} className="text-nowrap text-truncate mb-0"><ReactSVG src="/world.svg" wrapper="span" className="miniSvg"/> {store.country.name} - {store.country.shortcode}</p>
                     </div>
-                    <div className="col-4 card mx-4 py-3">
-                        <p style={{color: "var(--bs-gray-600)"}}><ReactSVG src="/map-marker-home.svg" wrapper="span" /> Dirección</p>
-                        <p className="fw-semibold fs-6" style={{color: "var(--blue-800, #052C65)"}}>{store.location}</p>
+                    <div className="card mx-4 p-3 justify-content-evenly storeDetailCard">
+                        <p className="mb-0" style={{color: "var(--bs-gray-600)"}}><ReactSVG src="/map-marker-home.svg" wrapper="span" className="miniSvg"/> Dirección</p>
+                        <p className="fw-semibold fs-6 mb-0" style={{color: "var(--blue-800, #052C65)"}}>{store.location}</p>
                     </div>
-                    <div className="col-3 card py-3">
-                        <p style={{color: "var(--bs-gray-600)"}}><img src="/imoney.png" alt="cash icon" width={18} height={18} /> Efectivo</p>
-                        <p className="fw-semibold" style={{color: "var(--blue-800, #052C65)"}}>{formatAmount(store.cash_balance.balance, store.cash_balance.currency.shortcode)}</p>
+                    <div className="card justify-content-evenly p-3">
+                        <p className="mb-1" style={{color: "var(--bs-gray-600)"}}> <ReactSVG src="/money.svg" wrapper="span"/> Efectivo</p>
+                        <p className="fw-semibold mb-1" style={{color: "var(--blue-800, #052C65)"}}>{formatAmount(store.cash_balance.balance, store.cash_balance.currency.shortcode)}</p>
                     </div>
                 </div>
             </section>

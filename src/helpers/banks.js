@@ -1,4 +1,4 @@
-import { BANKS_URL, API_INSTANCE, BANKS_TOTAL_URL, BANKS_COUNTRIES_URL } from '../consts/ApiUrl'
+import { BANKS_URL, API_INSTANCE, BANKS_COUNTRIES_URL } from '../consts/ApiUrl'
 
 export const getBanks = async (querys) => {
   try {
@@ -13,7 +13,7 @@ export const getBank = async (id) => {
     const request = await API_INSTANCE.get(BANKS_URL + '/' + id)
     return request.data
   } catch (error) {
-
+    return error.response
   }
 }
 export const createBank = async (form) => {

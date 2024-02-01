@@ -70,9 +70,9 @@ const ModalCreateReport = ({ modalShow, setModalShow }) => {
   useEffect(() => {
     getReportTypes(`paginated=no`).then(r => {
       if (Array.isArray(r)) {
-        const income = r.filter(e => e.type === 'income').map(e => ({ value: e.id, label: e.name, type: e.type }));;
-        const expense =  r.filter(e=> e.type === 'expense').map(e => ({ value: e.id, label: e.name, type: e.type }));;
-        const neutro = r.filter(e=> e.type === 'neutro').map(e => ({ value: e.id, label: e.name, type: e.type }));;
+        const income = r.filter(e => e.type === 'income').map(e => ({ value: e.id, label: e.name, type: e.type }));
+        const expense =  r.filter(e=> e.type === 'expense').map(e => ({ value: e.id, label: e.name, type: e.type }));
+        const neutro = r.filter(e=> e.type === 'neutro').map(e => ({ value: e.id, label: e.name, type: e.type }));
 
         setReportTypes([
           {

@@ -20,6 +20,8 @@
   --primary-light-200: #85B6FF;
   --primary-light-100: #ADCEFF;
   --primary-white: #E6EDFF;
+
+  --bs-blue-400: #3D8BFD;
 }
 @font-face {
   font-family: Inter;
@@ -81,7 +83,6 @@ h6{
 }
 .TableP{
   border-radius: 4px 4px 12px 12px !important;
-  
   overflow: hidden !important;
 }
 .DownloadButton{
@@ -208,4 +209,10 @@ thead th{
   position: fixed !important;
   top: 20px;
   right: 10px;
+}
+
+/*Svg Styles*/
+
+.miniSvg path{
+  fill: var(--bs-blue-400);
 }

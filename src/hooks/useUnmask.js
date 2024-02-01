@@ -13,6 +13,3 @@ export function useUnmask (masked) {
   return parseFloat(unmasked)
 }
 
-function isNumeric (char) {
-  return !isNaN(char - parseInt(char))
-}

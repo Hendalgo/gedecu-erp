@@ -1,4 +1,4 @@
-import { API_INSTANCE,BANKS_TOTAL_URL, BANKS_COUNTRIES_URL, COUNTRIES_URL } from "../consts/ApiUrl"
+import { API_INSTANCE,BANKS_TOTAL_URL, COUNTRIES_URL } from "../consts/ApiUrl"
 export const getCountriesTotal = async () => {
   try {
     const request = await API_INSTANCE.get(BANKS_TOTAL_URL)
