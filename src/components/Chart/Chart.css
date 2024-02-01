@@ -1,11 +1,11 @@
-.Income, .Outcome{
-
+.Income,
+.Outcome {
   font-size: 12px;
   font-style: normal;
   font-weight: 600;
   margin-right: 16px;
 }
-.Income::before{
+.Income::before {
   content: "";
   width: 8px;
   height: 8px;
@@ -13,26 +13,26 @@
   border-radius: 200px;
   margin-right: 4px;
 }
-.Outcome::before{
+.Outcome::before {
   content: "";
   width: 8px;
   height: 8px;
-  background-color: #DC3545;
+  background-color: #dc3545;
   border-radius: 200px;
   margin-right: 4px;
 }
-.ChartTop{
+.ChartTop {
   margin-bottom: 24px;
 }
-.ChartFilterContainer select[name="date"]{
+.ChartFilterContainer select[name="date"] {
   margin-right: 12px;
 }
-.ChartContainer{
+.ChartContainer {
   padding: 20px !important;
-  border: 1px solid var(--border, #E6EDFF);
+  border: 1px solid var(--border, #e6edff);
   border-radius: 8px;
 }
-select{
-  background-color: #F3F7FE !important;
+select {
+  background-color: #f3f7fe !important;
   border: none !important;
 }

@@ -1,29 +1,29 @@
-.welcome{
-  color: #6C7DA3;
+.welcome {
+  color: #6c7da3;
 }
-.WelcomeContainer{
+.WelcomeContainer {
   border-bottom: 1px solid var(--primary-white);
 }
-.BankAmountContainer{
+.BankAmountContainer {
   padding: 40px 20px 0px 20px;
   border-radius: 12px;
-  border: 1px solid #E6EDFF;
-  background: var(--gray-white, #FFF);
+  border: 1px solid #e6edff;
+  background: var(--gray-white, #fff);
   position: relative;
 }
-.BankAmountTop{
+.BankAmountTop {
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid #E6EDFF;
+  border-bottom: 1px solid #e6edff;
 }
-.BankAmountContainer h6{
+.BankAmountContainer h6 {
   margin-top: 28px;
 }
-.TotalAmountBank span{
+.TotalAmountBank span {
   border-radius: 50px;
   padding: 20px;
-  background: var(--blue-100, #E7F1FF);
+  background: var(--blue-100, #e7f1ff);
 }
-.TotalAmountBank svg{
-  fill: #0D6EFD;
+.TotalAmountBank svg {
+  fill: #0d6efd;
 }

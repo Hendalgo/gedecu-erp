@@ -1,71 +1,70 @@
-:root{
-  --primary-neutral-dark-900: #0A0818;
-  --primary-neutral-dark-800: #100E1E;
+:root {
+  --primary-neutral-dark-900: #0a0818;
+  --primary-neutral-dark-800: #100e1e;
   --primary-neutral-dark-700: #191625;
-  --primary-neutral-dark-600: #22202C;
-  --primary-neutral-default-500: #2E2C34;
-  --primary-neutral-ligth-400: #7A7585;
-  --primary-neutral-ligth-300: #B5B0C2;
-  --primary-neutral-ligth-200: #E0DCEA;
-  --primary-neutral-ligth-100: #EFEDF4;
-  --primary-neutral-white: #FFFFFF;
+  --primary-neutral-dark-600: #22202c;
+  --primary-neutral-default-500: #2e2c34;
+  --primary-neutral-ligth-400: #7a7585;
+  --primary-neutral-ligth-300: #b5b0c2;
+  --primary-neutral-ligth-200: #e0dcea;
+  --primary-neutral-ligth-100: #efedf4;
+  --primary-neutral-white: #ffffff;
 
   --primary-dark-900: #002966;
-  --primary-dark-800: #00398F;
-  --primary-dark-700: #0049B8;
-  --primary-dark-600: #005AE0;
-  --primary-default-500: #0066FF;
-  --primary-light-400: #3385FF;
-  --primary-light-300: #5C9DFF;
-  --primary-light-200: #85B6FF;
-  --primary-light-100: #ADCEFF;
-  --primary-white: #E6EDFF;
+  --primary-dark-800: #00398f;
+  --primary-dark-700: #0049b8;
+  --primary-dark-600: #005ae0;
+  --primary-default-500: #0066ff;
+  --primary-light-400: #3385ff;
+  --primary-light-300: #5c9dff;
+  --primary-light-200: #85b6ff;
+  --primary-light-100: #adceff;
+  --primary-white: #e6edff;
 
-  --bs-blue-400: #3D8BFD;
+  --bs-blue-400: #3d8bfd;
 }
 @font-face {
   font-family: Inter;
   src: url("/fonts/Inter-VariableFont_slnt\,wght.ttf");
 }
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: Inter;
 }
 *::-webkit-scrollbar {
-  width: 3px;     /* Tamaño del scroll en vertical */
-  height: 8px;    /* Ocultar scroll */
+  width: 3px; /* Tamaño del scroll en vertical */
+  height: 8px; /* Ocultar scroll */
 }
 *::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 8px;
 }
-body{
-
+body {
 }
-.WelcomeContainer h4{
-  color: var(--blue-800, #052C65);
+.WelcomeContainer h4 {
+  color: var(--blue-800, #052c65);
   font-family: Inter;
   font-size: 28px;
   font-style: normal;
   font-weight: 600;
 }
-.Required{
-  color: var(--theme-danger, #DC3545);
+.Required {
+  color: var(--theme-danger, #dc3545);
   font-family: Inter;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
 }
-.tooltip{
+.tooltip {
   font-size: 12px;
   background-color: var(--primary-light-100);
   border-radius: 4px;
   padding: 8px 8px;
   position: relative;
 }
-.tooltip::after{
+.tooltip::after {
   content: ".";
   color: transparent;
   position: absolute !important;
@@ -78,47 +77,46 @@ body{
   transform: rotate(45deg);
   background-color: var(--primary-light-100);
 }
-h6{
+h6 {
   margin-bottom: 0 !important;
 }
-.TableP{
+.TableP {
   border-radius: 4px 4px 12px 12px !important;
   overflow: hidden !important;
 }
-.DownloadButton{
+.DownloadButton {
   border: none;
   background-color: transparent;
-  color: var(--blue-500, #0D6EFD);
+  color: var(--blue-500, #0d6efd);
   font-size: 13px;
   font-weight: 500;
 }
-.DownloadButton>span{
+.DownloadButton > span {
   margin-right: 6px;
 }
-.DownloadIcon span{
-  background: var(--blue-100, #E7F1FF);
+.DownloadIcon span {
+  background: var(--blue-100, #e7f1ff);
   padding: 8px;
   border-radius: 6px;
-  
 }
-.ModalBodyTitle{
-  color: var(--blue-800, #052C65);
+.ModalBodyTitle {
+  color: var(--blue-800, #052c65);
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 600;
   line-height: 150%; /* 21px */
 }
-.ModalBodyContent{
+.ModalBodyContent {
   color: var(--body-text-body-color, #212529);
   font-family: Inter;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
-  line-height: 150%; 
+  line-height: 150%;
 }
-.ModalTopTitle{
-  color: var(--blue-800, #052C65);
+.ModalTopTitle {
+  color: var(--blue-800, #052c65);
   /* Heading/H4 */
   font-family: Inter;
   font-size: 24px;
@@ -126,8 +124,8 @@ h6{
   font-weight: 500;
   line-height: 120%; /* 28.8px */
 }
-.ModalTopSubTitle{
-  color: var(--primary-neutral-ligth-400, #E0DCEA);
+.ModalTopSubTitle {
+  color: var(--primary-neutral-ligth-400, #e0dcea);
   margin-top: 4px;
   text-wrap: balance;
   font-family: Inter;
@@ -136,20 +134,20 @@ h6{
   font-weight: 400;
   line-height: 150%; /* 22.5px */
 }
-.ReportTypeTableStyle{
+.ReportTypeTableStyle {
   padding: 2px 8px;
   border-radius: 4px;
   border: 1px solid;
 }
-.TableActionButtons{
+.TableActionButtons {
   border-radius: 4px;
-  border: 1px solid var(--gray-300, #DEE2E6);
+  border: 1px solid var(--gray-300, #dee2e6);
   display: flex;
   padding: 8px;
   align-items: center;
   gap: 10px;
 }
-.TableActionButtonsDone{
+.TableActionButtonsDone {
   display: flex;
   padding: 8px;
   align-items: center;
@@ -157,55 +155,54 @@ h6{
   height: 35px;
   width: 35px;
   border-radius: 4px;
-  border: 1px solid var(--green-200, #A3CFBB);
-  background: var(--green-100, #D1E7DD);
+  border: 1px solid var(--green-200, #a3cfbb);
+  background: var(--green-100, #d1e7dd);
 }
-.TableActionButtonsCancel{
+.TableActionButtonsCancel {
   display: flex;
   padding: 8px;
   align-items: center;
   height: 35px;
   width: 35px;
   border-radius: 4px;
-  border: 1px solid var(--red-200, #F1AEB5);
-  background: var(--red-100, #F8D7DA);
+  border: 1px solid var(--red-200, #f1aeb5);
+  background: var(--red-100, #f8d7da);
 }
-.FormContainer select{
+.FormContainer select {
   background-color: white !important;
-  border: 1px solid var(--gray-400, #CED4DA) !important;
-  
+  border: 1px solid var(--gray-400, #ced4da) !important;
 }
-.UserSearch{
+.UserSearch {
   background-color: var(--primary-neutral-white);
   position: absolute;
   max-height: 20vh;
-  
+
   border-radius: 4px 4px;
 }
-.UserSearch input{
+.UserSearch input {
   display: none;
 }
-.UserSearch div{
+.UserSearch div {
   padding: 8px;
   border-bottom: 1px solid var(--primary-white);
   display: flex;
   flex-direction: column;
 }
-.UserSearch label{
+.UserSearch label {
   display: flex;
   flex-direction: column;
 }
-.SearchResultName{
+.SearchResultName {
   color: var(--primary-neutral-dark-900);
 }
-.SearchResultDescription{
-  color: var(--primary-whit, #6C7DA3);
+.SearchResultDescription {
+  color: var(--primary-whit, #6c7da3);
   font-size: 12px;
 }
-thead th{
-  color: #052C65 !important;
+thead th {
+  color: #052c65 !important;
 }
-.AlertContainer{
+.AlertContainer {
   position: fixed !important;
   top: 20px;
   right: 10px;
@@ -213,6 +210,6 @@ thead th{
 
 /*Svg Styles*/
 
-.miniSvg path{
+.miniSvg path {
   fill: var(--bs-blue-400);
 }

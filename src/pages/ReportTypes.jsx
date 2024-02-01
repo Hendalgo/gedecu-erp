@@ -1,149 +1,181 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { SessionContext } from '../context/SessionContext'
-import SearchBar from '../components/SearchBar'
-import PaginationTable from '../components/PaginationTable'
-import Welcome from '../components/Welcome'
-import TableLoader from '../components/Loaders/TableLoader'
-import { useCheckRole } from '../hooks/useCheckRole'
-import ModalConfirmation from '../components/ModalConfirmation'
-import { deleteReportTypes, getReportTypes } from '../helpers/reports'
-import ModalCreateReportType from '../components/ModalCreateReportType'
-import ModalEditReportType from '../components/ModalEditReportType'
-import AlertMessage from '../components/AlertMessage'
-import FilterTableButtons from '../components/FilterTableButtons'
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { SessionContext } from "../context/SessionContext";
+import SearchBar from "../components/SearchBar";
+import PaginationTable from "../components/PaginationTable";
+import Welcome from "../components/Welcome";
+import TableLoader from "../components/Loaders/TableLoader";
+import { useCheckRole } from "../hooks/useCheckRole";
+import ModalConfirmation from "../components/ModalConfirmation";
+import { deleteReportTypes, getReportTypes } from "../helpers/reports";
+import ModalCreateReportType from "../components/ModalCreateReportType";
+import ModalEditReportType from "../components/ModalEditReportType";
+import AlertMessage from "../components/AlertMessage";
+import FilterTableButtons from "../components/FilterTableButtons";
 
 const ReportTypes = () => {
-  const { session } = useContext(SessionContext)
-  const [type, setType] = useState()
-  const [modalShow, setModalShow] = useState(false)
-  const [modalConfirmShow, setModalConfirmShow] = useState(false)
-  const [offset, setOffset] = useState(1)
-  const [modalEdit, setModalEdit] = useState(false)
-  const [types, setTypes] = useState([])
-  const form = useRef()
+  const { session } = useContext(SessionContext);
+  const [type, setType] = useState();
+  const [modalShow, setModalShow] = useState(false);
+  const [modalConfirmShow, setModalConfirmShow] = useState(false);
+  const [offset, setOffset] = useState(1);
+  const [modalEdit, setModalEdit] = useState(false);
+  const [types, setTypes] = useState([]);
+  const form = useRef();
   const [alert, setAlert] = useState({
     show: false,
-    variant: 'danger',
-    text: 'Error al realizar la acción'
+    variant: "danger",
+    text: "Error al realizar la acción",
   });
   const movementTypes = [
-    {name: "Ingreso", id: "income"},
-    {name: "Egreso", id: "outcome"},
-    {name: "Neutro", id: "neutro"},
+    { name: "Ingreso", id: "income" },
+    { name: "Egreso", id: "outcome" },
+    { name: "Neutro", id: "neutro" },
   ];
 
   if (!useCheckRole(session)) {
-    return <Navigate to={"/"}/>
+    return <Navigate to={"/"} />;
   }
   useEffect(() => {
-    getReportTypes().then(r=> setTypes(r));
-  }, [])
+    getReportTypes().then((r) => setTypes(r));
+  }, []);
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then(r => setTypes(r))
-  }
+    getReportTypes(
+      `order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`,
+    ).then((r) => setTypes(r));
+  };
   const handleEdit = (e) => {
-    setType(e)
-    setModalEdit(true)
-  }
+    setType(e);
+    setModalEdit(true);
+  };
   const handleSearch = (e) => {
-    e.preventDefault()
-    setOffset(1)
-    if (form.current.search !== '') {
-      getReportTypes(`order=created_at&order_by=desc&search=${form.current.search.value}`).then(r => setTypes(r))
+    e.preventDefault();
+    setOffset(1);
+    if (form.current.search !== "") {
+      getReportTypes(
+        `order=created_at&order_by=desc&search=${form.current.search.value}`,
+      ).then((r) => setTypes(r));
     }
-  }
+  };
 
   const handleMovementType = async (option) => {
     setOffset(1);
-    const reportsTypesResponse = await getReportTypes(`order=created_at&order_by=desc${option ? `&type=${option}` : ""}`);
-  }
+    const reportsTypesResponse = await getReportTypes(
+      `order=created_at&order_by=desc${option ? `&type=${option}` : ""}`,
+    );
+  };
 
-  const handleDelete = (e)=>{
-    deleteReportTypes(e.id).then( e =>{
-      if (e.status === 201) {
-        getReportTypes(`order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`).then( r=> setTypes(r))
+  const handleDelete = (e) => {
+    deleteReportTypes(e.id)
+      .then((e) => {
+        if (e.status === 201) {
+          getReportTypes(
+            `order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`,
+          ).then((r) => setTypes(r));
+          setAlert({
+            text: "Tipo eliminado con éxito.",
+            variant: "success",
+            show: true,
+          });
+          return;
+        }
+
         setAlert({
-          text: "Tipo eliminado con éxito.",
-          variant: "success",
-          show: true
-        })
-        return;
-      }
-      
-      setAlert({
-        text: "Error al intentar eliminar el tipo",
-        variant: "danger",
-        show: true
+          text: "Error al intentar eliminar el tipo",
+          variant: "danger",
+          show: true,
+        });
       })
-    })
-    .catch();
-  }
+      .catch();
+  };
   return (
-    <div className='container-fluid'>
-      <Welcome text='Tipos de reportes' showButton={false}/>
+    <div className="container-fluid">
+      <Welcome text="Tipos de reportes" showButton={false} />
       {/* {
         useCheckRole(session)
         ?<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' />
         :<Welcome text='Tipos de reportes' add={() => setModalShow(true)} textButton='Tipo' showButton= {false}/>
       } */}
-      <div className='row mt-4'>
-        <form onSubmit={handleSearch} action='' ref={form} className='form-group row'>
-          <div className='col-8'><FilterTableButtons data={movementTypes} callback={handleMovementType} /></div>
-          <div className='col-4'><SearchBar text='Reporte' /></div>
+      <div className="row mt-4">
+        <form
+          onSubmit={handleSearch}
+          action=""
+          ref={form}
+          className="form-group row"
+        >
+          <div className="col-8">
+            <FilterTableButtons
+              data={movementTypes}
+              callback={handleMovementType}
+            />
+          </div>
+          <div className="col-4">
+            <SearchBar text="Reporte" />
+          </div>
         </form>
       </div>
-      {
-        Array.isArray(types.data)
-          ? types.data.length > 0
-
-            ? <>
-              <div className='row mt-4'>
-                <div className='col-12'>
-                  <div className='d-flex justify-content-between'>
-                    <div />
-                    <PaginationTable text='locales' offset={offset} quantity={types.last_page} itemsTotal={types.total} handleChange={handleChange} />
-                  </div>
+      {Array.isArray(types.data) ? (
+        types.data.length > 0 ? (
+          <>
+            <div className="row mt-4">
+              <div className="col-12">
+                <div className="d-flex justify-content-between">
+                  <div />
+                  <PaginationTable
+                    text="locales"
+                    offset={offset}
+                    quantity={types.last_page}
+                    itemsTotal={types.total}
+                    handleChange={handleChange}
+                  />
                 </div>
               </div>
-              <div className='row mt-2'>
-                <div className='d-flex'>
-                  <table className='table TableP table-striped'>
-                    <thead>
-                      <tr className='pt-4'>
-                        <th scope='col'>Nombre</th>
-                        <th scope='col'>Descripción</th>
-                        <th scope='col'>Tipo</th>
-                        
-                        <th scope='col'>Nro° de reportes</th>
-                        {/* {useCheckRole(session) && <th />} */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        types.data.map(e => {
-                          
-                    const color = JSON.parse(e.config).styles
-                    const type = ()=>{
-                      if (e.type === 'income') {
-                        return 'Ingreso'
-                      }
-                      else if(e.type === 'expense'){
-                        return 'Egreso'
-                      }
-                      return 'Neutro'
-                    }
-                    return (
-                      <tr key={e.id}>
-                        <td scope='row'>
-                          <div className='d-flex justify-content-between align-items-center'>
-                            <span style={{ borderColor: color.borderColor, backgroundColor: color.backgroundColor, color: color.color, padding: '2px 8px', borderRadius: '4px' }}>{e.name}</span>
-                          </div>
-                        </td>
-                        <td>{e.description}</td>
-                        <td>{type()}</td>
-                        <td>{e.count}</td>
-                        {/* {
+            </div>
+            <div className="row mt-2">
+              <div className="d-flex">
+                <table className="table TableP table-striped">
+                  <thead>
+                    <tr className="pt-4">
+                      <th scope="col">Nombre</th>
+                      <th scope="col">Descripción</th>
+                      <th scope="col">Tipo</th>
+
+                      <th scope="col">Nro° de reportes</th>
+                      {/* {useCheckRole(session) && <th />} */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {types.data.map((e) => {
+                      const color = JSON.parse(e.config).styles;
+                      const type = () => {
+                        if (e.type === "income") {
+                          return "Ingreso";
+                        } else if (e.type === "expense") {
+                          return "Egreso";
+                        }
+                        return "Neutro";
+                      };
+                      return (
+                        <tr key={e.id}>
+                          <td scope="row">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span
+                                style={{
+                                  borderColor: color.borderColor,
+                                  backgroundColor: color.backgroundColor,
+                                  color: color.color,
+                                  padding: "2px 8px",
+                                  borderRadius: "4px",
+                                }}
+                              >
+                                {e.name}
+                              </span>
+                            </div>
+                          </td>
+                          <td>{e.description}</td>
+                          <td>{type()}</td>
+                          <td>{e.count}</td>
+                          {/* {
                           useCheckRole(session)
                           &&
                           <td>
@@ -173,27 +205,37 @@ const ReportTypes = () => {
                             </div>
                           </td>
                         } */}
-                      </tr>
-                    )
-                  }
-                  )
-                }
-                    </tbody>
-                  </table>
-                </div>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </>
-            : <div className='d-flex justify-content-center align-items-center'>No hay tipos para mostrar</div>
-          : <div className='mt-4'><TableLoader /></div>
-        }
-      <div className=''>
+            </div>
+          </>
+        ) : (
+          <div className="d-flex justify-content-center align-items-center">
+            No hay tipos para mostrar
+          </div>
+        )
+      ) : (
+        <div className="mt-4">
+          <TableLoader />
+        </div>
+      )}
+      <div className="">
         {/* <ModalCreateReportType modalShow={modalShow} setModalShow={setModalShow}/>
         <ModalEditReportType modalShow={modalEdit} setModalShow={setModalEdit} data={type}/> */}
-        <AlertMessage setShow={setAlert} message={alert.text} variant={alert.variant} show={alert.show} />
+        <AlertMessage
+          setShow={setAlert}
+          message={alert.text}
+          variant={alert.variant}
+          show={alert.show}
+        />
         {/* <ModalConfirmation setModalShow={setModalConfirmShow} show={modalConfirmShow} text={"país"} action={()=>handleDelete(type)}/> */}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReportTypes
+export default ReportTypes;

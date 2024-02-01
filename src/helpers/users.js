@@ -1,40 +1,40 @@
-import { API_INSTANCE, USER_URL } from '../consts/ApiUrl'
+import { API_INSTANCE, USER_URL } from "../consts/ApiUrl";
 
 export const getUsers = async (querys) => {
-  return API_INSTANCE.get(USER_URL + '?' + querys);
-}
+  return API_INSTANCE.get(USER_URL + "?" + querys);
+};
 export const createUser = async (form) => {
   try {
-    const request = await API_INSTANCE.post(USER_URL, form)
-    return request
+    const request = await API_INSTANCE.post(USER_URL, form);
+    return request;
   } catch (error) {
-    return error.response
+    return error.response;
   }
-}
+};
 
 export const getUsersRoles = async () => {
-  const request = await API_INSTANCE.get(USER_URL + '/roles');
+  const request = await API_INSTANCE.get(USER_URL + "/roles");
   return request.data;
-}
+};
 export const updateUser = async (id, formData) => {
   try {
-    const request = await API_INSTANCE.put(USER_URL + '/' + id, formData)
-    return request
+    const request = await API_INSTANCE.put(USER_URL + "/" + id, formData);
+    return request;
   } catch (error) {
-    return error.response
+    return error.response;
   }
-}
+};
 export const deleteUser = async (id) => {
   try {
-    const request = await API_INSTANCE.delete(USER_URL + '/' + id)
-    return request
+    const request = await API_INSTANCE.delete(USER_URL + "/" + id);
+    return request;
   } catch (error) {
-    return error.response
+    return error.response;
   }
-}
+};
 
 /* Users Balances */
 export const getUsersBalance = async (query = "") => {
   const response = await API_INSTANCE.get(`${USER_URL}/balances?${query}`);
   return response.data;
-}
+};

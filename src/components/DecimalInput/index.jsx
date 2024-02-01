@@ -1,13 +1,19 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
-const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => null, readOnly = false, }) => {
+const DecimalInput = ({
+  defaultValue = "0,00",
+  name,
+  id = "",
+  onChange = () => null,
+  readOnly = false,
+}) => {
   const inputRef = useRef();
   const prevNumber = useRef("0,00");
 
   const handleInputChange = (e) => {
     let { value } = e.target;
 
-    value = value.replace(/[.,]/gi, '');
+    value = value.replace(/[.,]/gi, "");
 
     if (value.match(/\D/gi)) {
       e.target.value = prevNumber.current;
@@ -27,18 +33,21 @@ const DecimalInput = ({ defaultValue = '0,00', name, id = "", onChange = () => n
   };
 
   useEffect(() => {
-    inputRef.current.selectionStart = inputRef.current.selectionEnd = prevNumber.current.length;
+    inputRef.current.selectionStart = inputRef.current.selectionEnd =
+      prevNumber.current.length;
   }, [prevNumber]);
 
   return (
     <input
       id={id}
       name={name}
-      className='form-control'
+      className="form-control"
       ref={inputRef}
       type="text"
       defaultValue={defaultValue}
-      onClick={({ target }) => target.setSelectionRange(target.value.length, target.value.length)}
+      onClick={({ target }) =>
+        target.setSelectionRange(target.value.length, target.value.length)
+      }
       onChange={handleInputChange}
       readOnly={readOnly}
     />

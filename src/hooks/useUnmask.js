@@ -1,15 +1,14 @@
-export function useUnmask (masked) {
-  function isNumeric (char) {
-    return !isNaN(char - parseFloat(char))
+export function useUnmask(masked) {
+  function isNumeric(char) {
+    return !isNaN(char - parseFloat(char));
   }
 
-  let unmasked = ''
+  let unmasked = "";
   for (let i = 0; i < masked.length; i++) {
-    if (isNumeric(masked[i]) || masked[i] === ',') {
-      unmasked += masked[i]
+    if (isNumeric(masked[i]) || masked[i] === ",") {
+      unmasked += masked[i];
     }
   }
-  unmasked = unmasked.replace(',', '.')
-  return parseFloat(unmasked)
+  unmasked = unmasked.replace(",", ".");
+  return parseFloat(unmasked);
 }
-

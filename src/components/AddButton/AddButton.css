@@ -1,12 +1,12 @@
-.AddButtonContainer{
+.AddButtonContainer {
   padding: 8px !important;
   border-radius: 6px;
   border: 1px solid var(--primary-white);
 }
-.AddButtonContainer:hover{
+.AddButtonContainer:hover {
   cursor: pointer;
 }
-.AddButtonIconContainer span{
+.AddButtonIconContainer span {
   background-color: var(--primary-white);
   width: 30px;
   height: 30px;
@@ -15,11 +15,11 @@
   align-items: center;
   border-radius: 4px;
 }
-.AddButtonTextContainer{
+.AddButtonTextContainer {
   font-size: 12px;
   line-height: 1.1;
   text-transform: uppercase;
 }
-.AddText{
+.AddText {
   font-weight: 600;
 }

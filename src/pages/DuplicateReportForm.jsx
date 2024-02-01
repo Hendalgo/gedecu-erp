@@ -6,215 +6,336 @@ import Welcome from "../components/Welcome";
 import { getDuplicateById, updateDuplicate } from "../helpers/reports";
 import formsByCurrencyMap from "../consts/DuplicatedFormsByCurrency";
 import DecimalInput from "../components/DecimalInput";
-import { DASHBOARD_ROUTE, HOME_ROUTE, } from "../consts/Routes";
+import { DASHBOARD_ROUTE, HOME_ROUTE } from "../consts/Routes";
 import DuplicateInfoCard from "../components/DuplicateInfoCard";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import { formatAmount } from "../utils/amount";
 import { divideInGroups } from "../utils/array";
 
 export default function DuplicateReportForm() {
-    const [duplicate, setDuplicate] = useState(null);
-    const [currency, setCurrency] = useState(0);
-    const [message, setMessage] = useState({messages: null, variant: "danger"});
-    const { session } = useContext(SessionContext);
-    const params = useParams();
-    const navigate = useNavigate();
+  const [duplicate, setDuplicate] = useState(null);
+  const [currency, setCurrency] = useState(0);
+  const [message, setMessage] = useState({ messages: null, variant: "danger" });
+  const { session } = useContext(SessionContext);
+  const params = useParams();
+  const navigate = useNavigate();
 
-    const getDuplicate = async () => {
-        const {id} = params;
+  const getDuplicate = async () => {
+    const { id } = params;
 
-        try {
-            const duplicateResponse = await getDuplicateById(id);
-            setDuplicate(duplicateResponse);
-        } catch ({response}) {
-            const {message, error} = response.data;
-            let errorMessages = [];
-            if (message) errorMessages.push(message);
-            console.log(message, error);
-            setMessage({messages: errorMessages, variant: "danger"});
-        }
+    try {
+      const duplicateResponse = await getDuplicateById(id);
+      setDuplicate(duplicateResponse);
+    } catch ({ response }) {
+      const { message, error } = response.data;
+      let errorMessages = [];
+      if (message) errorMessages.push(message);
+      console.log(message, error);
+      setMessage({ messages: errorMessages, variant: "danger" });
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      getDuplicate();
+    };
+
+    if (session.role_id !== 1) {
+      navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            getDuplicate();
+    fetchData();
+  }, [session.role_id, params]);
+
+  const handleRadioChange = ({ target }) => {
+    setMessage((prev) => ({ ...prev, messages: null }));
+    setCurrency(parseInt(target.value));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage((prev) => ({ ...prev, messages: null }));
+
+    const errors = [];
+
+    try {
+      const formData = new FormData(e.target);
+
+      if (formData.has("store") && !formData.get("store"))
+        errors.push("El campo Local es obligatorio");
+      if (formData.has("account") && !formData.get("account"))
+        errors.push("El campo Cuenta es obligatorio");
+      if (formData.has("amount") && formData.get("amount") === "0,00")
+        errors.push("El campo Monto es obligatorio");
+      if (!formData.get("date"))
+        errors.push("El campo Fecha de pago es obligatorio");
+
+      if (errors.length > 0) throw new Error(errors.join(";"));
+
+      const data = {};
+
+      for (const [key, value] of formData.entries()) {
+        let formatedValue = value;
+
+        if (key === "amount") {
+          formatedValue = new Number(formatedValue.replace(/\D/g, "")) / 100;
         }
 
-        if (session.role_id !== 1) {
-            navigate(`/${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
+        if (key === "date") {
+          const date = new Date(formatedValue);
+          const minutes = date.getUTCMinutes();
+          const timeZoneOffset = date.getTimezoneOffset();
+          date.setMinutes(minutes + timeZoneOffset);
+          formatedValue = date.toISOString();
         }
 
-        fetchData();
-    }, [session.role_id, params,]);
+        data[key] = formatedValue;
+      }
 
-    const handleRadioChange = ({ target }) => {
-        setMessage((prev) => ({...prev, messages: null}));
-        setCurrency(parseInt(target.value));
+      const { id } = params;
+
+      const { message } = await updateDuplicate(id, data);
+
+      if (message) {
+        setMessage({
+          messages: ["Reporte verificado exitosamente"],
+          variant: "success",
+        });
+        getDuplicate();
+      }
+    } catch ({ message, response }) {
+      let errorMessage;
+
+      if (response) {
+        errorMessage = [response.data.message];
+      } else {
+        errorMessage = message.split(";");
+      }
+      setMessage({ messages: errorMessage, variant: "danger" });
     }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setMessage((prev) => ({...prev, messages: null}));
+  if (!duplicate) return <></>;
 
-        const errors = [];
+  const duplicateData = JSON.parse(duplicate.duplicate_data);
+  const reportData = JSON.parse(duplicate.data);
+  const filteredRows = [];
+  let reportRows = [];
 
-        try {
-            const formData = new FormData(e.target);
-
-            if (formData.has("store") && !formData.get("store")) errors.push("El campo Local es obligatorio");
-            if (formData.has("account") && !formData.get("account")) errors.push("El campo Cuenta es obligatorio");
-            if (formData.has("amount") && formData.get("amount") === "0,00") errors.push("El campo Monto es obligatorio");
-            if (!formData.get("date")) errors.push("El campo Fecha de pago es obligatorio");
-            
-            if (errors.length > 0) throw new Error(errors.join(";"));
-
-            const data = {};
-
-            for (const [key, value] of formData.entries()) {
-                let formatedValue = value;
-
-                if (key === "amount") {
-                    formatedValue = new Number(formatedValue.replace(/\D/g, "")) / 100;
-                }
-
-                if (key === "date") {
-                    const date = new Date(formatedValue);
-                    const minutes = date.getUTCMinutes();
-                    const timeZoneOffset = date.getTimezoneOffset();
-                    date.setMinutes(minutes + timeZoneOffset);
-                    formatedValue = date.toISOString();
-                }
-
-                data[key] = formatedValue;
-            }
-
-            const {id} = params;
-
-            const {message} = await updateDuplicate(id, data);
-
-            if (message) {
-                setMessage({messages: ["Reporte verificado exitosamente"], variant: "success"});
-                getDuplicate();
-            }
-        } catch ({ message, response }) {
-            let errorMessage;
-
-            if (response) {
-                errorMessage = [response.data.message];
-            } else {
-                errorMessage = message.split(";");
-            }
-            setMessage({ messages: errorMessage, variant: "danger" });
-        }
+  for (const key of reportsColumnsMap.keys()) {
+    if (!["isDuplicated"].includes(key)) {
+      if (Object.keys(reportData).includes(key)) {
+        let formated = reportData[key];
+        if (["amount", "rate", "conversion"].includes(key))
+          formated = formatAmount(formated);
+        filteredRows.push([reportsColumnsMap.get(key), formated]);
+      }
     }
+  }
 
-    if (!duplicate) return <></>;
+  reportRows = divideInGroups(filteredRows);
 
-    const duplicateData = JSON.parse(duplicate.duplicate_data);
-    const reportData = JSON.parse(duplicate.data);
-    const filteredRows = []; let reportRows = [];
-
-    for (const key of reportsColumnsMap.keys()) {
-        if (!["isDuplicated"].includes(key)) {
-            if (Object.keys(reportData).includes(key)) {
-                let formated = reportData[key];
-                if (["amount", "rate", "conversion"].includes(key)) formated = formatAmount(formated);
-                filteredRows.push([reportsColumnsMap.get(key), formated]);
-            }
-        }
-    }
-
-    reportRows = divideInGroups(filteredRows);
-
-    return (
-        <>
-            <section className="mb-3">
-                <Welcome showButton={false} text="Verificar Reporte" />
-            </section>
-            <section className="row">
-                <div className="col-7">
-                    <Card>
-                        <Card.Header>Datos de recuperación</Card.Header>
-                        {
-                            duplicate.duplicate_status ?
-                            <DuplicateInfoCard data={duplicateData} /> :
-                            <form onSubmit={handleSubmit}>
-                                <Card.Body>
-                                    <div className="row">
-                                        <div className="col">
-                                            <Form.Check type="radio" id="bolivars" name="currencies" value={1} label="Bolívares" inline onChange={handleRadioChange} />
-                                            <Form.Check type="radio" id="others" name="currencies" value={2} label="Otros" inline onChange={handleRadioChange} />
-                                        </div>
-                                    </div>
-                                    {
-                                        formsByCurrencyMap.has(currency) && formsByCurrencyMap.get(currency)
-                                    }
-                                    {
-                                        currency > 0 && <div className="row">
-                                            <div className="col-6">
-                                                <label htmlFor="amount" className="form-label">Monto <span className="Required">*</span></label>
-                                                <DecimalInput id="amount" name="amount" />
-                                            </div>
-                                            <div className="col-6">
-                                                <label htmlFor="date" className="form-label">Fecha de pago <span className="Required">*</span></label>
-                                                <input type="date" name="date" id="date" className="form-control" />
-                                            </div>
-                                        </div>
-                                    }
-                                    <Alert show={message.messages?.length > 0} variant={message.variant} className="mt-3">
-                                        <ul>
-                                            {
-                                                message.messages?.map((message, index) => {
-                                                    return <li key={index}>{message}</li>
-                                                })
-                                            }
-                                        </ul>
-                                    </Alert>
-                                </Card.Body>
-                                <Card.Footer className="text-end">
-                                    <input type="submit" value="Verificar" className="col-4 btn btn-success" disabled={currency == 0 || duplicate.duplicate_status} />
-                                </Card.Footer>
-                            </form>
-                        }
-                    </Card>
+  return (
+    <>
+      <section className="mb-3">
+        <Welcome showButton={false} text="Verificar Reporte" />
+      </section>
+      <section className="row">
+        <div className="col-7">
+          <Card>
+            <Card.Header>Datos de recuperación</Card.Header>
+            {duplicate.duplicate_status ? (
+              <DuplicateInfoCard data={duplicateData} />
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <Card.Body>
+                  <div className="row">
+                    <div className="col">
+                      <Form.Check
+                        type="radio"
+                        id="bolivars"
+                        name="currencies"
+                        value={1}
+                        label="Bolívares"
+                        inline
+                        onChange={handleRadioChange}
+                      />
+                      <Form.Check
+                        type="radio"
+                        id="others"
+                        name="currencies"
+                        value={2}
+                        label="Otros"
+                        inline
+                        onChange={handleRadioChange}
+                      />
+                    </div>
+                  </div>
+                  {formsByCurrencyMap.has(currency) &&
+                    formsByCurrencyMap.get(currency)}
+                  {currency > 0 && (
+                    <div className="row">
+                      <div className="col-6">
+                        <label htmlFor="amount" className="form-label">
+                          Monto <span className="Required">*</span>
+                        </label>
+                        <DecimalInput id="amount" name="amount" />
+                      </div>
+                      <div className="col-6">
+                        <label htmlFor="date" className="form-label">
+                          Fecha de pago <span className="Required">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="date"
+                          id="date"
+                          className="form-control"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <Alert
+                    show={message.messages?.length > 0}
+                    variant={message.variant}
+                    className="mt-3"
+                  >
+                    <ul>
+                      {message.messages?.map((message, index) => {
+                        return <li key={index}>{message}</li>;
+                      })}
+                    </ul>
+                  </Alert>
+                </Card.Body>
+                <Card.Footer className="text-end">
+                  <input
+                    type="submit"
+                    value="Verificar"
+                    className="col-4 btn btn-success"
+                    disabled={currency == 0 || duplicate.duplicate_status}
+                  />
+                </Card.Footer>
+              </form>
+            )}
+          </Card>
+        </div>
+        <div className="col-5">
+          <Card>
+            <Card.Body>
+              {reportRows.map((row, index) => (
+                <div key={index} className="row">
+                  {row.map(([key, value]) => (
+                    <div key={key} className="col">
+                      <h6
+                        style={{
+                          color: "#6C7DA3",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {key}:
+                      </h6>
+                      <p
+                        style={{
+                          color: "#495057",
+                          fontSize: "16px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                <div className="col-5">
-                    <Card>
-                        <Card.Body>
-                            {
-                                reportRows.map((row, index) => <div key={index} className="row">
-                                    {
-                                        row.map(([key, value]) => <div key={key} className="col">
-                                            <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600, textTransform: "uppercase"}}>{key}:</h6>
-                                            <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{value}</p>
-                                        </div>)
-                                    }
-                                </div>)
-                            }
-                            <div className="row">
-                                <div className="col">
-                                    <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>RESPONSABLE:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{duplicate.report.user.name}</p>
-                                </div>
-                                <div className="col">
-                                    <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>FECHA:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{new Date(duplicate.created_at).toLocaleString("es-VE")}</p>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col">
-                                    <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>ID REPORTE:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>#{duplicate.report.id.toString().padStart(6, "0")}</p>
-                                </div>
-                                <div className="col">
-                                    <h6 style={{color: "#6C7DA3", fontSize: "12px", fontWeight: 600}}>MOTIVO:</h6>
-                                    <p style={{color: "#495057", fontSize: "16px", fontWeight: 600}}>{duplicate.report.type.name}</p>
-                                </div>
-                            </div>
-                        </Card.Body>
-                    </Card>
+              ))}
+              <div className="row">
+                <div className="col">
+                  <h6
+                    style={{
+                      color: "#6C7DA3",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    RESPONSABLE:
+                  </h6>
+                  <p
+                    style={{
+                      color: "#495057",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {duplicate.report.user.name}
+                  </p>
                 </div>
-            </section>
-        </>
-    )
+                <div className="col">
+                  <h6
+                    style={{
+                      color: "#6C7DA3",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    FECHA:
+                  </h6>
+                  <p
+                    style={{
+                      color: "#495057",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {new Date(duplicate.created_at).toLocaleString("es-VE")}
+                  </p>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                  <h6
+                    style={{
+                      color: "#6C7DA3",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    ID REPORTE:
+                  </h6>
+                  <p
+                    style={{
+                      color: "#495057",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    #{duplicate.report.id.toString().padStart(6, "0")}
+                  </p>
+                </div>
+                <div className="col">
+                  <h6
+                    style={{
+                      color: "#6C7DA3",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    MOTIVO:
+                  </h6>
+                  <p
+                    style={{
+                      color: "#495057",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {duplicate.report.type.name}
+                  </p>
+                </div>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </section>
+    </>
+  );
 }

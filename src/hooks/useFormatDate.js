@@ -7,8 +7,8 @@ export const useFormatDate = (date) => {
     year: "numeric",
     hour: "numeric",
     minute: "numeric",
-    second: "numeric"
+    second: "numeric",
   };
 
-  return formatDate.toLocaleString('es-VE', options);
-}
+  return formatDate.toLocaleString("es-VE", options);
+};

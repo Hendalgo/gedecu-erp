@@ -1,49 +1,50 @@
-.SideBarItem img{
-  fill: #6C7DA3;
+.SideBarItem img {
+  fill: #6c7da3;
 }
-.SideBarCol{
+.SideBarCol {
   background-color: var(--primary-neutral-white);
   height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
   padding: 20px 32px;
 }
-.AppContainer{
-  background: linear-gradient(180deg, #0D6EFD0A 0%, rgba(13, 110, 253, 0.00) 100%);
+.AppContainer {
+  background: linear-gradient(180deg, #0d6efd0a 0%, rgba(13, 110, 253, 0) 100%);
 }
-.logo{
+.logo {
   padding-left: 0 !important;
 }
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
   color: var(--primary-default-500) !important;
-  background-color: #E7F1FF !important;
+  background-color: #e7f1ff !important;
 }
-.nav-link{
-  color: #6C7DA3 !important;
+.nav-link {
+  color: #6c7da3 !important;
   padding: 8px 10px !important;
 }
-.nav-link svg{
-  fill: #6C7DA3;
+.nav-link svg {
+  fill: #6c7da3;
 }
-.nav-link.active svg{
+.nav-link.active svg {
   fill: var(--primary-default-500);
 }
-.accordion-button{
+.accordion-button {
   padding: 0px !important;
   padding-right: 8px !important;
-  fill: #6C7DA3;
-  color: #6C7DA3 !important;
+  fill: #6c7da3;
+  color: #6c7da3 !important;
   box-shadow: none !important;
 }
-.accordion-item.active{
-  background-color: #E7F1FF !important;
-  .accordion-button{
-    background-color: #E7F1FF !important;
+.accordion-item.active {
+  background-color: #e7f1ff !important;
+  .accordion-button {
+    background-color: #e7f1ff !important;
   }
 }
-.accordion-button:not(.collapsed){
+.accordion-button:not(.collapsed) {
   background-color: var(--blue-100, white) !important;
 }
-.accordion-item{
+.accordion-item {
   border: none !important;
 }

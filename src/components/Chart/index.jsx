@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,15 +7,15 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
-} from 'chart.js'
-import { Line } from 'react-chartjs-2'
-import './Chart.css'
+  Legend,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import "./Chart.css";
 
-import { getBanks } from '../../helpers/banks'
+import { getBanks } from "../../helpers/banks";
 
-import { getReports } from '../../helpers/reports'
-import { useFormatDate } from '../../hooks/useFormatDate'
+import { getReports } from "../../helpers/reports";
+import { useFormatDate } from "../../hooks/useFormatDate";
 
 ChartJS.register(
   CategoryScale,
@@ -24,99 +24,114 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
-)
+  Legend,
+);
 const Chart = () => {
-  const [banks, setBanks] = useState([])
+  const [banks, setBanks] = useState([]);
   const [options, setOptions] = useState({
     scales: {
       y: {
         min: 0,
-        max: 10000
+        max: 10000,
       },
       x: {
-        ticks: { color: '#6C757D' },
+        ticks: { color: "#6C757D" },
         grid: {
-          display: false
-        }
-      }
+          display: false,
+        },
+      },
     },
     plugins: {
       legend: {
-        display: false
+        display: false,
       },
       tooltip: {
-        backgroundColor: '#ffffff',
-        borderColor: '#E6EDFF',
+        backgroundColor: "#ffffff",
+        borderColor: "#E6EDFF",
         borderWidth: 1,
-        titleColor: '#6C757D',
+        titleColor: "#6C757D",
         titleFont: {
-          family: 'Inter',
-          weight: 400
+          family: "Inter",
+          weight: 400,
         },
-        titleAlign: 'center',
-        bodyColor: '#000',
-        bodyAlign: 'center',
+        titleAlign: "center",
+        bodyColor: "#000",
+        bodyAlign: "center",
         usePointStyle: true,
-        pointStyle: 'circle',
+        pointStyle: "circle",
         boxPadding: 4,
         boxWidth: 6,
         bodyFont: {
-          family: 'Inter',
+          family: "Inter",
           weight: 700,
-          size: 16
+          size: 16,
         },
-        padding: 12
-      }
-    }
-  })
+        padding: 12,
+      },
+    },
+  });
   const [data, setData] = useState({
-    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-    datasets: [
-    ]
-  })
-  const formRef = useRef()
+    labels: [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ],
+    datasets: [],
+  });
+  const formRef = useRef();
   useEffect(() => {
-    getBanks().then(e => setBanks(e.data)).finally(handleFilter)
-  }, [formRef])
+    getBanks()
+      .then((e) => setBanks(e.data))
+      .finally(handleFilter);
+  }, [formRef]);
 
   const handleFilter = async () => {
     try {
-      const form = new FormData(formRef.current)
+      const form = new FormData(formRef.current);
 
-      const data = (await getReports(`bank=${form.get('bank') || 1}&movement=income&period=${form.get('period') || 'daily'}`))
+      const data = await getReports(
+        `bank=${form.get("bank") || 1}&movement=income&period=${form.get("period") || "daily"}`,
+      );
       setOptions({
         ...options,
         scales: {
           y: {
-            min: 0
+            min: 0,
           },
           x: {
-            ticks: { color: '#6C757D' },
+            ticks: { color: "#6C757D" },
             grid: {
-              display: false
-            }
-          }
-        }
-      })
-      const chartdataI = []
+              display: false,
+            },
+          },
+        },
+      });
+      const chartdataI = [];
       let labels = Object.keys(data).reverse();
       const chartdataE = [];
-      if (formRef.current.period.value === 'year' ) {
-        labels.forEach(element => {
+      if (formRef.current.period.value === "year") {
+        labels.forEach((element) => {
           chartdataI.unshift(data[element].incomes);
         });
-        labels.forEach(element => {
+        labels.forEach((element) => {
           chartdataE.unshift(data[element].expenses);
         });
-        
+
         labels = labels.reverse();
-      }
-      else{
-        labels.forEach(element => {
+      } else {
+        labels.forEach((element) => {
           chartdataI.push(data[element].incomes);
         });
-        labels.forEach(element => {
+        labels.forEach((element) => {
           chartdataE.push(data[element].expenses);
         });
       }
@@ -124,74 +139,73 @@ const Chart = () => {
         labels,
         datasets: [
           {
-            label: 'Ingresos',
+            label: "Ingresos",
             data: chartdataI,
             fill: false,
-            borderColor: '#198754',
-            backgroundColor: '#198754',
-            tension: 0.4
-
+            borderColor: "#198754",
+            backgroundColor: "#198754",
+            tension: 0.4,
           },
           {
-            label: 'Egreso',
+            label: "Egreso",
             data: chartdataE,
             fill: false,
-            borderColor: '#DC3545',
-            backgroundColor: '#DC3545',
-            tension: 0.4
-
-          }
-        ]
-      })
+            borderColor: "#DC3545",
+            backgroundColor: "#DC3545",
+            tension: 0.4,
+          },
+        ],
+      });
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
   return (
-    <div className='d-flex'>
-      <div className='container-fluid bg-white ChartContainer'>
-        <div className='row'>
-          <div className='col-12'>
-            <div className='d-flex justify-content-between align-items-center ChartTop'>
-              <div className='d-flex'>
-                <span className='Income d-flex align-items-center'>Ingresos</span>
-                <span className='Outcome d-flex align-items-center'>Egresos</span>
+    <div className="d-flex">
+      <div className="container-fluid bg-white ChartContainer">
+        <div className="row">
+          <div className="col-12">
+            <div className="d-flex justify-content-between align-items-center ChartTop">
+              <div className="d-flex">
+                <span className="Income d-flex align-items-center">
+                  Ingresos
+                </span>
+                <span className="Outcome d-flex align-items-center">
+                  Egresos
+                </span>
               </div>
-              <div className='d-flex ChartFilterContainer'>
-                <form onChange={handleFilter} ref={formRef} className='d-flex'>
-                  <select name='period' className='form-select'>
-                    <option defaultChecked value='daily'>Día</option>
-                    <option value='week'>Semana</option>
-                    <option value='month'>Mes</option>
-                    <option value='quarter'>Trimestre</option>
-                    <option value='semester'>Semestre</option>
-                    <option value='year'>Año</option>
+              <div className="d-flex ChartFilterContainer">
+                <form onChange={handleFilter} ref={formRef} className="d-flex">
+                  <select name="period" className="form-select">
+                    <option defaultChecked value="daily">
+                      Día
+                    </option>
+                    <option value="week">Semana</option>
+                    <option value="month">Mes</option>
+                    <option value="quarter">Trimestre</option>
+                    <option value="semester">Semestre</option>
+                    <option value="year">Año</option>
                   </select>
-                  {
-                    banks.length > 0
-                      ? <select name='bank' className='form-select'>
-                        {
-                        banks.map((e) =>
-                          <option value={e.id} key={e.id}>{e.name}</option>
-                        )
-                      }
-                      </select>
-                      : null
-                  }
+                  {banks.length > 0 ? (
+                    <select name="bank" className="form-select">
+                      {banks.map((e) => (
+                        <option value={e.id} key={e.id}>
+                          {e.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
                 </form>
               </div>
             </div>
           </div>
         </div>
-        <div className='row'>
-          <Line
-            options={options}
-            data={data}
-          />
+        <div className="row">
+          <Line options={options} data={data} />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Chart
+export default Chart;

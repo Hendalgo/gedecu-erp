@@ -1,16 +1,16 @@
-.BankName{
+.BankName {
   font-size: 13px;
   font-style: normal;
   font-weight: 500;
-  color: var(--gray-600, #6C757D);
+  color: var(--gray-600, #6c757d);
 }
-.BankAmount{
-  color: var(--green-500, #052C65);
-font-family: Inter;
-font-size: 14px;
-font-style: normal;
-font-weight: 600;
+.BankAmount {
+  color: var(--green-500, #052c65);
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
 }
-.BankImage{
+.BankImage {
   margin-right: 6px;
 }

@@ -1,103 +1,109 @@
-import { REPORTS_DUPLICATE_ROUTE, DASHBOARD_INDEX_ROUTE, REPORTS_MISS_ROUTE, BANK_ACCOUNTS_ROUTE, CURRENCIES_ROUTE } from "./Routes"
+import {
+  REPORTS_DUPLICATE_ROUTE,
+  DASHBOARD_INDEX_ROUTE,
+  REPORTS_MISS_ROUTE,
+  BANK_ACCOUNTS_ROUTE,
+  CURRENCIES_ROUTE,
+} from "./Routes";
 
 export const AdminMenus = [
   {
-    title: 'Escritorio',
-    src: 'home-blue-icon',
+    title: "Escritorio",
+    src: "home-blue-icon",
     link: DASHBOARD_INDEX_ROUTE,
-    isActive: false
+    isActive: false,
   },
   {
-    title: 'Reportes',
-    src: 'document-white-icon',
-    link: 'reports',
+    title: "Reportes",
+    src: "document-white-icon",
+    link: "reports",
     others: [
       {
-        name: 'Duplicados',
-        link: 'reports/' + REPORTS_DUPLICATE_ROUTE
+        name: "Duplicados",
+        link: "reports/" + REPORTS_DUPLICATE_ROUTE,
       },
       {
-        name: 'Inconsistencias',
-        link: 'reports/' + REPORTS_MISS_ROUTE
+        name: "Inconsistencias",
+        link: "reports/" + REPORTS_MISS_ROUTE,
       },
     ],
-    isActive: false
+    isActive: false,
   },
   {
-    title: 'Locales',
-    src: 'map-marker-home',
-    link: 'stores',
-    isActive: false
+    title: "Locales",
+    src: "map-marker-home",
+    link: "stores",
+    isActive: false,
   },
   {
-    title: 'Bancos ',
-    src: 'bank',
-    link: 'banks',
+    title: "Bancos ",
+    src: "bank",
+    link: "banks",
     others: [
       {
-        name: 'Cuentas de banco',
-        link: 'banks/'+ BANK_ACCOUNTS_ROUTE
-      }
-    ],
-    isActive: false
-  },
-  {
-    title: 'Usuarios',
-    src: 'user',
-    link: 'users',
-    others: [
-      {
-        name: 'Saldos',
-        link: 'users/balance',
+        name: "Cuentas de banco",
+        link: "banks/" + BANK_ACCOUNTS_ROUTE,
       },
     ],
-    isActive: false
+    isActive: false,
   },
   {
-    title: 'Países',
-    src: 'world',
-    link: 'countries',
+    title: "Usuarios",
+    src: "user",
+    link: "users",
     others: [
       {
-        name: 'Monedas',
-        link: 'countries/'+ CURRENCIES_ROUTE
-      }
+        name: "Saldos",
+        link: "users/balance",
+      },
     ],
-    isActive: false
-  }
-]
+    isActive: false,
+  },
+  {
+    title: "Países",
+    src: "world",
+    link: "countries",
+    others: [
+      {
+        name: "Monedas",
+        link: "countries/" + CURRENCIES_ROUTE,
+      },
+    ],
+    isActive: false,
+  },
+];
 
 export function NormalUserMenu(session = null) {
   const menu = [
     {
-      title: 'Escritorio',
-      src: 'home-blue-icon',
+      title: "Escritorio",
+      src: "home-blue-icon",
       link: DASHBOARD_INDEX_ROUTE,
-      isActive: false
+      isActive: false,
     },
     {
-      title: 'Reportes',
-      src: 'document-white-icon',
+      title: "Reportes",
+      src: "document-white-icon",
       link: `users/${session.id}/reports`,
-      isActive: false
+      isActive: false,
     },
   ];
 
   if (session.role_id === 3 && session.store) {
     menu.push({
-      title: 'Local',
-      src: 'map-marker-home',
+      title: "Local",
+      src: "map-marker-home",
       link: `stores/${session.store.id}`,
-      isActive: false
+      isActive: false,
     });
   }
 
-  if ([2,].includes(session.role_id)) {
+  if ([2].includes(session.role_id)) {
     menu.push({
-      title: 'Cuentas de banco',
-      src: 'bank',
-      link: 'banks/' + BANK_ACCOUNTS_ROUTE,
-      isActive: false
+      title: "Cuentas de banco",
+      src: "bank",
+      link: "banks/" + BANK_ACCOUNTS_ROUTE,
+      isActive: false,
     });
   }
 
