@@ -85,71 +85,73 @@ export default function UsersBalance() {
 
   return (
     <>
-      <section>
-        <Welcome text="Saldo de usuarios" showButton={false} />
-      </section>
-      <section className="py-4">
-        <form
-          onSubmit={handleSearchSubmit}
-          action="GET"
-          className="form-group row"
-        >
-          <div className="col-8">
-            <FilterTableButtons
-              data={countries}
-              callback={handleCountryChange}
+      <div className="container-fluid">
+        <section>
+          <Welcome text="Saldo de usuarios" showButton={false} />
+        </section>
+        <section className="py-4">
+          <form
+            onSubmit={handleSearchSubmit}
+            action="GET"
+            className="form-group row"
+          >
+            <div className="col-8">
+              <FilterTableButtons
+                data={countries}
+                callback={handleCountryChange}
+              />
+            </div>
+            <div className="col-4">
+              <SearchBar text="Usuario" change={setSearch} />
+            </div>
+          </form>
+        </section>
+        <section>
+          <div className="mb-2 d-flex justify-content-end">
+            <PaginationTable
+              offset={offset}
+              text="usuarios"
+              quantity={users?.last_page || 1}
+              itemsTotal={users?.total || 0}
+              handleChange={handlePagination}
             />
           </div>
-          <div className="col-4">
-            <SearchBar text="Usuario" change={setSearch} />
-          </div>
-        </form>
-      </section>
-      <section>
-        <div className="mb-2 d-flex justify-content-end">
-          <PaginationTable
-            offset={offset}
-            text="usuarios"
-            quantity={users?.last_page || 1}
-            itemsTotal={users?.total || 0}
-            handleChange={handlePagination}
-          />
-        </div>
-        {Array.isArray(users?.data) ? (
-          <div className="w-100 overflow-hidden border rounded mb-4">
-            <table className="m-0 table table-striped">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Email</th>
-                  <th>Saldo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.data.length > 0 ? (
-                  users.data.map(({ id, user, balance, currency }) => {
-                    return (
-                      <tr key={id}>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{formatAmount(balance, currency.shortcode)}</td>
-                      </tr>
-                    );
-                  })
-                ) : (
+          {Array.isArray(users?.data) ? (
+            <div className="w-100 overflow-hidden border rounded mb-4">
+              <table className="m-0 table table-striped">
+                <thead>
                   <tr>
-                    <td colSpan={3}>No hay registros</td>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Saldo</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div>
-            <TableLoader />
-          </div>
-        )}
-      </section>
+                </thead>
+                <tbody>
+                  {users.data.length > 0 ? (
+                    users.data.map(({ id, user, balance, currency }) => {
+                      return (
+                        <tr key={id}>
+                          <td>{user.name}</td>
+                          <td>{user.email}</td>
+                          <td>{formatAmount(balance, currency.shortcode)}</td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={3}>No hay registros</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div>
+              <TableLoader />
+            </div>
+          )}
+        </section>
+      </div>
     </>
   );
 }
