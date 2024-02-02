@@ -33,8 +33,15 @@ const ModalCreateStore = ({ modalShow, setModalShow }) => {
           })),
         );
       })
-      .catch(({ error, message }) => {
-        setErrorMessage(error.message);
+      .catch((err) => {
+        let errorMessage = err.message;
+
+        if (err.response) {
+          const {message} = err.response.data;
+          errorMessage = message;
+        }
+
+        setErrorMessage(errorMessage);
         setAlertType("danger");
       })
       .finally(() => {
