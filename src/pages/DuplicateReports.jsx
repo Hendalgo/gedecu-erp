@@ -92,64 +92,43 @@ const DuplicateReports = () => {
     setDuplicates(await fetchDuplicates(params));
   };
 
-  const handleDate = async (e) => {
-    e.preventDefault();
-    setOffset(1);
-
-    let params = `${date ? `&date=${date}` : ""}`;
-
-    if (search) params += `&search=${search}`;
-    if (reportType) params += `&completed=${reportType}`;
-
-    setDuplicates(await fetchDuplicates(params));
-  };
-
   return (
     <>
       <div className="container-fluid">
         <Welcome text="Reportes duplicados" showButton={false} />
-        <div className="row mt-4">
-          <form onSubmit={handleSearch} action="" className="form-group row">
-            <div className="col-8">
-              <FilterTableButtons data={reportsTypes} callback={handleType} />
+        <div className="mt-4">
+          <form onSubmit={handleSearch} action="" className="form-group">
+            <div className="row mb-3">
+              <div className="col-8">
+                <FilterTableButtons data={reportsTypes} callback={handleType} />
+              </div>
+              <div className="col-4">
+                <SearchBar text="Duplicados" change={setSearch} />
+              </div>
             </div>
-            <div className="col-4">
-              <SearchBar text="Duplicados" change={setSearch} />
+            <div className="row">
+              <div className="d-flex col-4">
+                <input
+                  type="date"
+                  name="date"
+                  onChange={({ target }) => setDate(target.value)}
+                  className="form-control form-control-sm rounded-0 rounded-start"
+                  id=""
+                />
+                <input
+                  type="submit"
+                  className="btn btn-secondary rounded-0 rounded-end"
+                  value="Filtrar"
+                />
+              </div>
             </div>
           </form>
         </div>
-
-        <div className="row mt-3">
-          <div className="col-3">
-            <form
-              onSubmit={(e) => handleDate(e)}
-              className="d-flex"
-              method="post"
-            >
-              <input
-                style={{ borderRadius: "0.25rem 0 0 0.25rem" }}
-                type="date"
-                name="date"
-                onChange={({ target }) => setDate(target.value)}
-                className="form-control form-control-sm"
-                id=""
-              />
-              <input
-                style={{ borderRadius: "0 0.25rem 0.25rem 0" }}
-                type="submit"
-                className="btn btn-secondary"
-                value="Filtrar"
-              />
-            </form>
-          </div>
-        </div>
-
         {Array.isArray(duplicates?.data) ? (
           duplicates.data.length > 0 ? (
             <>
               <div className="row mt-4">
-                <div className="col-12">
-                  <div className="d-flex justify-content-end">
+                <div className="col-12 d-flex justify-content-end">
                     <PaginationTable
                       offset={offset}
                       itemOffset={offset}
@@ -157,87 +136,88 @@ const DuplicateReports = () => {
                       itemsTotal={duplicates.total}
                       handleChange={handleChange}
                     />
-                  </div>
                 </div>
               </div>
 
               <div className="row mt-2">
                 <div className="table-responsive">
-                  <table className="table TableP table-borderless align-middle">
-                    <thead className="">
-                      <tr className="pt-4">
-                        <th scope="col">Realizado por</th>
-                        <th scope="col">Rol</th>
-                        <th scope="col">Fecha - Hora</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Monto</th>
-                        {session.role_id === 1 && <th />}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {duplicates.data.map(
-                        ({
-                          id,
-                          report,
-                          created_at,
-                          currency,
-                          amount,
-                          duplicate_status,
-                        }) => {
-                          const reportTypeStyle = JSON.parse(
-                            report.type.config,
-                          );
-                          return (
-                            <tr key={id}>
-                              <td>
-                                {report.user.name} ({report.user.email})
-                              </td>
-                              <td>{report.user.role.name}</td>
-                              <td>
-                                {new Date(created_at).toLocaleString("es-VE", {
-                                  hour12: true,
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                  hour: "numeric",
-                                  minute: "numeric",
-                                  second: "numeric",
-                                })}
-                              </td>
-                              <td>
-                                <span
-                                  style={{ ...reportTypeStyle.styles }}
-                                  className="p-1 rounded"
-                                >
-                                  {report.type.name}
-                                  {report.type.type == "income"
-                                    ? " - Ingreso"
-                                    : " - Egreso"}
-                                </span>
-                              </td>
-                              <td>
-                                {formatAmount(amount, currency.shortcode)}
-                              </td>
-                              {session.role_id === 1 && (
+                  <div className="w-100 overflow-hidden border rounded mb-4">
+                    <table className="m-0 table table-striped">
+                      <thead className="">
+                        <tr className="pt-4">
+                          <th scope="col">Realizado por</th>
+                          <th scope="col">Rol</th>
+                          <th scope="col">Fecha - Hora</th>
+                          <th scope="col">Motivo</th>
+                          <th scope="col">Monto</th>
+                          {session.role_id === 1 && <th />}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {duplicates.data.map(
+                          ({
+                            id,
+                            report,
+                            created_at,
+                            currency,
+                            amount,
+                            duplicate_status,
+                          }) => {
+                            const reportTypeStyle = JSON.parse(
+                              report.type.config,
+                            );
+                            return (
+                              <tr key={id}>
                                 <td>
-                                  <button
-                                    className="btn bton-light border"
-                                    onClick={() =>
-                                      navigate(
-                                        `/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`,
-                                      )
-                                    }
-                                  >
-                                    {duplicate_status ? "Ver" : "Verificar"}
-                                  </button>
+                                  {report.user.name} ({report.user.email})
                                 </td>
-                              )}
-                            </tr>
-                          );
-                        },
-                      )}
-                    </tbody>
-                  </table>
+                                <td>{report.user.role.name}</td>
+                                <td>
+                                  {new Date(created_at).toLocaleString("es-VE", {
+                                    hour12: true,
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    second: "numeric",
+                                  })}
+                                </td>
+                                <td>
+                                  <span
+                                    style={{ ...reportTypeStyle.styles }}
+                                    className="p-1 rounded"
+                                  >
+                                    {report.type.name}
+                                    {report.type.type == "income"
+                                      ? " - Ingreso"
+                                      : " - Egreso"}
+                                  </span>
+                                </td>
+                                <td>
+                                  {formatAmount(amount, currency.shortcode)}
+                                </td>
+                                {session.role_id === 1 && (
+                                  <td>
+                                    <button
+                                      className="w-100 btn btn-light border"
+                                      onClick={() =>
+                                        navigate(
+                                          `/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/${REPORTS_DUPLICATE_ROUTE}/${id}`,
+                                        )
+                                      }
+                                    >
+                                      {duplicate_status ? "Ver" : "Verificar"}
+                                    </button>
+                                  </td>
+                                )}
+                              </tr>
+                            );
+                          },
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </>

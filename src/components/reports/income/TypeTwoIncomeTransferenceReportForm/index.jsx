@@ -2,13 +2,10 @@ import { useContext, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { SessionContext } from "../../../../context/SessionContext";
-import { Form } from "react-bootstrap";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
-  const { session } = useContext(SessionContext);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -70,11 +67,6 @@ const TypeTwoIncomeTransferenceReportForm = () => {
           name="currency"
           value={bankAccount?.currency || ""}
         />
-      </div>
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
-        </div>
       </div>
       <div className="row text-end">
         <div className="col">

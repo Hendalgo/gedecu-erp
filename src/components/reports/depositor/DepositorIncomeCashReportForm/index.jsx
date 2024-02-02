@@ -1,4 +1,3 @@
-import { Form } from "react-bootstrap";
 import DecimalInput from "../../../DecimalInput";
 import StoresSelect from "../../../StoresSelect";
 import { useContext, useState } from "react";
@@ -66,16 +65,6 @@ export default function DepositorIncomeCashReportForm() {
             value={store?.currency_id || 0}
           />
           <input type="hidden" name="currency" value={store?.currency || ""} />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
-          />
         </div>
       </div>
       <div className="row">

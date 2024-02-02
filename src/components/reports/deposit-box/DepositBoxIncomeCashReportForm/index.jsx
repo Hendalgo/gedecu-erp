@@ -3,7 +3,6 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import StoresSelect from "../../../StoresSelect";
 import DecimalInput from "../../../DecimalInput";
-import { Form } from "react-bootstrap";
 
 export default function DepositBoxIncomeCashReportForm() {
   const [store, setStore] = useState(null);
@@ -66,16 +65,6 @@ export default function DepositBoxIncomeCashReportForm() {
             value={store?.currency_id || 0}
           />
           <input type="hidden" name="currency" value={store?.currency || ""} />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
-          />
         </div>
       </div>
       <div className="row">

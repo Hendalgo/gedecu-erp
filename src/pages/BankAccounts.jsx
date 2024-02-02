@@ -110,7 +110,7 @@ const BankAccounts = () => {
         textButton={"Cuenta"}
         add={() => setModalShow(true)}
       />
-      <div className="row mt-4">
+      <div className="mt-4">
         <form
           onSubmit={handleSearch}
           action=""
@@ -134,8 +134,7 @@ const BankAccounts = () => {
           <>
             <div className="row mt-4">
               <div className="col-12">
-                <div className="d-flex justify-content-between">
-                  <div />
+                <div className="d-flex justify-content-end">
                   <PaginationTable
                     text="cuentas"
                     quantity={banks.last_page}
@@ -147,7 +146,8 @@ const BankAccounts = () => {
             </div>
             <div className="row mt-2">
               <div className="d-flex">
-                <table className="table TableP table-striped">
+              <div className="w-100 overflow-hidden border rounded mb-4">
+                <table className="m-0 table table-striped">
                   <thead>
                     <tr className="pt-4">
                       <th scope="col">ID</th>
@@ -218,6 +218,7 @@ const BankAccounts = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
               </div>
             </div>
           </>

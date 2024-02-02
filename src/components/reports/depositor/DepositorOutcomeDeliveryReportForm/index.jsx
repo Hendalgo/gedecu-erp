@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
 import DecimalInput from "../../../DecimalInput";
-import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 
 export default function DepositorOutcomeDeliveryReportForm() {
@@ -69,16 +68,6 @@ export default function DepositorOutcomeDeliveryReportForm() {
             type="hidden"
             name="currency"
             value={country?.currency || session.country.currency.shortcode}
-          />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
           />
         </div>
       </div>

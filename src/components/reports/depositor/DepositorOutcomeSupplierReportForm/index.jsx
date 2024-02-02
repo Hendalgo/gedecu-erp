@@ -3,7 +3,6 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
 import DecimalInput from "../../../DecimalInput";
-import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 
 export default function DepositorOutcomeSupplierReportForm() {
@@ -80,16 +79,6 @@ export default function DepositorOutcomeSupplierReportForm() {
             type="hidden"
             name="currency"
             value={country?.currency || session.country.currency.shortcode}
-          />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col">
-          <Form.Check
-            type="checkbox"
-            id="isDuplicated"
-            name="isDuplicated"
-            label="Duplicado"
           />
         </div>
       </div>

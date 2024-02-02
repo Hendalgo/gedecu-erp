@@ -3,7 +3,6 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import UsersSelect from "../../../UsersSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
-import { Form } from "react-bootstrap";
 
 const ReceivedHelpReportForm = () => {
   const [user, setUser] = useState(null);
@@ -101,11 +100,6 @@ const ReceivedHelpReportForm = () => {
             maxLength={20}
             className="form-control"
           />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
         </div>
       </div>
       <div className="row text-end">

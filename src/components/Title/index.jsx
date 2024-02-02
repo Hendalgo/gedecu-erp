@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
 import { ReactSVG } from "react-svg";
-import { OverlayTrigger } from "react-bootstrap";
+import { OverlayTrigger, } from "react-bootstrap";
 import "./Title.css";
 
 const Title = ({ title, icon, description }) => {
@@ -12,7 +11,7 @@ const Title = ({ title, icon, description }) => {
         placement="top"
         overlay={<span className="tooltip">{description}</span>}
       >
-        <ReactSVG src="/info.svg" wrapper="span" />
+        {() => (<ReactSVG src="/info.svg" wrapper="span" />)}
       </OverlayTrigger>
     </div>
   );

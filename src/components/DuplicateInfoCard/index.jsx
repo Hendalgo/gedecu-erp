@@ -2,6 +2,7 @@ import { Card } from "react-bootstrap";
 import reportsColumnsMap from "../../consts/ReportsColumnsMap";
 import { formatAmount } from "../../utils/amount";
 import { divideInGroups } from "../../utils/array";
+import { useFormatDate } from "../../hooks/useFormatDate";
 
 export default function DuplicateInfoCard({ data = null }) {
   let rows = [];
@@ -12,6 +13,7 @@ export default function DuplicateInfoCard({ data = null }) {
       if (Object.keys(data).includes(key)) {
         let formated = data[key];
         if (key === "amount") formated = formatAmount(formated);
+        if (key === "date") formated = useFormatDate(formated, false);
         filteredFields.push([reportsColumnsMap.get(key), formated]);
       }
     }

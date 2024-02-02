@@ -100,20 +100,6 @@ export const ReportsIndex = () => {
     fetchReports(params).then((response) => setReports(response));
   };
 
-  const handleDate = (e) => {
-    e.preventDefault();
-    setOffset(1);
-    let params = `${date ? `&date=${date}` : ""}`;
-    if (form.current.search.value)
-      params += `&search=${form.current.search.value}`;
-    if (form.current.filter_type.value != "false")
-      params += `&type_id=${form.current.filter_type.value}`;
-
-    fetchReports(params)
-      .then((r) => setReports(r))
-      .catch((e) => console.error(e));
-  };
-
   return (
     <>
       <div className="container-fluid">
@@ -122,46 +108,39 @@ export const ReportsIndex = () => {
           add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)}
           textButton="Reporte"
         />
-        <div className="row mt-4">
+        <div className="mt-4">
           <form
             onSubmit={handleSearch}
             action=""
             ref={form}
-            className="form-group row"
+            className="form-group"
           >
-            <div className="col-8">
-              <FilterTableButtons data={roles} callback={handleType} />
+            <div className="row mb-3">
+              <div className="col-8">
+                <FilterTableButtons data={roles} callback={handleType} />
+              </div>
+              <div className="col-4">
+                <SearchBar text="Reportes" />
+              </div>
             </div>
-            <div className="col-4">
-              <SearchBar text="Reportes" />
+            <div className="row">
+              <div className="d-flex col-4">
+                <input
+                  type="date"
+                  name="date"
+                  value={date}
+                  onChange={({ target }) => setDate(target.value)}
+                  className="form-control form-control-sm rounded-0 rounded-start"
+                  id=""
+                />
+                <input
+                  type="submit"
+                  className="btn btn-secondary rounded-0 rounded-end"
+                  value="Filtrar"
+                />
+              </div>
             </div>
           </form>
-        </div>
-
-        <div className="row mt-3">
-          <div className="col-4">
-            <form
-              onSubmit={(e) => handleDate(e)}
-              className="d-flex"
-              method="post"
-            >
-              <input
-                style={{ borderRadius: "0.25rem 0 0 0.25rem" }}
-                type="date"
-                name="date"
-                value={date}
-                onChange={({ target }) => setDate(target.value)}
-                className="form-control form-control-sm"
-                id=""
-              />
-              <input
-                style={{ borderRadius: "0 0.25rem 0.25rem 0" }}
-                type="submit"
-                className="btn btn-secondary"
-                value="Filtrar"
-              />
-            </form>
-          </div>
         </div>
         {Array.isArray(reports.data) ? (
           reports.data.length > 0 ? (
@@ -182,7 +161,8 @@ export const ReportsIndex = () => {
               </div>
               <div className="row mt-2">
                 <div className="d-flex">
-                  <table className="table TableP table-striped">
+                <div className="w-100 overflow-hidden border rounded mb-4">
+                  <table className="m-0 table table-striped">
                     <thead>
                       <tr className="pt-4">
                         <th scope="col">Responsable</th>
@@ -235,6 +215,7 @@ export const ReportsIndex = () => {
                       })}
                     </tbody>
                   </table>
+                </div>
                 </div>
               </div>
             </>

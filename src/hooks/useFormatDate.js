@@ -1,14 +1,20 @@
-export const useFormatDate = (date) => {
+export const useFormatDate = (date, showTime = true) => {
   let formatDate = new Date(date);
-  const options = {
+  let options = {
     hour12: true,
     day: "numeric",
     month: "short",
     year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
   };
+
+  if (showTime) {
+    options = {
+      ...options,
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    }
+  }
 
   return formatDate.toLocaleString("es-VE", options);
 };

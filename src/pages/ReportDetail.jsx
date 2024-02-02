@@ -106,35 +106,37 @@ export default function ReportDetail() {
         </ul>
       </Alert>
       <section>
-        <table className="table table-striped tableP">
-          <thead>
-            <tr>
-              {titles.map((title, index) => (
-                <th key={index}>{title}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {subreports.map((row, index) => {
-              return (
-                <tr key={`row-${index}`}>
-                  {row.map((cell, childIndex) => (
-                    <td key={childIndex}>{cell}</td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-          <tfoot>
-            {footer.map(({ currency, amount }) => (
-              <tr key={currency}>
-                <td className="fw-semibold text-end" colSpan={titles.length}>
-                  Total {currency}: {formatAmount(amount)}
-                </td>
+        <div className="w-100 overflow-hidden border rounded mb-4">
+          <table className="m-0 table table-striped">
+            <thead>
+              <tr>
+                {titles.map((title, index) => (
+                  <th key={index}>{title}</th>
+                ))}
               </tr>
-            ))}
-          </tfoot>
-        </table>
+            </thead>
+            <tbody>
+              {subreports.map((row, index) => {
+                return (
+                  <tr key={`row-${index}`}>
+                    {row.map((cell, childIndex) => (
+                      <td key={childIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              {footer.map(({ currency, amount }) => (
+                <tr key={currency}>
+                  <td className="fw-semibold text-end" colSpan={titles.length}>
+                    Total {currency}: {formatAmount(amount)}
+                  </td>
+                </tr>
+              ))}
+            </tfoot>
+          </table>
+        </div>
       </section>
       <section className="p-2 row mt-3 justify-content-end">
         <Card className="col-5">

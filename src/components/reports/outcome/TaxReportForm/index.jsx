@@ -2,7 +2,6 @@ import DecimalInput from "../../../DecimalInput";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
-import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 
 const TaxReportForm = () => {
@@ -72,11 +71,6 @@ const TaxReportForm = () => {
         name="currency"
         value={bankAccount?.currency || ""}
       />
-      <div className="row mb-3">
-        <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
-        </div>
-      </div>
       <div className="row text-end">
         <div className="col">
           <button type="submit" className="btn btn-outline-primary">

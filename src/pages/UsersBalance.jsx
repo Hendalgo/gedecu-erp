@@ -106,7 +106,7 @@ export default function UsersBalance() {
         </form>
       </section>
       <section>
-        <div className="mb-4 d-flex justify-content-end">
+        <div className="mb-2 d-flex justify-content-end">
           <PaginationTable
             offset={offset}
             text="usuarios"
@@ -116,32 +116,34 @@ export default function UsersBalance() {
           />
         </div>
         {Array.isArray(users?.data) ? (
-          <table className="table table-striped TableP">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Saldo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.data.length > 0 ? (
-                users.data.map(({ id, user, balance, currency }) => {
-                  return (
-                    <tr key={id}>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>{formatAmount(balance, currency.shortcode)}</td>
-                    </tr>
-                  );
-                })
-              ) : (
+          <div className="w-100 overflow-hidden border rounded mb-4">
+            <table className="m-0 table table-striped">
+              <thead>
                 <tr>
-                  <td colSpan={3}>No hay registros</td>
+                  <th>Nombre</th>
+                  <th>Email</th>
+                  <th>Saldo</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.data.length > 0 ? (
+                  users.data.map(({ id, user, balance, currency }) => {
+                    return (
+                      <tr key={id}>
+                        <td>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>{formatAmount(balance, currency.shortcode)}</td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={3}>No hay registros</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div>
             <TableLoader />
