@@ -107,6 +107,7 @@ export const ReportsIndex = () => {
           text="Reportes"
           add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)}
           textButton="Reporte"
+          showButton={session.role_id > 1}
         />
         <div className="mt-4">
           <form
