@@ -1,4 +1,4 @@
-import { API_INSTANCE, CURRENCIES_URL } from "../consts/ApiUrl";
+import { API_INSTANCE, CURRENCIES_TOTAL_URL, CURRENCIES_URL } from "../consts/ApiUrl";
 
 export const getCurrencies = async (query = "") => {
   try {
@@ -36,4 +36,9 @@ export const deleteCurrency = async (id) => {
 export const getCurrencyById = async (id, query = "") => {
   const response = await API_INSTANCE.get(`${CURRENCIES_URL}/${id}?${query}`);
   return response;
+};
+
+export const getTotalAmountByCurrency = async () => {
+  const response = await API_INSTANCE.get(CURRENCIES_TOTAL_URL);
+  return response.data;
 };
