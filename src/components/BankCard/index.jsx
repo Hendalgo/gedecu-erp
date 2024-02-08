@@ -34,9 +34,9 @@ const BankCard = ({ total, currency, shortcode, name, bank }) => {
 
 BankCard.propTypes = {
   total: PropTypes.number.isRequired,
-  currency: PropTypes.object,
   currency: PropTypes.string,
   shortcode: PropTypes.string,
+  name: PropTypes.string,
   bank: PropTypes.object.isRequired,
 };
 

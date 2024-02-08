@@ -20,14 +20,14 @@ const Card = ({ country = "", currency, total, percent, img = "/world.svg" }) =>
           <img src={img} alt={currency} />
         </div>
       </div>
-      {/* <div className="pb-4 px-4">
+      <div className="pb-4 px-4">
         {percent >= 0 ? (
           <ReactSVG src="/up.svg" wrapper="span" />
         ) : (
           <ReactSVG src="/down.svg" wrapper="span" />
         )}
         <span>{percent.toFixed(2)}% día de hoy</span>
-      </div> */}
+      </div>
     </div>
   );
 };

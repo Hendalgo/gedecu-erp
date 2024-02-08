@@ -7,7 +7,6 @@ import Card from "../components/Card";
 import Chart from "../components/Chart";
 import { ReactSVG } from "react-svg";
 import BankCard from "../components/BankCard";
-import DownloadButton from "../components/DownloadButton";
 import { getReports } from "../helpers/reports";
 import { getTotalAmountByBank } from "../helpers/banks";
 import BalanceLoader from "../components/Loaders/BalanceLoader";
@@ -19,6 +18,7 @@ import { DASHBOARD_ROUTE, REPORTS_ROUTE } from "../consts/Routes";
 import ReportsTable from "../components/ReportsTable";
 import ReportsByUserTable from "../components/ReportsByUserTable";
 import { getTotalAmountByCurrency } from "../helpers/currencies";
+import AlertMessage from "../components/AlertMessage";
 
 const Home = () => {
   const { session } = useContext(SessionContext);
@@ -29,44 +29,57 @@ const Home = () => {
   const [loadingReports, setLoadingReports] = useState(true);
   const [banks, setBanks] = useState([]);
   const [currencies, setCurrencies] = useState([]);
+  const [alert, setAlert] = useState({ message: "", variant: "danger" });
   const navigate = useNavigate();
+
+  const getErrors = (err) => {
+    if (err.response) {
+      const { errors, message } = err.response.data;
+      if (errors) {
+        return Object.values(errors).flat();
+      } else {
+        return [message];
+      }
+    }
+
+    return [err.message];
+  }
 
   useEffect(() => {
     const fetchData = async () => {
+      let errors = [];
       const promises = [getTotalAmountByCurrency() ,getReports(`order=created_at&order_by=desc`),];
 
       if (session.role_id == 1) promises.push(getTotalAmountByBank(),);
+      
+      const [currenciesResponse, reportsResponse, banksResponse,] = await Promise.allSettled(promises);
 
-      try {
-        const [currenciesResponse, reportsResponse, banksResponse,] = await Promise.allSettled(promises);
+      if (currenciesResponse.status == "fulfilled") {
+        setCurrencies(currenciesResponse.value);
+      } else {
+        errors = errors.concat(getErrors(currenciesResponse.reason));
+      }
+      
+      if (reportsResponse.status == "fulfilled") {
+        setReports(reportsResponse.value);
+      } else {
+        errors = errors.concat(getErrors(reportsResponse.reason));
+      }
 
-        if (currenciesResponse.status == "fulfilled") {
-          setCurrencies(currenciesResponse.value);
-        }
-
-        if (reportsResponse.status == "fulfilled") {
-          setReports(reportsResponse.value);
-        }
-
-        if (banksResponse && banksResponse.status == "fulfilled") {
+      if (banksResponse) {
+        if (banksResponse.status == "fulfilled") {
           setBanks(banksResponse.value);
-        }
-
-        setLoadingCurrencies(false);
-        setLoadingReports(false);
-        setLoadingBanks(false);
-
-      } catch (err) {
-        if (err.response) {
-          const { errors, message } = err.response.data;
-          if (errors) {
-            console.log(errors)
-          } else {
-            console.log(message)
-          }
         } else {
-          console.log("Message:", err.message);
+          errors = errors.concat(getErrors(banksResponse.reason));
         }
+      }
+
+      setLoadingCurrencies(false);
+      setLoadingReports(false);
+      setLoadingBanks(false);
+
+      if (errors.length > 0) {
+        setAlert((prev) => ({ ...prev, message: errors.join(" | ") }));
       }
     };
 
@@ -126,12 +139,12 @@ const Home = () => {
                     <div className="col-4"><BalanceLoader /></div>
                     <div className="col-4"><BalanceLoader /></div>
                   </> :
-                  currencies.map(({currency, total}, index) => {
+                  currencies.map(({currency, total, percentage}, index) => {
                     return <div key={index} className="">
                       <Card
                       currency={`${currency.name} - ${currency.shortcode}`}
                       total={total}
-                      percent={2}
+                      percent={percentage || 0}
                     />
                   </div>
                   })
@@ -190,6 +203,7 @@ const Home = () => {
         </div>
       </section>
       <ModalCreateUser setModalShow={setModalUser} modalShow={modalUser} />
+      <AlertMessage show={alert.message.length > 0} setShow={() => setAlert((prev) => ({ ...prev, message: "" }))} message={alert.message} variant={alert.variant} />
     </div>
   );
 };

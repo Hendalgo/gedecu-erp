@@ -1,7 +1,7 @@
 export const frecuencies = [
     {
         label: "Día",
-        value: "daily"
+        value: "day"
     },
     {
         label: "Semanal",

@@ -16,6 +16,7 @@ import Select from "react-select";
 import { frecuencies } from "../../consts/frecuencies";
 import { getCurrencies } from "../../helpers/currencies";
 import { getMovementStatistics } from "../../helpers/statistics";
+import { Alert } from "react-bootstrap";
 
 ChartJS.register(
   CategoryScale,
@@ -31,9 +32,11 @@ const Chart = () => {
   const [currencies, setCurrencies] = useState([]);
   const [currency, setCurrency] = useState(null);
   const [frecuency, setFrecuency] = useState(null);
+  const [alert, setAlert] = useState({ messages: [], variant: "danger" });
 
   const handleErrors = (err) => {
     let errorMessages = [];
+
     if (err.response) {
       const { message, errors } = err.response.data;
       if (errors) {
@@ -44,7 +47,8 @@ const Chart = () => {
     } else {
       errorMessages.push(err.message);
     }
-    console.log(errorMessages)
+
+    setAlert((prev) => ({ ...prev, messages: errorMessages }));
   }
 
   useEffect(() => {
@@ -82,6 +86,8 @@ const Chart = () => {
   }
 
   const fetchData = async (currency, frecuency) => {
+    setAlert((prev) => ({ ...prev, messages: [] }));
+
     try {
       const response = await getMovementStatistics(`currency=${currency}&period=${frecuency}`);
       console.log(response)
@@ -206,6 +212,15 @@ const Chart = () => {
         <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Moneda" onChange={handleCurrencyChange} className="w-25" />
         <Select inputId="frecuency" name="frecuency" options={frecuencies} value={frecuency} placeholder="Periodo" onChange={handleFrecuencyChange} className="w-25" />
       </div>
+      <Alert show={alert.messages.length > 0} variant={alert.variant}>
+        <ul className="m-0">
+          {
+            alert.messages.map((message, index) => {
+              return <li key={index}>{message}</li>
+            })
+          }
+        </ul>
+      </Alert>
       <Line
         data={{
           labels: ["Label 1", "Label 2"],
