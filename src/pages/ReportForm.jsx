@@ -8,6 +8,7 @@ import ModalConfirmation from "../components/ModalConfirmation";
 import { createReport, getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
 import { getCountries } from "../helpers/countries";
+import { formatAmount } from "../utils/amount";
 
 export default function ReportForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -382,7 +383,11 @@ export default function ReportForm() {
       let currency = newEntry["currency"];
 
       if (newEntry["convert_amount"]) {
-        amount *= newEntry["rate"];
+        if (newEntry["currency_id"] == newEntry["rate_currency"]) {
+          amount *= newEntry["rate"];
+        } else {
+          amount /= newEntry["rate"];
+        }
         currency = newEntry["conversionCurrency"];
       }
 
@@ -448,21 +453,22 @@ export default function ReportForm() {
     setIsLoading(true);
 
     try {
-      const response = await createReport({
-        type_id: reportType.value,
-        subreports: subreports.current,
-      });
+      console.log(subreports.current)
+      // const response = await createReport({
+      //   type_id: reportType.value,
+      //   subreports: subreports.current,
+      // });
 
-      if (response.status === 201) {
-        setReportType(null);
-        clearTableData();
+      // if (response.status === 201) {
+      //   setReportType(null);
+      //   clearTableData();
 
-        setError({
-          show: true,
-          message: ["Reporte creado exitosamente."],
-          variant: "success",
-        });
-      }
+      //   setError({
+      //     show: true,
+      //     message: ["Reporte creado exitosamente."],
+      //     variant: "success",
+      //   });
+      // }
     } catch ({ message, error, response }) {
       let errorsMessages = [];
       if (error) {
@@ -568,7 +574,7 @@ export default function ReportForm() {
       </section>
       <section className="overflow-x-auto">
         {tableData && tableData.header.length > 0 && (
-          <div className="w-100 overflow-hidden border rounded mb-4">
+          <div className="w-100 overflow-hidden overflow-x-auto border rounded mb-4">
             <table className="m-0 table table-striped">
               <thead>
                 <tr>
@@ -632,10 +638,7 @@ export default function ReportForm() {
                         colSpan={tableData.header.length + 1}
                         className="text-end fw-semibold"
                       >
-                        Total {currency}:{" "}
-                        {amount.toLocaleString("es-VE", {
-                          minimumFractionDigits: 2,
-                        })}
+                        Total { formatAmount(amount, currency) }
                       </td>
                     </tr>
                   );

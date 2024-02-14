@@ -1,14 +1,22 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import RateCalcInput from "../../../RateCalcInput";
+import { USA_CURRENCY } from "../../../../consts/currencies";
+import { formatAmount } from "../../../../utils/amount";
 
 const TypeOneWalletReportForm = () => {
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
+  const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    setRateCurrency(USA_CURRENCY);
+  }, []);
 
   const handleAmountChange = (amount) => {
     if (Number.isNaN(amount))
@@ -29,6 +37,19 @@ const TypeOneWalletReportForm = () => {
       }));
     else setRate(rate);
   };
+
+  const handleRateCurrencyClick = () => {
+    let newCurrency = {...USA_CURRENCY};
+
+    if (rateCurrency.id == USA_CURRENCY.id) {
+      newCurrency = {
+        id: country?.currency_id || session.country.currency.id,
+        shortcode: country?.currency || session.country.currency.shortcode
+      }
+    }
+
+    setRateCurrency(newCurrency);
+  }
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -62,14 +83,14 @@ const TypeOneWalletReportForm = () => {
     setRate(0);
   };
 
-  const conversionAmount =
-    rate > 0
-      ? (amount * rate).toLocaleString("es-VE", {
-          useGrouping: true,
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : 0;
+  let conversionAmount = 0;
+  if (rate > 0) {
+    conversionAmount = amount * rate;
+    if (rateCurrency.id != USA_CURRENCY.id) {
+      conversionAmount = amount / rate;
+    }
+  }
+  conversionAmount = formatAmount(conversionAmount);
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
@@ -108,14 +129,8 @@ const TypeOneWalletReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <DecimalInput
-            id="rate"
-            name="rate"
-            defaultValue={rate.toLocaleString("es-VE", {
-              minimumFractionDigits: 2,
-            })}
-            onChange={handleRateChange}
-          />
+          <RateCalcInput currency={rateCurrency.shortcode} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
           <label htmlFor="conversion" className="form-label">
