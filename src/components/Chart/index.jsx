@@ -17,6 +17,7 @@ import { frecuencies } from "../../consts/frecuencies";
 import { getCurrencies } from "../../helpers/currencies";
 import { getMovementStatistics } from "../../helpers/statistics";
 import { Alert } from "react-bootstrap";
+import { handleError } from "../../utils/error";
 
 ChartJS.register(
   CategoryScale,
@@ -35,20 +36,7 @@ const Chart = () => {
   const [alert, setAlert] = useState({ messages: [], variant: "danger" });
 
   const handleErrors = (err) => {
-    let errorMessages = [];
-
-    if (err.response) {
-      const { message, errors } = err.response.data;
-      if (errors) {
-        errorMessages = Object.values(errors).flat();
-      } else {
-        errorMessages.push(message);
-      }
-    } else {
-      errorMessages.push(err.message);
-    }
-
-    setAlert((prev) => ({ ...prev, messages: errorMessages }));
+    setAlert((prev) => ({ ...prev, messages: handleError(err) }));
   }
 
   useEffect(() => {

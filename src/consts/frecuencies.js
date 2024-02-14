@@ -16,10 +16,6 @@ export const frecuencies = [
         value: "quarter"
     },
     {
-        label: "Semestral",
-        value: "semester"
-    },
-    {
         label: "Anual",
         value: "year"
     },

@@ -142,10 +142,10 @@ const Home = () => {
                   currencies.map(({currency, total, percentage}, index) => {
                     return <div key={index} className="">
                       <Card
-                      currency={`${currency.name} - ${currency.shortcode}`}
-                      total={total}
-                      percent={percentage || 0}
-                    />
+                        currency={`${currency.name} - ${currency.shortcode}`}
+                        total={total}
+                        percent={percentage || 0}
+                      />
                   </div>
                   })
                 }
