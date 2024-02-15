@@ -29,10 +29,21 @@ ChartJS.register(
   Legend,
 );
 
+const datasetsOptions = {
+  tension: 0.1,
+  borderColor: "green",
+  backgroundColor: "yellow",
+  borderWidth: 1,
+}
+
 const Chart = () => {
   const [currencies, setCurrencies] = useState([]);
   const [currency, setCurrency] = useState(null);
   const [frecuency, setFrecuency] = useState(null);
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
   const [alert, setAlert] = useState({ messages: [], variant: "danger" });
 
   const handleErrors = (err) => {
@@ -77,8 +88,78 @@ const Chart = () => {
     setAlert((prev) => ({ ...prev, messages: [] }));
 
     try {
-      const response = await getMovementStatistics(`currency=${currency}&period=${frecuency}`);
-      console.log(response)
+      const { income, neutro, expense } = await getMovementStatistics(`currency=${currency}&period=${frecuency}`);
+
+      let keys = new Set();
+      const datasets = [];
+
+      if (income) {
+        Object.keys(income).forEach((key) => keys.add(key));
+        datasets.push({
+          ...datasetsOptions,
+          label: "Ingresos",
+          data: [],
+        });
+      }
+
+      if (neutro) {
+        Object.keys(neutro).forEach((key) => keys.add(key));
+        datasets.push({
+          ...datasetsOptions,
+          label: "Neutro",
+          borderColor: "blue",
+          data: [],
+        });
+      }
+
+      if (expense) {
+        Object.keys(expense).forEach((key) => keys.add(key));
+        datasets.push({
+          ...datasetsOptions,
+          label: "Egresos",
+          borderColor: "red",
+          data: [],
+        });
+      }
+
+      /* **
+      * Arreglar el ordenamiento de las keys: las fechas pueden llegar en orden diferente porque están en distintos objetos. Ver cómo ordenarlos
+      */
+
+      const labels = Array.from(keys);
+
+      if (frecuency == "day") {
+        labels.sort((a, b) => {
+          return a.split(",").pop().localeCompare(b.split(",").pop());
+        });
+      }
+
+      labels.forEach((key) => {
+        let value = 0;
+
+        if (income[key]) {
+          value = income[key];
+        }
+
+        datasets[0].data.push(value);
+
+        value = 0;
+        if (neutro[key]) {
+          value = neutro[key];
+        }
+
+        datasets[1].data.push(value);
+
+        value = 0;
+        if (expense[key]) {
+          value = expense[key];
+        }
+
+        datasets.at(2).data.push(value);
+      });
+
+      setChartData((prev) => ({ ...prev, labels, datasets }));
+      
     } catch (err) {
       handleErrors(err);
     }
@@ -127,73 +208,6 @@ const Chart = () => {
   //   },
   // });
 
-  // const handleFilter = async () => {
-  //   try {
-  //     const form = new FormData(formRef.current);
-
-  //     const data = await getReports(
-  //       `bank=${form.get("bank") || 1}&movement=income&period=${form.get("period") || "daily"}`,
-  //     );
-  //     setOptions({
-  //       ...options,
-  //       scales: {
-  //         y: {
-  //           min: 0,
-  //         },
-  //         x: {
-  //           ticks: { color: "#6C757D" },
-  //           grid: {
-  //             display: false,
-  //           },
-  //         },
-  //       },
-  //     });
-  //     const chartdataI = [];
-  //     let labels = Object.keys(data).reverse();
-  //     const chartdataE = [];
-  //     if (formRef.current.period.value === "year") {
-  //       labels.forEach((element) => {
-  //         chartdataI.unshift(data[element].incomes);
-  //       });
-  //       labels.forEach((element) => {
-  //         chartdataE.unshift(data[element].expenses);
-  //       });
-
-  //       labels = labels.reverse();
-  //     } else {
-  //       labels.forEach((element) => {
-  //         chartdataI.push(data[element].incomes);
-  //       });
-  //       labels.forEach((element) => {
-  //         chartdataE.push(data[element].expenses);
-  //       });
-  //     }
-  //     setData({
-  //       labels,
-  //       datasets: [
-  //         {
-  //           label: "Ingresos",
-  //           data: chartdataI,
-  //           fill: false,
-  //           borderColor: "#198754",
-  //           backgroundColor: "#198754",
-  //           tension: 0.4,
-  //         },
-  //         {
-  //           label: "Egreso",
-  //           data: chartdataE,
-  //           fill: false,
-  //           borderColor: "#DC3545",
-  //           backgroundColor: "#DC3545",
-  //           tension: 0.4,
-  //         },
-  //       ],
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   return (
     <div className="w-100 bg-white p-4 rounded border">
       <div className="mb-4 d-flex justify-content-end" style={{gap: "3%"}}>
@@ -210,19 +224,7 @@ const Chart = () => {
         </ul>
       </Alert>
       <Line
-        data={{
-          labels: ["Label 1", "Label 2"],
-          datasets: [
-            {
-              label: "Ingreso",
-              data: [],
-            },
-            {
-              label: "Egreso",
-              data: [],
-            }
-          ]
-        }}
+        data={chartData}
         options={null}
       />
       {/* <div className="container-fluid bg-white ChartContainer">
