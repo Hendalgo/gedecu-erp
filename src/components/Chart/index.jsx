@@ -30,9 +30,9 @@ ChartJS.register(
 );
 
 const datasetsOptions = {
-  tension: 0.1,
-  borderColor: "green",
-  backgroundColor: "yellow",
+  tension: 0.25,
+  borderColor: "#198754",
+  backgroundColor: "#198754",
   borderWidth: 1,
 }
 
@@ -95,67 +95,73 @@ const Chart = () => {
 
       if (income) {
         Object.keys(income).forEach((key) => keys.add(key));
-        datasets.push({
-          ...datasetsOptions,
-          label: "Ingresos",
-          data: [],
-        });
       }
 
       if (neutro) {
         Object.keys(neutro).forEach((key) => keys.add(key));
-        datasets.push({
-          ...datasetsOptions,
-          label: "Neutro",
-          borderColor: "blue",
-          data: [],
-        });
       }
 
       if (expense) {
         Object.keys(expense).forEach((key) => keys.add(key));
-        datasets.push({
-          ...datasetsOptions,
-          label: "Egresos",
-          borderColor: "red",
-          data: [],
-        });
       }
 
-      /* **
-      * Arreglar el ordenamiento de las keys: las fechas pueden llegar en orden diferente porque están en distintos objetos. Ver cómo ordenarlos
-      */
+      datasets.push(
+        {
+          ...datasetsOptions,
+          label: "Ingresos",
+          data: [],
+        },
+        {
+          ...datasetsOptions,
+          label: "Neutro",
+          borderColor: "#0d6efd",
+          backgroundColor: "#0d6efd",
+          data: [],
+        },
+        {
+          ...datasetsOptions,
+          label: "Egresos",
+          borderColor: "#dc3545",
+          backgroundColor: "#dc3545",
+          data: [],
+        }
+      );
 
       const labels = Array.from(keys);
 
       if (frecuency == "day") {
         labels.sort((a, b) => {
-          return a.split(",").pop().localeCompare(b.split(",").pop());
+          return new Date(a).getTime() - new Date(b).getTime();
         });
       }
 
       labels.forEach((key) => {
         let value = 0;
 
-        if (income[key]) {
-          value = income[key];
+        if (income) {
+          if (income[key]) {
+            value = income[key];
+          }
+  
+          datasets[0].data.push(value);
         }
-
-        datasets[0].data.push(value);
 
         value = 0;
-        if (neutro[key]) {
-          value = neutro[key];
+        if (neutro) {
+          if (neutro[key]) {
+            value = neutro[key];
+          }
+  
+          datasets[1].data.push(value);
         }
-
-        datasets[1].data.push(value);
 
         value = 0;
-        if (expense[key]) {
-          value = expense[key];
+        if (expense) {
+          if (expense[key]) {
+            value = expense[key];
+          }
+          datasets.at(2).data.push(value);
         }
-
-        datasets.at(2).data.push(value);
       });
 
       setChartData((prev) => ({ ...prev, labels, datasets }));
@@ -227,48 +233,6 @@ const Chart = () => {
         data={chartData}
         options={null}
       />
-      {/* <div className="container-fluid bg-white ChartContainer">
-        <div className="row">
-          <div className="col-12">
-            <div className="d-flex justify-content-between align-items-center ChartTop">
-              <div className="d-flex">
-                <span className="Income d-flex align-items-center">
-                  Ingresos
-                </span>
-                <span className="Outcome d-flex align-items-center">
-                  Egresos
-                </span>
-              </div>
-              <div className="d-flex ChartFilterContainer">
-                <form onChange={handleFilter} ref={formRef} className="d-flex">
-                  <select name="period" className="form-select">
-                    <option defaultChecked value="daily">
-                      Día
-                    </option>
-                    <option value="week">Semana</option>
-                    <option value="month">Mes</option>
-                    <option value="quarter">Trimestre</option>
-                    <option value="semester">Semestre</option>
-                    <option value="year">Año</option>
-                  </select>
-                  {banks.length > 0 ? (
-                    <select name="bank" className="form-select">
-                      {banks.map((e) => (
-                        <option value={e.id} key={e.id}>
-                          {e.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : null}
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <Line options={options} data={data} />
-        </div>
-      </div> */}
     </div>
   );
 };
