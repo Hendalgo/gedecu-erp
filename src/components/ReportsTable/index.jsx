@@ -7,6 +7,7 @@ import { DASHBOARD_ROUTE, REPORTS_ROUTE, USERS_ROUTE } from "../../consts/Routes
 export default function ReportsTable({
     data = null,
     loading = false,
+    showPagination = true,
     onPaginate = () => null,
 }) {
     const navigate = useNavigate();
@@ -17,19 +18,22 @@ export default function ReportsTable({
                 (loading || !data) ?
                 <TableLoader /> :
                 <>
-                    <div className="row mb-2">
-                        <div className="col">
-                            <div className="d-flex justify-content-end">
-                                <PaginationTable
-                                    text="reportes"
-                                    offset={data.current_page}
-                                    quantity={data.last_page}
-                                    itemsTotal={data.total}
-                                    handleChange={onPaginate}
-                                />
+                    {
+                        showPagination &&
+                        <div className="row mb-2">
+                            <div className="col">
+                                <div className="d-flex justify-content-end">
+                                    <PaginationTable
+                                        text="reportes"
+                                        offset={data.current_page}
+                                        quantity={data.last_page}
+                                        itemsTotal={data.total}
+                                        handleChange={onPaginate}
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                     <div className="row">
                         <div className="d-flex">
                             <div className="w-100 overflow-hidden mb-4 border rounded">
