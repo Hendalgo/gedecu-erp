@@ -1,13 +1,17 @@
 import "./BankCard.css";
 import useRandColor from "../../hooks/useRandColor";
 import PropTypes from "prop-types";
-const BankCard = ({ amount, currency, name }) => {
+import { formatAmount } from "../../utils/amount";
+
+const BankCard = ({ total, currency, shortcode, name, bank }) => {
+  const backgroundColor = useRandColor();
+
   return (
     <div className="d-flex align-items-center mb-2">
       <div>
         <span
           style={{
-            backgroundColor: useRandColor(),
+            backgroundColor,
             height: 40,
             width: 40,
             display: "block",
@@ -19,18 +23,21 @@ const BankCard = ({ amount, currency, name }) => {
         </span>
       </div>
       <div className="d-flex flex-column">
-        <span className="BankName">{name}</span>
+        <span className="BankName">{bank.name}</span>
         <span className="BankAmount">
-          {currency} {amount}
+          {currency || shortcode} {formatAmount(total)}
         </span>
       </div>
     </div>
   );
 };
+
 BankCard.propTypes = {
-  amount: PropTypes.string.isRequired,
-  currency: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  currency: PropTypes.string,
+  shortcode: PropTypes.string,
+  name: PropTypes.string,
+  bank: PropTypes.object.isRequired,
 };
 
 export default BankCard;

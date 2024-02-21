@@ -1,22 +1,19 @@
 import { ReactSVG } from "react-svg";
 import "./Card.css";
 import PropTypes from "prop-types";
+import { formatAmount } from "../../utils/amount";
 
-const Card = ({ country, currency, total, percent, img }) => {
+const Card = ({ country = "", currency, total, percent, img = "/world.svg" }) => {
   return (
     <div className="bg-white CardContainer">
       <div className="px-4 pt-4 pb-3 d-flex justify-content-between">
         <div>
-          <div className="CountryName pb-1" style={{ textWrap: "nowrap" }}>
-            <ReactSVG src="/world.svg" className="me-2" wrapper="span" />
-            {country}
-          </div>
           <div className="TotalCard" style={{ textWrap: "nowrap" }}>
-            {`${currency} ${total}`}
+            {`${currency} ${formatAmount(total)}`}
           </div>
         </div>
         <div className="ms-5 CardIcon">
-          <img src={img} alt={country} />
+          <img src={img} alt={currency} />
         </div>
       </div>
       <div className="pb-4 px-4">
@@ -25,18 +22,18 @@ const Card = ({ country, currency, total, percent, img }) => {
         ) : (
           <ReactSVG src="/down.svg" wrapper="span" />
         )}
-        <span>{percent.toFixed(2)}% día de hoy</span>
+        <span>{formatAmount(percent)}% día de hoy</span>
       </div>
     </div>
   );
 };
 
 Card.propTypes = {
-  country: PropTypes.string.isRequired,
+  country: PropTypes.string,
   currency: PropTypes.string.isRequired,
-  total: PropTypes.string.isRequired,
-  percent: PropTypes.number.isRequired,
-  img: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  percent: PropTypes.number,
+  img: PropTypes.string,
 };
 
 export default Card;

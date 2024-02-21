@@ -141,31 +141,6 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
                   />
                 </div>
                 <div className="d-flex mb-3">
-                  <div className="me-4">
-                    <label htmlFor="role">
-                      Rol <span className="Required">*</span>
-                    </label>
-                    <select
-                      required
-                      className="form-select"
-                      id="role"
-                      name="role"
-                    >
-                      {roles
-                        ? roles.map((e) => {
-                            return (
-                              <option
-                                key={e.id}
-                                style={{ textTransform: "capitalize" }}
-                                value={e.id}
-                              >
-                                {e.name}
-                              </option>
-                            );
-                          })
-                        : null}
-                    </select>
-                  </div>
                   <div>
                     <label htmlFor="country">
                       País <span className="Required">*</span>
@@ -179,6 +154,31 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
                     >
                       {countries
                         ? countries.map((e) => {
+                            return (
+                              <option
+                                key={e.id}
+                                style={{ textTransform: "capitalize" }}
+                                value={e.id}
+                              >
+                                {e.name}
+                              </option>
+                            );
+                          })
+                        : null}
+                    </select>
+                  </div>
+                  <div className="ms-4">
+                    <label htmlFor="role">
+                      Rol <span className="Required">*</span>
+                    </label>
+                    <select
+                      required
+                      className="form-select"
+                      id="role"
+                      name="role"
+                    >
+                      {roles
+                        ? roles.map((e) => {
                             return (
                               <option
                                 key={e.id}

@@ -108,6 +108,7 @@ const BankAccounts = () => {
       <Welcome
         text={"Cuentas de banco"}
         textButton={"Cuenta"}
+        showButton={session.role_id > 1}
         add={() => setModalShow(true)}
       />
       <div className="mt-4">

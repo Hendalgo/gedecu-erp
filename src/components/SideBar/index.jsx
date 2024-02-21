@@ -207,7 +207,7 @@ const SideBarBig = ({ menus, setSession, children }) => {
                 Cerrar Sesión
               </Link>
             </div>
-            <img src="/logo-broders.png" alt="Logo broders" />
+            <img src="/logo-broders.png" alt="Logo broders" /> - <span className="fw-semibold">Beta</span>
           </div>
         </div>
         <div

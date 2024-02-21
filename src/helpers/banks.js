@@ -1,4 +1,4 @@
-import { BANKS_URL, API_INSTANCE, BANKS_COUNTRIES_URL } from "../consts/ApiUrl";
+import { BANKS_URL, API_INSTANCE, BANKS_COUNTRIES_URL, BANKS_TOTAL_URL } from "../consts/ApiUrl";
 
 export const getBanks = async (querys) => {
   try {
@@ -54,5 +54,10 @@ export const getCountriesCount = async () => {
 
 export const getBanksTypes = async () => {
   const response = await API_INSTANCE.get(`${BANKS_URL}/types`);
+  return response.data;
+};
+
+export const getTotalAmountByBank = async () => {
+  const response = await API_INSTANCE.get(BANKS_TOTAL_URL);
   return response.data;
 };
