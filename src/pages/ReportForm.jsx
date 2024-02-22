@@ -453,22 +453,21 @@ export default function ReportForm() {
     setIsLoading(true);
 
     try {
-      console.log(subreports.current)
-      // const response = await createReport({
-      //   type_id: reportType.value,
-      //   subreports: subreports.current,
-      // });
+      const response = await createReport({
+        type_id: reportType.value,
+        subreports: subreports.current,
+      });
 
-      // if (response.status === 201) {
-      //   setReportType(null);
-      //   clearTableData();
+      if (response.status === 201) {
+        setReportType(null);
+        clearTableData();
 
-      //   setError({
-      //     show: true,
-      //     message: ["Reporte creado exitosamente."],
-      //     variant: "success",
-      //   });
-      // }
+        setError({
+          show: true,
+          message: ["Reporte creado exitosamente."],
+          variant: "success",
+        });
+      }
     } catch ({ message, error, response }) {
       let errorsMessages = [];
       if (error) {
@@ -565,7 +564,7 @@ export default function ReportForm() {
           </div>
         </ReportTableContext.Provider>
         <Alert show={error.show} variant={error.variant}>
-          <ul>
+          <ul className="m-0">
             {error.message.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
