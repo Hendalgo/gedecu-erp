@@ -3,16 +3,10 @@ export const getReports = async (query = "") => {
   const request = await API_INSTANCE.get(REPORTS_URL + "?" + query);
   return request.data;
 };
-export const getInconsistences = async (query) => {
-  try {
-    const request = await API_INSTANCE.get(
-      REPORTS_URL + "/inconsistences" + "?" + query,
-    );
 
-    return request.data;
-  } catch (error) {
-    return error.response;
-  }
+export const getInconsistences = async (query) => {
+  const response = await API_INSTANCE.get("inconsistenses" + "?" + query);
+  return response.data;
 };
 
 export const getReportById = async (id) => {
