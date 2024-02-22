@@ -13,6 +13,10 @@ const TypeOneWalletReportForm = () => {
   const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+  const userCountry = {
+    id: country?.currency_id || session.country.currency.id,
+    shortcode: country?.currency || session.country.currency.shortcode,
+  };
 
   useEffect(() => {
     setRateCurrency(USA_CURRENCY);
@@ -43,8 +47,8 @@ const TypeOneWalletReportForm = () => {
 
     if (rateCurrency.id == USA_CURRENCY.id) {
       newCurrency = {
-        id: country?.currency_id || session.country.currency.id,
-        shortcode: country?.currency || session.country.currency.shortcode
+        id: userCountry.id,
+        shortcode: userCountry.shortcode,
       }
     }
 
@@ -92,6 +96,14 @@ const TypeOneWalletReportForm = () => {
   }
   conversionAmount = formatAmount(conversionAmount);
 
+  let rateCalcMessage = "1 ";
+
+  if (rateCurrency.id == USA_CURRENCY.id) {
+    rateCalcMessage += `${rateCurrency.shortcode} a ${rate} ${userCountry.shortcode}`;
+  } else {
+    rateCalcMessage += `${userCountry.shortcode} a ${rate} ${USA_CURRENCY.shortcode}`;
+  }
+
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <input
@@ -129,7 +141,7 @@ const TypeOneWalletReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput currency={rateCurrency.shortcode} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">

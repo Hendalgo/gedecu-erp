@@ -111,6 +111,17 @@ const StoreReportForm = () => {
   
   conversionAmount = formatAmount(conversionAmount);
 
+  let rateCalcMessage = "Seleccione un local y una cuenta";
+  if (store && bankAccount) {
+    rateCalcMessage = "1 ";
+    if (rateCurrency.id == store.currency_id) {
+      rateCalcMessage += `${store.currency} a ${rate} ${bankAccount.currency}`;
+    } else {
+      rateCalcMessage += `${bankAccount.currency} a ${rate} ${store.currency}`;
+
+    }
+  }
+
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <div className="row mb-3">
@@ -172,7 +183,7 @@ const StoreReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa de cambio <span className="Required">*</span>
           </label>
-          <RateCalcInput currency={rateCurrency?.shortcode || "Seleccione un local y una cuenta"} disableButton={!store || !bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput message={rateCalcMessage} disableButton={!store || !bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">

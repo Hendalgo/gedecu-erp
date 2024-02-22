@@ -141,6 +141,14 @@ const TypeOneDraftReportForm = () => {
   
   conversionAmount = formatAmount(conversionAmount);
 
+  let rateCalcMessage = "1 ";
+
+  if (rateCurrency.id == originCurrency.current.id) {
+    rateCalcMessage += `${originCurrency.current.shortcode} a ${rate} ${VZLA_CURRENCY.shortcode}`;
+  } else {
+    rateCalcMessage += `${VZLA_CURRENCY.shortcode} a ${rate} ${originCurrency.current.shortcode}`;
+  }
+
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <input
@@ -223,7 +231,7 @@ const TypeOneDraftReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput currency={rateCurrency.shortcode} onChange={handleRateChange} onClick={handleRateCurrencyClick} />
+          <RateCalcInput message={rateCalcMessage} onChange={handleRateChange} onClick={handleRateCurrencyClick} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
