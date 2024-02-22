@@ -5,7 +5,7 @@ export const getReports = async (query = "") => {
 };
 
 export const getInconsistences = async (query) => {
-  const response = await API_INSTANCE.get("inconsistenses" + "?" + query);
+  const response = await API_INSTANCE.get("inconsistences" + "?" + query);
   return response.data;
 };
 

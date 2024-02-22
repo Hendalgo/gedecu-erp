@@ -40,7 +40,7 @@ const Inconsistences = () => {
     if (statusRef.current) params += `&status=${statusRef.current}`;
 
     try {
-      return await getInconsistences(`order_by=created_at&order=desc${params}`);
+      return await getInconsistences(`order=created_at&order_by=desc${params}`);
     } catch (err) {
       let errorMessage = handleError(err);
 
@@ -51,7 +51,7 @@ const Inconsistences = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [inconsistencesResponse, accountsResponse, balancesResponse] = await Promise.all([fetchInconsistences(), getBankAccounts("negative=yes"), getUsersBalance("moreThanOne=yes")]);
-      // setInconsistences(inconsistencesResponse);
+      setInconsistences(inconsistencesResponse);
       setAccounts(accountsResponse);
       setBalances(balancesResponse);
     }
