@@ -32,7 +32,7 @@ export default function ReportDetail() {
   const getSubreportsTable = () => {
     let footer = [];
 
-    const jsonData = Object.keys(JSON.parse(report.subreports.at(0).data));
+    const jsonData = Object.keys(report.subreports.at(0).data);
     const fields = [];
     const titles = [];
 
@@ -44,7 +44,7 @@ export default function ReportDetail() {
     }
 
     const subreports = report.subreports.map(({ data }) => {
-      const parsed = JSON.parse(data);
+      const parsed = data;
       let amount = parsed["amount"];
       let currency = parsed["currency"];
 
@@ -58,21 +58,22 @@ export default function ReportDetail() {
       );
 
       if (footerIndex === -1) {
-        footer.push({ currency, amount });
+        footer.push({ currency, amount: new Number(amount) });
       } else {
-        footer.at(footerIndex).amount += amount;
+        footer.at(footerIndex).amount += new Number(amount);
       }
 
       const values = fields.map((key) => {
         let formated = parsed[key];
         if (key == "isDuplicated") {
           formated = "No";
-          if (parsed[key]) {
+          if (parsed[key] == "1") {
             formated = "Sí";
           }
         }
 
         if (["amount", "rate", "conversion"].includes(key)) {
+          formated = new Number(formated);
           formated = formatAmount(formated);
         }
 
@@ -130,7 +131,7 @@ export default function ReportDetail() {
               {footer.map(({ currency, amount }) => (
                 <tr key={currency}>
                   <td className="fw-semibold text-end" colSpan={titles.length}>
-                    Total {currency}: {formatAmount(amount)}
+                    Total {currency}: {formatAmount(new Number(amount))}
                   </td>
                 </tr>
               ))}

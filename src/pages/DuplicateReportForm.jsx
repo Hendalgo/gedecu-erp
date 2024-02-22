@@ -118,7 +118,7 @@ export default function DuplicateReportForm() {
   if (!duplicate) return <></>;
 
   const duplicateData = JSON.parse(duplicate.duplicate_data);
-  const reportData = JSON.parse(duplicate.data);
+  const reportData = duplicate.data;
   const filteredRows = [];
   let reportRows = [];
 
@@ -127,7 +127,7 @@ export default function DuplicateReportForm() {
       if (Object.keys(reportData).includes(key)) {
         let formated = reportData[key];
         if (["amount", "rate", "conversion"].includes(key))
-          formated = formatAmount(formated);
+          formated = formatAmount(new Number(formated));
         filteredRows.push([reportsColumnsMap.get(key), formated]);
       }
     }
