@@ -49,7 +49,11 @@ export default function ReportDetail() {
       let currency = parsed["currency"];
 
       if (parsed["convert_amount"]) {
-        amount *= parsed["rate"];
+        if (parsed["rate_currency"] == currency) {
+          amount *= parsed["rate"];
+        } else {
+          amount /= parsed["rate"];
+        }
         currency = parsed["conversionCurrency"];
       }
 
