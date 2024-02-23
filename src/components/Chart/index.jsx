@@ -11,7 +11,6 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import "./Chart.css";
-import { useFormatDate } from "../../hooks/useFormatDate";
 import Select from "react-select";
 import { frecuencies } from "../../consts/frecuencies";
 import { getCurrencies } from "../../helpers/currencies";
@@ -34,6 +33,30 @@ const datasetsOptions = {
   borderColor: "#198754",
   backgroundColor: "#198754",
   borderWidth: 1,
+}
+
+const options = {
+  elements: {
+    point: {},
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false,
+      }
+    },
+    y: {},
+  },
+  plugins: {
+    legend: {
+      display: false
+    },
+    bodyFont: {
+      family: "Inter",
+      weight: 700,
+      size: 16,
+    },
+  }
 }
 
 const Chart = () => {
@@ -216,9 +239,14 @@ const Chart = () => {
 
   return (
     <div className="w-100 bg-white p-4 rounded border">
-      <div className="mb-4 d-flex justify-content-end" style={{gap: "3%"}}>
-        <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Moneda" onChange={handleCurrencyChange} className="w-25" />
-        <Select inputId="frecuency" name="frecuency" options={frecuencies} value={frecuency} placeholder="Periodo" onChange={handleFrecuencyChange} className="w-25" />
+      <div className="w-100 mb-4 d-flex justify-content-between align-items-center">
+        <div>
+          Leyenda
+        </div>
+        <div className="d-flex justify-content-end align-items-center" style={{gap: "3%"}}>
+          <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Moneda" onChange={handleCurrencyChange} className="w-25" />
+          <Select inputId="frecuency" name="frecuency" options={frecuencies} value={frecuency} placeholder="Periodo" onChange={handleFrecuencyChange} className="w-25" />
+        </div>
       </div>
       <Alert show={alert.messages.length > 0} variant={alert.variant}>
         <ul className="m-0">
@@ -231,7 +259,7 @@ const Chart = () => {
       </Alert>
       <Line
         data={chartData}
-        options={null}
+        options={options}
       />
     </div>
   );
