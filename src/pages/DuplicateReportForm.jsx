@@ -83,9 +83,6 @@ export default function DuplicateReportForm() {
 
         if (key === "date") {
           const date = new Date(formatedValue);
-          const minutes = date.getUTCMinutes();
-          const timeZoneOffset = date.getTimezoneOffset();
-          date.setMinutes(minutes + timeZoneOffset);
           formatedValue = date.toISOString();
         }
 
