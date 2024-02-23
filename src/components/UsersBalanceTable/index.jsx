@@ -12,7 +12,7 @@ export default function UsersBalanceTable({
                 data ?
                 <>
                     <div className="mb-2 d-flex justify-content-end">
-                        <PaginationTable handleChange={onPaginate} itemsTotal={data.total} itemsPerPage={data.per_page} text="usuarios" quantity={data.last_page} />
+                        <PaginationTable handleChange={onPaginate} itemsTotal={data.total} itemsPerPage={data.per_page} offset={data.current_page} text="usuarios" quantity={data.last_page} />
 
                     </div>
                     <div className="w-100 overflow-hidden border rounded mb-4">

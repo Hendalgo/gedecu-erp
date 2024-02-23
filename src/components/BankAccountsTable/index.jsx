@@ -12,7 +12,7 @@ export default function BankAccountsTable({
                 data ?
                 <>
                     <div className="mb-2 d-flex justify-content-end">
-                        <PaginationTable itemsTotal={data.total} itemsPerPage={data.per_page} quantity={data.last_page} text="cuentas" handleChange={onPagination} />
+                        <PaginationTable itemsTotal={data.total} itemsPerPage={data.per_page} offset={data.current_page} quantity={data.last_page} text="cuentas" handleChange={onPagination} />
                     </div>
                     <div className="w-100 overflow-hidden border rounded mb-4">
                         <table className="m-0 table table-striped">
