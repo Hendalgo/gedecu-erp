@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { getInconsistences, updateReport } from "../helpers/reports";
+import { getInconsistences, } from "../helpers/reports";
 import Welcome from "../components/Welcome";
 import FilterTableButtons from "../components/FilterTableButtons";
 import PaginationTable from "../components/PaginationTable";
@@ -14,6 +14,7 @@ import { getUsersBalance } from "../helpers/users";
 import UsersBalanceTable from "../components/UsersBalanceTable";
 import BankAccountsTable from "../components/BankAccountsTable";
 import { handleError } from "../utils/error";
+import { useFormatDate } from "../hooks/useFormatDate";
 
 const statusOptions = [
   {id: "yes", name: "Verificado"},
@@ -50,7 +51,7 @@ const Inconsistences = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [inconsistencesResponse, accountsResponse, balancesResponse] = await Promise.all([fetchInconsistences(), getBankAccounts("negative=yes"), getUsersBalance("moreThanOne=yes")]);
+      const [inconsistencesResponse, accountsResponse, balancesResponse] = await Promise.all([fetchInconsistences(), getBankAccounts("negatives=yes"), getUsersBalance("moreThanOne=yes")]);
       setInconsistences(inconsistencesResponse);
       setAccounts(accountsResponse);
       setBalances(balancesResponse);
@@ -83,7 +84,13 @@ const Inconsistences = () => {
   }
 
   const handleBalancesPagination = async ({ selected }) => {
-    console.log(selected)
+    try {
+      const response = await getUsersBalance(`moreThanOne=yes&page=${selected + 1}`);
+      setBalances(response);
+    } catch (err) {
+      let errorMessages = handleError(err);
+      setAlert({ message: errorMessages.join(" | "), variant: "danger" });
+    }
   }
 
   const handleAccountsPagination = async ({ selected }) => {
@@ -116,24 +123,32 @@ const Inconsistences = () => {
           {
             inconsistences ?
             <>
-              <div>
-                <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={0} offset={1} quantity={0} />
+              <div className="mb-2 d-flex justify-content-end">
+                <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
               </div>
-              <div>
-                <table>
+              <div className="w-100">
+                <table className="table table-striped">
                   <thead>
                     <tr>
-                      <th></th>
+                      <th>ID</th>
+                      <th>Usuario</th>
+                      <th>Tipo</th>
+                      <th>Fecha - Hora</th>
                     </tr>
                   </thead>
                   <tbody>
                     {
                       inconsistences.data.length == 0 ?
                       <tr>
-                        <td>No hay registros.</td>
+                        <td colSpan={4}>No hay registros.</td>
                       </tr> :
-                      inconsistences.data.map((inconsistence) => {
-                        return <tr key={inconsistence.id}><td>Inconsistencia</td></tr>
+                      inconsistences.data.map(({ id, report, created_at }) => {
+                        return <tr key={id}>
+                          <td>#{id.toString().padStart(6, '0')}</td>
+                          <td>{report.user.name} ({report.user.email})</td>
+                          <td>{report.type.name}</td>
+                          <td>{useFormatDate(created_at)}</td>
+                        </tr>
                       })
                     }
                   </tbody>
