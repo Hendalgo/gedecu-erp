@@ -55,18 +55,22 @@ const BankAccounts = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     setOffset(1);
-    if (form.current.search !== "") {
-      getBankAccounts(
-        `order=created_at&order_by=desc${form.current.filter_type.value !== "false" ? `&bank=${form.current.filter_type.value}` : ""}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`,
-      ).then((r) => setBanks(r));
-    }
+    let params = "";
+
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    if (form.current.filter_type.value !== "false") params += `&bank=${form.current.filter_type.value}`;
+
+    getBankAccounts(`order=created_at&order_by=desc${params}`,).then((r) => setBanks(r));
   };
 
   const handleBankChange = async (bankId) => {
     setOffset(1);
-    const accountsResponse = await getBankAccounts(
-      `order=created_at${bankId ? `&bank=${bankId}` : ""}${form.current.search.value ? `&search=${form.current.search.value}` : ""}`,
-    );
+    let params = "";
+
+    if (bankId != false) params += `&bank=${bankId}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
+    const accountsResponse = await getBankAccounts(`order=created_at${params}`,);
     setBanks(accountsResponse);
   };
 
@@ -74,8 +78,8 @@ const BankAccounts = () => {
     setOffset(offset.selected + 1);
     let params = `order=created_at&order_by=desc&page=${offset.selected + 1}`;
 
-    if (form.current.search.value)
-      params += `&search=${form.current.search.value}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    if (form.current.filter_type.value != "false") params += `&bank=${form.current.filter_type.value}`;
 
     getBankAccounts(params).then((r) => setBanks(r));
   };
@@ -138,6 +142,7 @@ const BankAccounts = () => {
                 <div className="d-flex justify-content-end">
                   <PaginationTable
                     text="cuentas"
+                    offset={banks.current_page}
                     quantity={banks.last_page}
                     itemsTotal={banks.total}
                     handleChange={handleChange}
