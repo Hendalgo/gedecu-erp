@@ -9,6 +9,7 @@ import { AdminMenus, NormalUserMenu } from "../../consts/Menus";
 import { useCheckRole } from "../../hooks/useCheckRole";
 import useScreenSize from "../../hooks/useScreenSize";
 import { getStores } from "../../helpers/stores";
+import Layout from "../Layout";
 
 const SideBar = ({ children }) => {
   const location = useLocation();
@@ -113,14 +114,18 @@ const SideBarSmall = ({ menus, setSession, children }) => {
                 Cerrar Sesión
               </Link>
             </div>
-            <img src="/logo-broders.png" alt="Logo broders" />
+            <img src="/logo-broders.png" alt="Logo broders" /> - <span className="fw-semibold">Beta</span>
           </div>
         </div>
         <div
-          className="col-9"
+          className="col-9 p-0"
           style={{ maxHeight: "100vh", overflowY: "scroll" }}
         >
-          {children}
+          <Layout>
+            <main className="px-3">
+              {children}
+            </main>
+          </Layout>
         </div>
       </div>
     </div>
@@ -211,10 +216,14 @@ const SideBarBig = ({ menus, setSession, children }) => {
           </div>
         </div>
         <div
-          className="col-10"
+          className="col-10 p-0"
           style={{ maxHeight: "100vh", overflowY: "scroll" }}
         >
-          {children}
+          <Layout>
+            <main className="px-3">
+              {children}
+            </main>
+          </Layout>
         </div>
       </div>
     </div>
