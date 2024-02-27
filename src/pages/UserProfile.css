@@ -1,0 +1,21 @@
+.UserProfileName {
+    color: #212529;
+    font-size: 24px;
+}
+
+.UserProfileRole {
+    color: #6C7DA3;
+    font-size: 16px;
+}
+
+.UserProfileStoreLabel {
+    color: #6C7DA3;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.UserProfileStoreInfo {
+    color: #495057;
+    font-size: 16px;
+    font-weight: 600;
+}
