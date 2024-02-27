@@ -21,6 +21,7 @@ import TableLoader from "../components/Loaders/TableLoader";
 import "./StoreDetail.css";
 import Title from "../components/Title";
 import ModalConfirmation from "../components/ModalConfirmation";
+import SearchBar from "../components/SearchBar";
 
 export default function StoreDetail() {
   const [store, setStore] = useState(null);
@@ -29,6 +30,7 @@ export default function StoreDetail() {
   const [alert, setAlert] = useState({ message: [], variant: "danger" });
   const [banks, setBanks] = useState([]);
   const [bank, setBank] = useState(false);
+  const search = useRef("");
   const [offset, setOffset] = useState(1);
   const [show, setShow] = useState(false);
   const { session } = useContext(SessionContext);
@@ -90,9 +92,23 @@ export default function StoreDetail() {
     setBank(option);
 
     let params = `${option ? `&bank=${option}` : ""}`;
+    if (search.current) params += `&search=${search.current}`;
 
     setAccounts(await fetchBankAccounts(params));
   };
+
+  const handleSearch = async (ev) => {
+    ev.preventDefault();
+    setOffset(1);
+
+    const currentSearch = ev.target.search.value;
+    search.current = currentSearch;
+
+    let params = `${search.current ? `&search=${search.current}` : ""}`;
+    if (bank) params += `&bank=${bank}`;
+
+    setAccounts(await fetchBankAccounts(params));
+  }
 
   const handlePagination = async ({ selected }) => {
     const newOffset = selected + 1;
@@ -211,23 +227,22 @@ export default function StoreDetail() {
         </div>
       </section>
       <section>
-        <div className="row justify-content-between mb-3">
+        <div className="row justify-content-between mb-4">
           <div className="col-8">
             <FilterTableButtons data={banks} callback={handleBankChange} />
           </div>
-          <div className="col-4 text-end">
-            <button
-              type="button"
-              className="btn btn-outline-primary"
-              onClick={() =>
-                navigate(
-                  `/${DASHBOARD_ROUTE}/${STORES_ROUTE}/${params.id}/${BANK_ACCOUNTS_ROUTE}`,
-                )
-              }
-            >
-              Registrar cuenta
-            </button>
-          </div>
+          <form onSubmit={handleSearch} className="col-4 text-end">
+            <SearchBar text="Cuentas" />
+          </form>
+        </div>
+        <div className="w-100 mb-4 text-end">
+          <button
+            type="button"
+            className="btn btn-outline-primary"
+            onClick={() => navigate(`/${DASHBOARD_ROUTE}/${STORES_ROUTE}/${params.id}/${BANK_ACCOUNTS_ROUTE}`)}
+          >
+            Registrar cuenta
+          </button>
         </div>
         <Alert show={alert.message.length > 0} variant={alert.variant}>
           <ul>

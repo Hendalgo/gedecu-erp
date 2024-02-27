@@ -10,6 +10,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
   const [alertType, setAlertType] = useState("danger");
   const [banks, setBanks] = useState([]);
   const [currencies, setCurrencies] = useState([]);
+  const [currency, setCurrency] = useState(null);
   const [errorMessage, setErrorMessage] = useState();
   const [loading, setLoading] = useState(false);
   const form = useRef();
@@ -28,6 +29,7 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
           currenciesResponse.map(({ name, shortcode, id }) => ({
             label: name.concat(" (", shortcode, ")"),
             value: id,
+            shortcode
           })),
         );
       })
@@ -145,6 +147,8 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
                   inputId="currency_id"
                   name="currency_id"
                   options={currencies}
+                  value={currency}
+                  onChange={setCurrency}
                 />
               </div>
             </div>
@@ -153,7 +157,10 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
                 <label htmlFor="balance" className="form-label">
                   Monto inicial <span className="Required">*</span>
                 </label>
-                <DecimalInput id="balance" name="balance" />
+                <div className="input-group">
+                  <span className="input-group-text">{currency?.shortcode}</span>
+                  <DecimalInput id="balance" name="balance" />
+                </div>
               </div>
             </div>
           </div>

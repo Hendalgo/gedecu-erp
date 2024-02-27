@@ -1,5 +1,5 @@
 import { REPORTS_URL, API_INSTANCE, REPORTS_TYPE_URL } from "../consts/ApiUrl";
-export const getReports = async (query) => {
+export const getReports = async (query = "") => {
   const request = await API_INSTANCE.get(REPORTS_URL + "?" + query);
   return request.data;
 };
