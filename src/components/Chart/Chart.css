@@ -1,5 +1,6 @@
 .Income,
-.Outcome {
+.Outcome,
+.Neutro {
   font-size: 12px;
   font-style: normal;
   font-weight: 600;
@@ -18,6 +19,14 @@
   width: 8px;
   height: 8px;
   background-color: #dc3545;
+  border-radius: 200px;
+  margin-right: 4px;
+}
+.Neutro::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background-color: #0d6efd;
   border-radius: 200px;
   margin-right: 4px;
 }

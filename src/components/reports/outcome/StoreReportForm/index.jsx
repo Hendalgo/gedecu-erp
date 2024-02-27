@@ -5,13 +5,30 @@ import StoresSelect from "../../../StoresSelect";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import RateCalcInput from "../../../RateCalcInput";
+import { formatAmount } from "../../../../utils/amount";
 
 const StoreReportForm = () => {
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
+  const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const [store, setStore] = useState(null);
   const [bankAccount, setBankAccount] = useState(null);
   const { handleSubmit, setError } = useContext(ReportTableContext);
+
+  const handleStoreChange = (option) => {
+    let newRateCurrency = { id: 0, shortcode: "" };
+
+    if (option) {
+      newRateCurrency = {
+        id: option.currency_id,
+        shortcode: option.currency,
+      }
+    }
+
+    setRateCurrency(newRateCurrency);
+    setStore(option);
+  }
 
   const handleAmountChange = (amount) => {
     if (Number.isNaN(amount))
@@ -22,6 +39,22 @@ const StoreReportForm = () => {
       });
     else setAmount(amount);
   };
+
+  const handleRateCurrencyClick = () => {
+    let newCurrency = {
+      id: store.currency_id,
+      shortcode: store.currency
+    };
+
+    if (rateCurrency.id == store.currency_id) {
+      newCurrency = {
+        id: bankAccount.currency_id,
+        shortcode: bankAccount.currency
+      }
+    }
+
+    setRateCurrency(newCurrency);
+  }
 
   const handleRateChange = (rate) => {
     if (Number.isNaN(amount))
@@ -67,14 +100,27 @@ const StoreReportForm = () => {
     setBankAccount(null);
   };
 
-  const conversionAmount =
-    rate > 0
-      ? (amount * rate).toLocaleString("es-VE", {
-          useGrouping: true,
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : 0;
+  let conversionAmount = 0;
+
+  if (rate > 0 && store && bankAccount) {
+    conversionAmount = amount * rate;
+    if (rateCurrency.id != store.currency_id) {
+      conversionAmount = amount / rate;
+    }
+  }
+  
+  conversionAmount = formatAmount(conversionAmount);
+
+  let rateCalcMessage = "Seleccione un local y una cuenta";
+  if (store && bankAccount) {
+    rateCalcMessage = "1 ";
+    if (rateCurrency.id == store.currency_id) {
+      rateCalcMessage += `${store.currency} a ${rate} ${bankAccount.currency}`;
+    } else {
+      rateCalcMessage += `${bankAccount.currency} a ${rate} ${store.currency}`;
+
+    }
+  }
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
@@ -87,7 +133,7 @@ const StoreReportForm = () => {
             id="store"
             name="store"
             value={store}
-            onChange={setStore}
+            onChange={handleStoreChange}
             onError={setError}
           />
         </div>
@@ -137,14 +183,8 @@ const StoreReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa de cambio <span className="Required">*</span>
           </label>
-          <DecimalInput
-            id="rate"
-            name="rate"
-            defaultValue={rate.toLocaleString("es-VE", {
-              minimumFractionDigits: 2,
-            })}
-            onChange={handleRateChange}
-          />
+          <RateCalcInput message={rateCalcMessage} disableButton={!store || !bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
           <label htmlFor="conversion" className="form-label">

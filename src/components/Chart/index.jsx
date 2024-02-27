@@ -11,8 +11,6 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import "./Chart.css";
-import { useFormatDate } from "../../hooks/useFormatDate";
-import Select from "react-select";
 import { frecuencies } from "../../consts/frecuencies";
 import { getCurrencies } from "../../helpers/currencies";
 import { getMovementStatistics } from "../../helpers/statistics";
@@ -30,16 +28,58 @@ ChartJS.register(
 );
 
 const datasetsOptions = {
-  tension: 0.25,
+  tension: 0.3,
   borderColor: "#198754",
   backgroundColor: "#198754",
   borderWidth: 1,
 }
 
+const options = {
+  elements: {
+    point: {},
+  },
+  scales: {
+    x: {
+      grid: {
+        display: false,
+      }
+    },
+    y: {},
+  },
+  plugins: {
+    legend: {
+      display: false
+    },
+    tooltip: {
+      backgroundColor: "#ffffff",
+      borderColor: "#E6EDFF",
+      borderWidth: 1,
+      titleColor: "#6C757D",
+      titleFont: {
+        family: "Inter",
+        weight: 400,
+      },
+      titleAlign: "center",
+      bodyColor: "#000",
+      bodyAlign: "center",
+      usePointStyle: true,
+      pointStyle: "circle",
+      boxPadding: 4,
+      boxWidth: 6,
+      bodyFont: {
+        family: "Inter",
+        weight: 700,
+        size: 16,
+      },
+      padding: 12,
+    },
+  }
+}
+
 const Chart = () => {
   const [currencies, setCurrencies] = useState([]);
-  const [currency, setCurrency] = useState(null);
-  const [frecuency, setFrecuency] = useState(null);
+  const [currency, setCurrency] = useState(1);
+  const [frecuency, setFrecuency] = useState("day");
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [],
@@ -56,32 +96,36 @@ const Chart = () => {
       setCurrencies(response.map(({name, id, shortcode}) => {
         return { label: `${name} (${shortcode})`, value: id }
       }));
+
+      fetchData(currency, frecuency);
     })
     .catch((err) => handleErrors(err));
   }, []);
 
-  const handleCurrencyChange = (option) => {
-    setCurrency(option);
+  const handleCurrencyChange = ({ target }) => {
+    const { value } = target;
+    setCurrency(parseInt(value));
     let currentFrecuency = frecuency;
 
     if (!currentFrecuency) {
-      currentFrecuency = frecuencies.at(0);
+      currentFrecuency = frecuencies.at(0).value;
       setFrecuency(currentFrecuency);
     }
 
-    fetchData(option.value, currentFrecuency.value);
+    fetchData(value, currentFrecuency);
   }
 
-  const handleFrecuencyChange = (option) => {
-    setFrecuency(option);
+  const handleFrecuencyChange = ({ target }) => {
+    const { value } = target;
+    setFrecuency(value);
     let currentCurrency = currency;
 
     if (!currentCurrency) {
-      currentCurrency = currencies.at(0);
+      currentCurrency = currencies.at(0).value;
       setCurrency(currentCurrency);
     }
 
-    fetchData(currentCurrency.value, option.value);
+    fetchData(currentCurrency, value);
   }
 
   const fetchData = async (currency, frecuency) => {
@@ -171,54 +215,30 @@ const Chart = () => {
     }
   }
 
-  // const [options, setOptions] = useState({
-  //   scales: {
-  //     y: {
-  //       min: 0,
-  //       max: 10000,
-  //     },
-  //     x: {
-  //       ticks: { color: "#6C757D" },
-  //       grid: {
-  //         display: false,
-  //       },
-  //     },
-  //   },
-  //   plugins: {
-  //     legend: {
-  //       display: false,
-  //     },
-  //     tooltip: {
-  //       backgroundColor: "#ffffff",
-  //       borderColor: "#E6EDFF",
-  //       borderWidth: 1,
-  //       titleColor: "#6C757D",
-  //       titleFont: {
-  //         family: "Inter",
-  //         weight: 400,
-  //       },
-  //       titleAlign: "center",
-  //       bodyColor: "#000",
-  //       bodyAlign: "center",
-  //       usePointStyle: true,
-  //       pointStyle: "circle",
-  //       boxPadding: 4,
-  //       boxWidth: 6,
-  //       bodyFont: {
-  //         family: "Inter",
-  //         weight: 700,
-  //         size: 16,
-  //       },
-  //       padding: 12,
-  //     },
-  //   },
-  // });
-
   return (
     <div className="w-100 bg-white p-4 rounded border">
-      <div className="mb-4 d-flex justify-content-end" style={{gap: "3%"}}>
-        <Select inputId="currency" name="currency_id" options={currencies} value={currency} placeholder="Moneda" onChange={handleCurrencyChange} className="w-25" />
-        <Select inputId="frecuency" name="frecuency" options={frecuencies} value={frecuency} placeholder="Periodo" onChange={handleFrecuencyChange} className="w-25" />
+      <div className="row align-items-center ChartTop">
+        <div className="col-6 d-flex">
+          <span className="Income d-flex align-items-center">Ingreso</span>
+          <span className="Neutro d-flex align-items-center">Neutro</span>
+          <span className="Outcome d-flex align-items-center">Egreso</span>
+        </div>
+        <div className="col-6 row d-flex justify-content-end p-0">
+          <select defaultValue={currency} className="col form-select form-select-sm me-2" onChange={handleCurrencyChange}>
+            {
+              currencies.map(({ value, label }) => {
+                return <option key={value} value={value} label={label}></option>
+              })
+            }
+          </select>
+          <select defaultValue={frecuency} className="col form-select form-select-sm" onChange={handleFrecuencyChange}>
+            {
+              frecuencies.map(({ value, label }) => {
+                return <option key={value} value={value} label={label}></option>
+              })
+            }
+          </select>
+        </div>
       </div>
       <Alert show={alert.messages.length > 0} variant={alert.variant}>
         <ul className="m-0">
@@ -231,7 +251,7 @@ const Chart = () => {
       </Alert>
       <Line
         data={chartData}
-        options={null}
+        options={options}
       />
     </div>
   );

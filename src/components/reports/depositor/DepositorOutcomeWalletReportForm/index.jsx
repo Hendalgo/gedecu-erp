@@ -5,6 +5,9 @@ import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
+import RateCalcInput from "../../../RateCalcInput";
+import { USA_CURRENCY } from "../../../../consts/currencies";
+import { formatAmount } from "../../../../utils/amount";
 
 export default function DepositorOutcomeWalletReportForm() {
   const [user, setUser] = useState(null);
@@ -12,6 +15,7 @@ export default function DepositorOutcomeWalletReportForm() {
   const { session } = useContext(SessionContext);
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
+  const [rateCurrency, setRateCurrency] = useState({...USA_CURRENCY});
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -51,14 +55,35 @@ export default function DepositorOutcomeWalletReportForm() {
   const handleAmount = (value) => {
     setAmount(value);
   };
+
+  const handleRateCurrencyClick = () => {
+    let newCurrency = {...USA_CURRENCY};
+
+    if (rateCurrency.id == USA_CURRENCY.id) {
+      newCurrency = {
+        id: country?.currency_id || session.country.currency.id,
+        shortcode: country?.currency || session.country.currency.shortcode
+      };
+    }
+
+    setRateCurrency(newCurrency);
+  }
+
   const handleRate = (value) => {
     setRate(value);
   };
 
-  const conversion = (amount * rate).toLocaleString("es-VE", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  let conversion = 0;
+
+  if (rate > 0) {
+    if (rateCurrency.id == USA_CURRENCY.id) {
+      conversion = amount * rate;
+    } else {
+      conversion = amount / rate;
+    }
+  }
+
+  conversion = formatAmount(conversion);
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset}>
@@ -96,7 +121,8 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <DecimalInput id="rate" name="rate" onChange={handleRate} />
+          <RateCalcInput currency={`Tasa en ${rateCurrency.shortcode}`} onClick={handleRateCurrencyClick} onChange={handleRate} />
+          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
       </div>
       <div className="row mb-3">

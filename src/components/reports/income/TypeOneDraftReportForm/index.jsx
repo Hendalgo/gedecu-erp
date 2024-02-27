@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import BanksSelect from "../../../BanksSelect";
@@ -6,15 +6,34 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import Select from "react-select";
 import { getUsers } from "../../../../helpers/users";
+import RateCalcInput from "../../../RateCalcInput";
+import { formatAmount } from "../../../../utils/amount";
+import { VZLA_CURRENCY } from "../../../../consts/currencies";
 
 const TypeOneDraftReportForm = () => {
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
+  const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [bank, setBank] = useState(null);
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+  const originCurrency = useRef({ id: 0, shortcode: "" });
+
+  useEffect(() => {
+    originCurrency.current = {
+      id: session.country.currency.id,
+      shortcode: session.country.currency.shortcode
+    };
+
+    if (country) {
+      originCurrency.current.id = country.currency_id;
+      originCurrency.current.shortcode = country.currency;
+    }
+
+    setRateCurrency(originCurrency.current);
+  }, []);
 
   const handleBankChange = async (option) => {
     if (option?.value !== bank?.value) {
@@ -59,8 +78,20 @@ const TypeOneDraftReportForm = () => {
         message: ["Valor inadecuado."],
         variant: "danger",
       });
-    else setRate(rate);
+    else {
+      setRate(rate);
+    }
   };
+
+  const handleRateCurrencyClick = () => {
+    let newCurrency = {...VZLA_CURRENCY};
+
+    if (rateCurrency.id == VZLA_CURRENCY.id) {
+      newCurrency = {...originCurrency.current};
+    }
+
+    setRateCurrency(newCurrency);
+  }
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -98,14 +129,25 @@ const TypeOneDraftReportForm = () => {
     setRate(0);
   };
 
-  const conversionAmount =
-    rate > 0
-      ? (amount * rate).toLocaleString("es-VE", {
-          useGrouping: true,
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : 0;
+  let conversionAmount = 0;
+
+  if (rate > 0) {
+    conversionAmount = amount * rate;
+
+    if (rateCurrency.id !== originCurrency.current.id) {
+      conversionAmount = amount / rate;
+    }
+  }
+  
+  conversionAmount = formatAmount(conversionAmount);
+
+  let rateCalcMessage = "1 ";
+
+  if (rateCurrency.id == originCurrency.current.id) {
+    rateCalcMessage += `${originCurrency.current.shortcode} a ${rate} ${VZLA_CURRENCY.shortcode}`;
+  } else {
+    rateCalcMessage += `${VZLA_CURRENCY.shortcode} a ${rate} ${originCurrency.current.shortcode}`;
+  }
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
@@ -189,14 +231,8 @@ const TypeOneDraftReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <DecimalInput
-            id="rate"
-            name="rate"
-            defaultValue={rate.toLocaleString("es-VE", {
-              minimumFractionDigits: 2,
-            })}
-            onChange={handleRateChange}
-          />
+          <RateCalcInput message={rateCalcMessage} onChange={handleRateChange} onClick={handleRateCurrencyClick} />
+          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
           <label htmlFor="conversion" className="form-label">

@@ -41,24 +41,38 @@ export const BanksIndex = () => {
   }, []);
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
+    let params = "";
+
+    if (form.current.filter_type.value != "false") params += `&country=${form.current.filter_type.value}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
     getBanks(
-      `order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== "false" ? `&country=${form.current.filter_type.value}` : ""}&search=${form.current.search.value}`,
+      `order=created_at&order_by=desc&page=${offset.selected + 1}${params}`,
     ).then((r) => setBanks(r));
   };
+
   const handleType = (e) => {
     setOffset(1);
+    let params = "";
+
+    if (e) params += `&country=${e}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
     getBanks(
-      `order=created_at&order_by=desc&country=${e ? `&country=${e}` : ""}&search=${form.current.search.value}`,
+      `order=created_at&order_by=desc${params}`,
     ).then((r) => setBanks(r));
   };
+
   const handleSearch = (e) => {
     e.preventDefault();
     setOffset(1);
-    if (form.current.search !== "") {
-      getBanks(
-        `order=created_at&order_by=desc${form.current.filter_type.value !== "false" ? `&country=${form.current.filter_type.value}` : ""}&search=${form.current.search.value}`,
-      ).then((r) => setBanks(r));
-    }
+
+    let params = "";
+
+    if (form.current.filter_type.value != "false") params += `&country=${form.current.filter_type.value}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
+    getBanks(`order=created_at&order_by=desc${params}`,).then((r) => setBanks(r));
   };
   const handleBank = (e) => {
     setModalEditShow(true);
@@ -117,6 +131,7 @@ export const BanksIndex = () => {
                   <div />
                   <PaginationTable
                     text="bancos"
+                    offset={banks.current_page}
                     quantity={banks.last_page}
                     itemsTotal={banks.total}
                     handleChange={handleChange}

@@ -63,8 +63,13 @@ const Stores = () => {
 
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
+    let params = "";
+
+    if (country) params += `&country=${country}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+
     getStores(
-      `order=created_at&order_by=desc&page=${offset.selected + 1}&search=${form.current.search.value}`,
+      `order=created_at&order_by=desc&page=${offset.selected + 1}${params}`,
     ).then((r) => setStores(r));
   };
   const handleEdit = (e) => {
@@ -146,7 +151,7 @@ const Stores = () => {
                 <div className="d-flex justify-content-end">
                   <PaginationTable
                     text="locales"
-                    offset={offset}
+                    offset={stores.current_page}
                     quantity={stores.last_page}
                     itemsTotal={stores.total}
                     handleChange={handleChange}
