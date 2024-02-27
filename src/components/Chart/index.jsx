@@ -105,7 +105,6 @@ const Chart = () => {
   const handleCurrencyChange = ({ target }) => {
     const { value } = target;
     setCurrency(parseInt(value));
-    console.log(frecuency)
     let currentFrecuency = frecuency;
 
     if (!currentFrecuency) {

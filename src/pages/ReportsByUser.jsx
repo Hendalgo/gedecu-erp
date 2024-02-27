@@ -45,7 +45,11 @@ export default function ReportsByUser() {
 
   if (!reports) return <></>;
 
-  const userName = reports.data.at(0).user.name;
+  let userName = "usuarios";
+
+  if (reports.data.length > 0) {
+    userName = reports.data.at(0).user.name;
+  }
 
   return (
     <>
