@@ -45,10 +45,13 @@ export default function ReportsByUser() {
 
   if (!reports) return <></>;
 
-  let userName = "usuarios";
+  let userName;
 
-  if (reports.data.length > 0) {
-    userName = reports.data.at(0).user.name;
+  if (session.role_id == 1) {
+    userName = "usuarios";
+    if (reports.data.length > 0) {
+      userName = reports.data.at(0).user.name;
+    }
   }
 
   return (
