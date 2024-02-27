@@ -12,7 +12,13 @@ export function handleError(err) {
             errorMessages.push(message);
         }
     } else {
-        errorMessages.push(message);
+        const splittedMessages = message.split(";");
+
+        if (splittedMessages.length > 0) {
+            errorMessages = splittedMessages;
+        } else {
+            errorMessages.push(message);
+        }
     }
 
     return errorMessages;

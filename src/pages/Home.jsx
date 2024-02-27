@@ -117,7 +117,7 @@ const Home = () => {
         </div>
       </section>
       <section className="row pt-4">
-        <div className="col-10">
+        <div className="col-9">
           {
             useCheckRole(session) &&
             <>
@@ -165,7 +165,7 @@ const Home = () => {
         </div>
         {
           (useCheckRole(session)) &&
-          <aside className="col-2 radius overflow-hidden overflow-y-auto" style={{ maxHeight: "90vh" }}>
+          <aside className="col-3 radius overflow-hidden overflow-y-auto" style={{ maxHeight: "90vh" }}>
             {
               loadingBanks ?
               <TableLoader height={1400} /> :
