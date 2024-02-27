@@ -83,9 +83,6 @@ export default function DuplicateReportForm() {
 
         if (key === "date") {
           const date = new Date(formatedValue);
-          const minutes = date.getUTCMinutes();
-          const timeZoneOffset = date.getTimezoneOffset();
-          date.setMinutes(minutes + timeZoneOffset);
           formatedValue = date.toISOString();
         }
 
@@ -118,7 +115,7 @@ export default function DuplicateReportForm() {
   if (!duplicate) return <></>;
 
   const duplicateData = JSON.parse(duplicate.duplicate_data);
-  const reportData = JSON.parse(duplicate.data);
+  const reportData = duplicate.data;
   const filteredRows = [];
   let reportRows = [];
 
@@ -127,7 +124,7 @@ export default function DuplicateReportForm() {
       if (Object.keys(reportData).includes(key)) {
         let formated = reportData[key];
         if (["amount", "rate", "conversion"].includes(key))
-          formated = formatAmount(formated);
+          formated = formatAmount(new Number(formated));
         filteredRows.push([reportsColumnsMap.get(key), formated]);
       }
     }

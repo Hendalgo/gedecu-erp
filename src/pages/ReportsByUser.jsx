@@ -1,12 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { getReports } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
-import TableLoader from "../components/Loaders/TableLoader";
 import Welcome from "../components/Welcome";
-import PaginationTable from "../components/PaginationTable";
 import { useNavigate, useParams } from "react-router-dom";
 import { DASHBOARD_ROUTE, REPORTS_ROUTE } from "../consts/Routes";
-import { useFormatDate } from "../hooks/useFormatDate";
 import ReportsByUserTable from "../components/ReportsByUserTable";
 
 export default function ReportsByUser() {
@@ -46,20 +43,20 @@ export default function ReportsByUser() {
     setReports(await getUserReports(`&date=${date}`));
   };
 
-  const handlePagination = async ({ selected }) => {
-    setOffset(selected + 1);
-
-    setReports(await getUserReports(`&page=${selected + 1}`));
-  };
-
   if (!reports) return <></>;
+
+  let userName = "usuarios";
+
+  if (reports.data.length > 0) {
+    userName = reports.data.at(0).user.name;
+  }
 
   return (
     <>
       <div className="container-fluid">
         <section>
           <Welcome
-            text="Reportes de usuario"
+            text={session.role_id == 1 ? `Reportes de ${userName}` : "Tus reportes"}
             showButton={session.role_id !== 1}
             add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)}
             textButton="Reportes"

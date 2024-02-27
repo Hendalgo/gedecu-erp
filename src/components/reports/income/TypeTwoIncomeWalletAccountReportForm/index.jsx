@@ -4,17 +4,50 @@ import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
+import RateCalcInput from "../../../RateCalcInput";
+import { formatAmount } from "../../../../utils/amount";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
+  const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  const handleAccountChange = (option) => {
+    let newRateCurrency = { id: 0, shortcode: "" };
+
+    if (option) {
+      newRateCurrency = {
+        id: option.currency_id,
+        shortcode: option.currency,
+      }
+    }
+
+    setRateCurrency(newRateCurrency);
+    setBankAccount(option);
+  }
 
   const handleAmountChange = (amount) => {
     setAmount(amount);
   };
+
+  const handleRateCurrencyClick = () => {
+    let newCurrency = {
+      id: bankAccount.currency_id,
+      shortcode: bankAccount.currency
+    };
+
+    if (rateCurrency.id == bankAccount.currency_id) {
+      newCurrency = {
+        id: country?.currency_id || session.country.currency.id,
+        shortcode: country?.currency || session.country.currency.shortcode
+      }
+    }
+
+    setRateCurrency(newCurrency);
+  }
 
   const handleRateChange = (rate) => {
     setRate(rate);
@@ -53,14 +86,16 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
     setBankAccount(null);
   };
 
-  const conversion =
-    rate > 0
-      ? (amount * rate).toLocaleString("es-VE", {
-          useGrouping: true,
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : 0;
+  let conversion = 0;
+
+  if (rate > 0 && bankAccount) {
+    conversion = amount * rate;
+    if (rateCurrency.id != bankAccount.currency_id) {
+      conversion = amount / rate;
+    }
+  }
+
+  conversion = formatAmount(conversion);
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
@@ -74,7 +109,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
             name="account"
             value={bankAccount}
             query={`&type=2`}
-            onChange={setBankAccount}
+            onChange={handleAccountChange}
             onError={setError}
           />
         </div>
@@ -113,7 +148,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <DecimalInput id="rate" name="rate" onChange={handleRateChange} />
+          <RateCalcInput currency={rateCurrency?.shortcode ? `Tasa en ${rateCurrency?.shortcode}` : "Seleccione una cuenta"} disableButton={!bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
         </div>
       </div>
       <div className="row mb-3">
