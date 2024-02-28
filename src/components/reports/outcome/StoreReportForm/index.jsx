@@ -1,5 +1,4 @@
 import { useContext, useState } from "react";
-import DecimalInput from "../../../DecimalInput";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import StoresSelect from "../../../StoresSelect";
 import NumberInput from "../../../NumberInput";
@@ -7,6 +6,7 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const StoreReportForm = () => {
   const [amount, setAmount] = useState(0);
@@ -166,14 +166,7 @@ const StoreReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto total en {store?.currency} <span className="Required">*</span>
           </label>
-          <DecimalInput
-            id="amount"
-            name="amount"
-            defaultValue={amount.toLocaleString("es-VE", {
-              minimumFractionDigits: 2,
-            })}
-            onChange={handleAmountChange}
-          />
+          <AmountCurrencyInput currencySymbol={store?.currency} onChange={handleAmountChange} />
         </div>
       </div>
       <input type="hidden" name="currency_id" value={store?.currency_id || 0} />
