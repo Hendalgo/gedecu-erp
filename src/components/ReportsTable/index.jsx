@@ -36,7 +36,7 @@ export default function ReportsTable({
             }
             <div className="row">
               <div className="d-flex">
-                <div className="w-100 overflow-hidden mb-4 border rounded">
+                <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
                   <table className="m-0 table table-striped">
                     <thead>
                       <tr>

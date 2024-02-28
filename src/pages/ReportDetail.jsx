@@ -45,14 +45,15 @@ export default function ReportDetail() {
 
     const subreports = report.subreports.map(({ data }) => {
       const parsed = data;
-      let amount = parsed["amount"];
+      let amount = new Number(parsed["amount"]);
       let currency = parsed["currency"];
 
-      if (parsed["convert_amount"]) {
-        if (parsed["rate_currency"] == currency) {
-          amount *= parsed["rate"];
+      if (Boolean(data["convert_amount"]) == true) {
+        const rate = new Number(data["rate"]);
+        if (parsed["rate_currency"] == data["currency_id"]) {
+          amount *= rate;
         } else {
-          amount /= parsed["rate"];
+          amount /= rate;
         }
         currency = parsed["conversionCurrency"];
       }
@@ -111,7 +112,7 @@ export default function ReportDetail() {
         </ul>
       </Alert>
       <section>
-        <div className="w-100 overflow-hidden border rounded mb-4">
+        <div className="w-100 overflow-hidden overflow-x-auto border rounded mb-4">
           <table className="m-0 table table-striped">
             <thead>
               <tr>

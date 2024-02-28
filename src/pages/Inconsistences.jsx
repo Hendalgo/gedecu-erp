@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { getInconsistences, } from "../helpers/reports";
+import { getInconsistences, patchInconsistence, patchInconsistencesMassive, } from "../helpers/reports";
 import Welcome from "../components/Welcome";
 import FilterTableButtons from "../components/FilterTableButtons";
 import PaginationTable from "../components/PaginationTable";
@@ -97,6 +97,28 @@ const Inconsistences = () => {
     console.log(selected)
   }
 
+  const verifyInconsistence = async (id) => {
+    try {
+      const response = await patchInconsistence(id);
+      console.log(response);
+
+    } catch (err) {
+      let errorMessages = handleError(err);
+      setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
+    }
+  }
+
+  const verifyInconsistencesMassive = async () => {
+    try {
+      const response = await patchInconsistencesMassive();
+      console.log(response);
+
+    } catch (err) {
+      let errorMessages = handleError(err);
+      setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
+    }
+  }
+
   return (
     <div className="container-fluid">
       <section>
@@ -126,7 +148,10 @@ const Inconsistences = () => {
                 <div className="mb-2 d-flex justify-content-end">
                   <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
                 </div>
-                <div className="w-100">
+                <div className="mb-2 d-flex justify-content-end">
+                  <button className="btn btn-primary" onClick={() => verifyInconsistencesMassive()}>Verificar todas</button>
+                </div>
+                <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
                   <table className="table table-striped">
                     <thead>
                       <tr>
@@ -134,6 +159,7 @@ const Inconsistences = () => {
                         <th>Usuario</th>
                         <th>Tipo</th>
                         <th>Fecha - Hora</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -148,6 +174,9 @@ const Inconsistences = () => {
                               <td>{report.user.name} ({report.user.email})</td>
                               <td>{report.type.name}</td>
                               <td>{useFormatDate(created_at)}</td>
+                              <td>
+                                <button className="btn btn-outline-primary" onClick={() => verifyInconsistence(id)}>Verificar</button>
+                              </td>
                             </tr>
                           })
                       }
