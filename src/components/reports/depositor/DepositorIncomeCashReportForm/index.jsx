@@ -1,8 +1,8 @@
-import DecimalInput from "../../../DecimalInput";
 import StoresSelect from "../../../StoresSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function DepositorIncomeCashReportForm() {
   const [store, setStore] = useState(null);
@@ -58,7 +58,7 @@ export default function DepositorIncomeCashReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={store?.currency || ""} />
           <input
             type="hidden"
             name="currency_id"
