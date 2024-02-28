@@ -1,8 +1,8 @@
-import DecimalInput from "../../../DecimalInput";
 import { useContext } from "react";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoWalletAccountReportForm = () => {
   // Reporte 2 > Egreso > Cuenta Billetera Efectivo
@@ -40,7 +40,7 @@ const TypeTwoWalletAccountReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" onChange={() => null} />
+          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
         </div>
         <input
           type="hidden"
@@ -53,21 +53,6 @@ const TypeTwoWalletAccountReportForm = () => {
           value={country?.currency || session.country.currency.shortcode}
         />
       </div>
-      {/* <div className={`row mb-3 ${paymentMethod.value !== 2 ? 'd-none' : 'd-block'}`}>
-                <div className="col-6">
-                    <input type="hidden" name="account" value={bankAccount?.label || ""} />
-                    <label htmlFor="account_id" className="form-label">Cuenta <span className="Required">*</span></label>
-                    <Select
-                        inputId="account_id"
-                        name="account_id"
-                        options={bankAccounts}
-                        value={bankAccount}
-                        placeholder="Selecciona la cuenta"
-                        noOptionsMessage={() => "No hay coincidencias"}
-                        onChange={setBankAccount}
-                    />
-                </div>
-            </div> */}
       <div className="row mb-3">
         <div className="col-6">
           <Form.Check

@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
-import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 import RateCalcInput from "../../../RateCalcInput";
 import { USA_CURRENCY } from "../../../../consts/currencies";
 import { formatAmount } from "../../../../utils/amount";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function DepositorOutcomeWalletReportForm() {
   const [user, setUser] = useState(null);
@@ -16,6 +16,10 @@ export default function DepositorOutcomeWalletReportForm() {
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
   const [rateCurrency, setRateCurrency] = useState({...USA_CURRENCY});
+  const currentCountry = {
+    id: country?.currency_id || session.country.currency.id,
+    shortcode: country?.currency || session.country.currency.shortcode,
+  };
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -84,6 +88,15 @@ export default function DepositorOutcomeWalletReportForm() {
   }
 
   conversion = formatAmount(conversion);
+  let rateCalcMessage = "Seleccione un gestor";
+  if (user) {
+    rateCalcMessage = "1 ";
+    if (rateCurrency.id == USA_CURRENCY.id) {
+      rateCalcMessage += `${USA_CURRENCY.shortcode} a ${rate} ${currentCountry.shortcode}`;
+    } else {
+      rateCalcMessage += `${currentCountry.shortcode} a ${rate} ${USA_CURRENCY.shortcode}`;
+    }
+  }
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset}>
@@ -113,7 +126,7 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" onChange={handleAmount} />
+          <AmountCurrencyInput currencySymbol="USD" onChange={handleAmount} />
           <input type="hidden" name="currency_id" value={3} />
           <input type="hidden" name="currency" value="USD" />
         </div>
@@ -121,7 +134,7 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput currency={`Tasa en ${rateCurrency.shortcode}`} onClick={handleRateCurrencyClick} onChange={handleRate} />
+          <RateCalcInput message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRate} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
       </div>

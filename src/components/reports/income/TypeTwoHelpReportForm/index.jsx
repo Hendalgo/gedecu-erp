@@ -1,9 +1,9 @@
-import DecimalInput from "../../../DecimalInput";
 import StoresSelect from "../../../StoresSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoHelpReportForm = () => {
   const [store, setStore] = useState(null);
@@ -76,7 +76,7 @@ const TypeTwoHelpReportForm = () => {
           <label htmlFor="amount">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
         </div>
       </div>
       <input

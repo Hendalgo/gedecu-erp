@@ -1,7 +1,7 @@
-import DecimalInput from "../../../DecimalInput";
 import { useContext } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoCashReportForm = () => {
   const { handleSubmit, setError, country } = useContext(ReportTableContext);
@@ -37,7 +37,7 @@ const TypeTwoCashReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
         </div>
       </div>
       <input

@@ -1,8 +1,8 @@
-import DecimalInput from "../../../DecimalInput";
 import { useContext, useState } from "react";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function TypeTwoWalletAccountTransferenceForm() {
   // Reporte 2 > Egreso > Cuenta Billetera Transferencia
@@ -57,7 +57,7 @@ export default function TypeTwoWalletAccountTransferenceForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" onChange={() => null} />
+          <AmountCurrencyInput currencySymbol={account?.currency || ""} />
         </div>
         <input
           type="hidden"

@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
-import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -97,6 +97,18 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
 
   conversion = formatAmount(conversion);
 
+  let rateCalcMessage = "Seleccione una cuenta de banco";
+
+  if (bankAccount) {
+    rateCalcMessage = "1 ";
+    if (rateCurrency.id == bankAccount.currency_id) {
+      rateCalcMessage += `${rateCurrency.shortcode} a ${rate} ${country?.currency || session.country.currency.shortcode}`;
+    } else {
+      rateCalcMessage += `${country?.currency || session.country.currency.shortcode} a ${rate} ${bankAccount.currency}`;
+    }
+  }
+
+
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <div className="row mb-3">
@@ -128,11 +140,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput
-            id="amount"
-            name="amount"
-            onChange={handleAmountChange}
-          />
+          <AmountCurrencyInput currencySymbol={bankAccount?.currency} onChange={handleAmountChange} />
         </div>
         <input
           type="hidden"
@@ -148,7 +156,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput currency={rateCurrency?.shortcode ? `Tasa en ${rateCurrency?.shortcode}` : "Seleccione una cuenta"} disableButton={!bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput message={rateCalcMessage} disableButton={!bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
         </div>
       </div>
       <div className="row mb-3">
