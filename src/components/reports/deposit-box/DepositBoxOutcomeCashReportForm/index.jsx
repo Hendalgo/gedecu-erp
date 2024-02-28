@@ -2,8 +2,8 @@ import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import StoresSelect from "../../../StoresSelect";
-import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function DepositBoxOutcomeCashReportForm() {
   const [store, setStore] = useState(null);
@@ -69,7 +69,7 @@ export default function DepositBoxOutcomeCashReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={store?.currency || ""} />
           <input
             type="hidden"
             name="currency_id"

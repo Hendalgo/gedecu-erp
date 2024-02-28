@@ -4,7 +4,7 @@ import BanksSelect from "../../../BanksSelect";
 import { getUsers } from "../../../../helpers/users";
 import Select from "react-select";
 import { getBankAccounts } from "../../../../helpers/banksAccounts";
-import DecimalInput from "../../../DecimalInput";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function SupplierOutcomeReportForm() {
   const [bank, setBank] = useState(null);
@@ -175,7 +175,7 @@ export default function SupplierOutcomeReportForm() {
             <label htmlFor="amount" className="form-label">
               Monto <span className="Required">*</span>
             </label>
-            <DecimalInput id="amount" name="amount" />
+            <AmountCurrencyInput currencySymbol={bankAccount?.currency || ""} />
           </div>
           <input
             type="hidden"
