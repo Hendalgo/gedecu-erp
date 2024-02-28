@@ -44,21 +44,21 @@ const ModalEditCurrency = ({ modalShow, setModalShow, currency }) => {
       const request = await updateCurrency(currency.id, data);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Moneda editada con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Moneda editada con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la edicion de la moneda");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la edicion de la moneda");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la edicion de la moneda");

@@ -47,21 +47,21 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
       const request = await createBank(formData);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Banco creado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Banco creado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la creación del banco");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la creación del banco");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la creación del banco");
@@ -113,16 +113,16 @@ const ModalCreateBank = ({ modalShow, setModalShow }) => {
                 >
                   {countries
                     ? countries.map((e) => {
-                        return (
-                          <option
-                            key={e.id}
-                            style={{ textTransform: "capitalize" }}
-                            value={e.id}
-                          >
-                            {e.name}
-                          </option>
-                        );
-                      })
+                      return (
+                        <option
+                          key={e.id}
+                          style={{ textTransform: "capitalize" }}
+                          value={e.id}
+                        >
+                          {e.name}
+                        </option>
+                      );
+                    })
                     : null}
                 </select>
               </div>

@@ -31,21 +31,21 @@ const ModalEditUser = ({ modalShow, setModalShow, user, setUser }) => {
       const request = await updateUser(user.id, userUpdate);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Usuario actualizado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Usuario actualizado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error actualizando el usuario");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error actualizando el usuario");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error actualizando el usuario");

@@ -1,5 +1,5 @@
 const options = {};
 
 export default {
-    options
+  options
 }

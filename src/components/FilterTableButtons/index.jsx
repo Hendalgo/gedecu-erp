@@ -26,24 +26,24 @@ const FilterTableButtons = ({ data, callback }) => {
       </div>
       {Array.isArray(data)
         ? data.map((e) => (
-            <div key={e.id} className="me-2">
-              <input
-                onChange={() => callback(e.id)}
-                type="radio"
-                name="filter_type"
-                value={e.id}
-                id={e.id}
-                style={{ display: "none" }}
-              />
-              <label
-                htmlFor={e.id}
-                style={{ textTransform: "capitalize" }}
-                className="filter-type"
-              >
-                {e.name} {/* <span>{e.count}</span> */}
-              </label>
-            </div>
-          ))
+          <div key={e.id} className="me-2">
+            <input
+              onChange={() => callback(e.id)}
+              type="radio"
+              name="filter_type"
+              value={e.id}
+              id={e.id}
+              style={{ display: "none" }}
+            />
+            <label
+              htmlFor={e.id}
+              style={{ textTransform: "capitalize" }}
+              className="filter-type"
+            >
+              {e.name} {/* <span>{e.count}</span> */}
+            </label>
+          </div>
+        ))
         : null}
     </fieldset>
   );

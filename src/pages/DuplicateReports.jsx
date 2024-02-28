@@ -129,13 +129,13 @@ const DuplicateReports = () => {
             <>
               <div className="row mt-4">
                 <div className="col-12 d-flex justify-content-end">
-                    <PaginationTable
-                      offset={offset}
-                      itemOffset={offset}
-                      quantity={duplicates.last_page}
-                      itemsTotal={duplicates.total}
-                      handleChange={handleChange}
-                    />
+                  <PaginationTable
+                    offset={offset}
+                    itemOffset={offset}
+                    quantity={duplicates.last_page}
+                    itemsTotal={duplicates.total}
+                    handleChange={handleChange}
+                  />
                 </div>
               </div>
 

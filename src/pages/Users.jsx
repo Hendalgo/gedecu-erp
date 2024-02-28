@@ -151,8 +151,8 @@ const Users = () => {
                               {e.role.name}
                             </td>
                             <td>
-                                {
-                                  !e.is_initial &&
+                              {
+                                !e.is_initial &&
                                   <div className="d-flex justify-content-evenly align-items-center">
                                     <button
                                       onClick={() => handleUser(e)}
@@ -211,7 +211,7 @@ const Users = () => {
                                       </svg>
                                     </button>
                                   </div>
-                                }
+                              }
                             </td>
                           </tr>
                         );

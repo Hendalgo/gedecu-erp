@@ -97,10 +97,10 @@ export default function ReportDetail() {
 
   return (
     <>
-      <section className="p-2 mb-4">
+      <section className="p-2 pt-4 mb-4">
         <div className="WelcomeContainer">
           <h6 className="welcome">Información detallada</h6>
-          <h4>Reporte</h4>
+          <h4>Reporte #{id.toString().padStart(6, "0")}</h4>
         </div>
       </section>
       <Alert show={error.show} variant={error.variant}>
@@ -252,7 +252,7 @@ export default function ReportDetail() {
                 >
                   MOTIVO:
                 </h6>
-                <span className="rounded" style={reportStyles}>
+                <span className="rounded p-1 " style={reportStyles}>
                   {report.type.name}
                 </span>
               </div>

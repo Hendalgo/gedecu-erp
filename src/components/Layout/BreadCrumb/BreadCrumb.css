@@ -2,6 +2,7 @@
     font-size: 12px;
     color: #6C7DA3BF;
     opacity: 0.75;
+    cursor: default;
 }
 
 .BreadCrumb.current {

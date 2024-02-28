@@ -16,21 +16,21 @@ const ModalEditReportType = ({ modalShow, setModalShow, data }) => {
         type: formData.type.value,
       });
       switch (request.status) {
-        case 201:
-          setErrorMessage("Tipo editado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Tipo editado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la edición del tipo");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la edición del tipo");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la edición del tipo");

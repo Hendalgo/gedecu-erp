@@ -134,20 +134,20 @@ const Home = () => {
               >
                 {
                   loadingCurrencies ?
-                  <>
-                    <div className="col-4"><BalanceLoader /></div>
-                    <div className="col-4"><BalanceLoader /></div>
-                    <div className="col-4"><BalanceLoader /></div>
-                  </> :
-                  currencies.map(({currency, total, percentage}, index) => {
-                    return <div key={index} className="">
-                      <Card
-                        currency={`${currency.name} - ${currency.shortcode}`}
-                        total={total}
-                        percent={percentage || 0}
-                      />
-                  </div>
-                  })
+                    <>
+                      <div className="col-4"><BalanceLoader /></div>
+                      <div className="col-4"><BalanceLoader /></div>
+                      <div className="col-4"><BalanceLoader /></div>
+                    </> :
+                    currencies.map(({currency, total, percentage}, index) => {
+                      return <div key={index} className="">
+                        <Card
+                          currency={`${currency.name} - ${currency.shortcode}`}
+                          total={total}
+                          percent={percentage || 0}
+                        />
+                      </div>
+                    })
                 }
               </div>
             </>
@@ -168,7 +168,7 @@ const Home = () => {
           <aside className="col-3 radius overflow-hidden overflow-y-auto" style={{ maxHeight: "90vh" }}>
             {
               loadingBanks ?
-              <TableLoader height={1400} /> :
+                <TableLoader height={1400} /> :
                 <div className="BankAmountContainer">
                   <div className="d-flex flex-column align-items-center BankAmountTop" >
                     <ReactSVG src="/bank.svg" className="TotalAmountBank" wrapper="span" />
@@ -197,8 +197,8 @@ const Home = () => {
         <div className="pb-2">
           {
             session.role_id === 1 ?
-            <ReportsTable loading={loadingReports} data={reports} /> :
-            <ReportsByUserTable loading={loadingReports} data={reports} />
+              <ReportsTable loading={loadingReports} data={reports} /> :
+              <ReportsByUserTable loading={loadingReports} data={reports} />
           }
         </div>
       </section>

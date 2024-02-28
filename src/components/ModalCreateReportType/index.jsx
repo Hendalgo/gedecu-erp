@@ -12,21 +12,21 @@ const ModalCreateReportType = ({ modalShow, setModalShow }) => {
       const formData = form.current;
       const request = await createReportTypes(formData);
       switch (request.status) {
-        case 201:
-          setErrorMessage("Tipo creado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Tipo creado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la creación del tipo");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la creación del tipo");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la creación del tipo");

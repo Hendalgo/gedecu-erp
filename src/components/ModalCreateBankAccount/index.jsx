@@ -53,21 +53,21 @@ const ModalCreateBankAccount = ({ modalShow, setModalShow }) => {
       const request = await createBankAccount(formData);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Cuenta creada con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Cuenta creada con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la creación de la cuenta");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la creación de la cuenta");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la creación de la cuenta");

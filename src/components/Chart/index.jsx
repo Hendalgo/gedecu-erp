@@ -92,14 +92,14 @@ const Chart = () => {
 
   useEffect(() => {
     getCurrencies("paginated=no")
-    .then((response) => {
-      setCurrencies(response.map(({name, id, shortcode}) => {
-        return { label: `${name} (${shortcode})`, value: id }
-      }));
+      .then((response) => {
+        setCurrencies(response.map(({name, id, shortcode}) => {
+          return { label: `${name} (${shortcode})`, value: id }
+        }));
 
-      fetchData(currency, frecuency);
-    })
-    .catch((err) => handleErrors(err));
+        fetchData(currency, frecuency);
+      })
+      .catch((err) => handleErrors(err));
   }, []);
 
   const handleCurrencyChange = ({ target }) => {

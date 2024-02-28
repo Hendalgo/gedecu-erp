@@ -35,21 +35,21 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
       const request = await createUser(formData);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Usuario creado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Usuario creado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error en la creación del usuario");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error en la creación del usuario");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error en la creación del usuario");
@@ -154,16 +154,16 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
                     >
                       {countries
                         ? countries.map((e) => {
-                            return (
-                              <option
-                                key={e.id}
-                                style={{ textTransform: "capitalize" }}
-                                value={e.id}
-                              >
-                                {e.name}
-                              </option>
-                            );
-                          })
+                          return (
+                            <option
+                              key={e.id}
+                              style={{ textTransform: "capitalize" }}
+                              value={e.id}
+                            >
+                              {e.name}
+                            </option>
+                          );
+                        })
                         : null}
                     </select>
                   </div>
@@ -179,16 +179,16 @@ const ModalCreateUser = ({ modalShow, setModalShow }) => {
                     >
                       {roles
                         ? roles.map((e) => {
-                            return (
-                              <option
-                                key={e.id}
-                                style={{ textTransform: "capitalize" }}
-                                value={e.id}
-                              >
-                                {e.name}
-                              </option>
-                            );
-                          })
+                          return (
+                            <option
+                              key={e.id}
+                              style={{ textTransform: "capitalize" }}
+                              value={e.id}
+                            >
+                              {e.name}
+                            </option>
+                          );
+                        })
                         : null}
                     </select>
                   </div>

@@ -122,40 +122,40 @@ const Inconsistences = () => {
         <div>
           {
             inconsistences ?
-            <>
-              <div className="mb-2 d-flex justify-content-end">
-                <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
-              </div>
-              <div className="w-100">
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Usuario</th>
-                      <th>Tipo</th>
-                      <th>Fecha - Hora</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      inconsistences.data.length == 0 ?
+              <>
+                <div className="mb-2 d-flex justify-content-end">
+                  <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
+                </div>
+                <div className="w-100">
+                  <table className="table table-striped">
+                    <thead>
                       <tr>
-                        <td colSpan={4}>No hay registros.</td>
-                      </tr> :
-                      inconsistences.data.map(({ id, report, created_at }) => {
-                        return <tr key={id}>
-                          <td>#{id.toString().padStart(6, '0')}</td>
-                          <td>{report.user.name} ({report.user.email})</td>
-                          <td>{report.type.name}</td>
-                          <td>{useFormatDate(created_at)}</td>
-                        </tr>
-                      })
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </> :
-            <TableLoader />
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Tipo</th>
+                        <th>Fecha - Hora</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        inconsistences.data.length == 0 ?
+                          <tr>
+                            <td colSpan={4}>No hay registros.</td>
+                          </tr> :
+                          inconsistences.data.map(({ id, report, created_at }) => {
+                            return <tr key={id}>
+                              <td>#{id.toString().padStart(6, '0')}</td>
+                              <td>{report.user.name} ({report.user.email})</td>
+                              <td>{report.type.name}</td>
+                              <td>{useFormatDate(created_at)}</td>
+                            </tr>
+                          })
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </> :
+              <TableLoader />
           }
         </div>
       </section>

@@ -17,23 +17,23 @@ const Login = () => {
       const response = await login(formData);
 
       switch (response.status) {
-        case 200:
-          localStorage.setItem("token", response.data.access_token);
-          window.location.reload();
-          break;
-        case 401:
-          setErrorMessage(
-            "Email o contraseña incorrectos. Verifique e intente de nuevo.",
-          );
-          break;
-        case 422:
-          setErrorMessage("Error email y contraseña son campos requeridos");
-          break;
-        case 500:
-          setErrorMessage("Error de servidor, intente de nuevo mas tarde.");
-        default:
-          setErrorMessage("Error de servidor, intente de nuevo mas tarde.");
-          break;
+      case 200:
+        localStorage.setItem("token", response.data.access_token);
+        window.location.reload();
+        break;
+      case 401:
+        setErrorMessage(
+          "Email o contraseña incorrectos. Verifique e intente de nuevo.",
+        );
+        break;
+      case 422:
+        setErrorMessage("Error email y contraseña son campos requeridos");
+        break;
+      case 500:
+        setErrorMessage("Error de servidor, intente de nuevo mas tarde.");
+      default:
+        setErrorMessage("Error de servidor, intente de nuevo mas tarde.");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error de servidor, intente de nuevo mas tarde.");

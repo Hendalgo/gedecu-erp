@@ -55,21 +55,21 @@ const ModalEditBank = ({ modalShow, setModalShow, bank, setBank }) => {
       const request = await updateBank(bank.id, data);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Banco actualizado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Banco actualizado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error actualizando el banco");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error actualizando el banco");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       setErrorMessage("Error actualizando el banco");

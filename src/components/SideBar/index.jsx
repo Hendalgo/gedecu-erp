@@ -10,6 +10,7 @@ import { useCheckRole } from "../../hooks/useCheckRole";
 import useScreenSize from "../../hooks/useScreenSize";
 import { getStores } from "../../helpers/stores";
 import Layout from "../Layout";
+import { DASHBOARD_INDEX_ROUTE, DASHBOARD_ROUTE } from "../../consts/Routes";
 
 const SideBar = ({ children }) => {
   const location = useLocation();
@@ -53,7 +54,9 @@ const SideBarSmall = ({ menus, setSession, children }) => {
       <div className="row">
         <div className="col-3 SideBarCol d-flex flex-column flex-shrink-0 p-3">
           <div className="d-flex pb-4 pt-3 align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <img src="/gedecu.png" className="img-fluid bi pe-none me-2" />
+            <NavLink to={`/${DASHBOARD_ROUTE}/${DASHBOARD_INDEX_ROUTE}`}>
+              <img src="/gedecu.png" className="img-fluid bi pe-none me-2" />
+            </NavLink>
           </div>
           <ul className="nav nav-pills flex-column mb-auto">
             {isActive.map((Menu, index) => (
@@ -151,7 +154,9 @@ const SideBarBig = ({ menus, setSession, children }) => {
       <div className="row">
         <div className="col-2 SideBarCol d-flex flex-column flex-shrink-0 p-3">
           <div className="d-flex pb-4 pt-3 align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <img src="/gedecu.png" className="img-fluid bi pe-none me-2" />
+            <NavLink to={`/${DASHBOARD_ROUTE}/${DASHBOARD_INDEX_ROUTE}`}>
+              <img src="/gedecu.png" className="img-fluid bi pe-none me-2" />
+            </NavLink>
           </div>
           <ul className="nav nav-pills flex-column mb-auto">
             {isActive.map((Menu, index) => (

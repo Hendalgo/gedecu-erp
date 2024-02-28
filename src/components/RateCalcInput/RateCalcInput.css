@@ -1,0 +1,6 @@
+.CalcRateSvg{
+  transition: all 250ms linear;
+}
+.CalcRateSvg.rotate{
+  transform: rotate(180deg);
+}

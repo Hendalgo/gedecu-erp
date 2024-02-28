@@ -56,21 +56,21 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
       const request = await updateStore(store.id, data);
 
       switch (request.status) {
-        case 201:
-          setErrorMessage("Local actualizado con éxito");
-          setAlertType("success");
+      case 201:
+        setErrorMessage("Local actualizado con éxito");
+        setAlertType("success");
 
-          window.location.reload();
-          break;
-        case 422:
-          setErrorMessage(request.data.message);
-          setAlertType("danger");
-          break;
+        window.location.reload();
+        break;
+      case 422:
+        setErrorMessage(request.data.message);
+        setAlertType("danger");
+        break;
 
-        default:
-          setErrorMessage("Error actualizando el local");
-          setAlertType("danger");
-          break;
+      default:
+        setErrorMessage("Error actualizando el local");
+        setAlertType("danger");
+        break;
       }
     } catch (error) {
       console.log(error);
@@ -155,9 +155,9 @@ const ModalEditStore = ({ modalShow, setModalShow, store }) => {
                 defaultValue={
                   store.user
                     ? {
-                        label: `${store.user.name} - ${store.user.email}`,
-                        value: store.user.id,
-                      }
+                      label: `${store.user.name} - ${store.user.email}`,
+                      value: store.user.id,
+                    }
                     : null
                 }
               />
