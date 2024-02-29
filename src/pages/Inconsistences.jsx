@@ -80,7 +80,7 @@ const Inconsistences = () => {
   const handlePagination = async ({ selected }) => {
     const newOffset = selected + 1;
     const response = await fetchInconsistences(`&page=${newOffset}`);
-    console.log(response);
+    setInconsistences(response);
   }
 
   const handleBalancesPagination = async ({ selected }) => {
@@ -94,14 +94,23 @@ const Inconsistences = () => {
   }
 
   const handleAccountsPagination = async ({ selected }) => {
-    console.log(selected)
+    const response = await getBankAccounts(`negatives=yes&page=${selected + 1}`);
+    setAccounts(response);
   }
 
   const verifyInconsistence = async (id) => {
     try {
-      const response = await patchInconsistence(id);
-      console.log(response);
+      let response = await patchInconsistence(id);
 
+      if (response.status == 200) {
+        response = await fetchInconsistences();
+        setInconsistences(response);
+
+        setAlert({
+          message: "Inconsistencia verificada",
+          variant: "success"
+        });
+      }
     } catch (err) {
       let errorMessages = handleError(err);
       setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
@@ -110,8 +119,16 @@ const Inconsistences = () => {
 
   const verifyInconsistencesMassive = async () => {
     try {
-      const response = await patchInconsistencesMassive();
-      console.log(response);
+      let response = await patchInconsistencesMassive();
+      if (response.status == 200) {
+        response = await fetchInconsistences();
+        setInconsistences(response);
+
+        setAlert({
+          message: "Inconsistencias verificadas",
+          variant: "success"
+        });
+      }
 
     } catch (err) {
       let errorMessages = handleError(err);
@@ -149,10 +166,10 @@ const Inconsistences = () => {
                   <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
                 </div>
                 <div className="mb-2 d-flex justify-content-end">
-                  <button className="btn btn-primary" onClick={() => verifyInconsistencesMassive()}>Verificar todas</button>
+                  <button className="btn btn-primary" disabled={!inconsistences || inconsistences.data.length == 0} onClick={() => verifyInconsistencesMassive()}>Verificar todas</button>
                 </div>
                 <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
-                  <table className="table table-striped">
+                  <table className="m-0 table table-striped">
                     <thead>
                       <tr>
                         <th>ID</th>
@@ -166,7 +183,7 @@ const Inconsistences = () => {
                       {
                         inconsistences.data.length == 0 ?
                           <tr>
-                            <td colSpan={4}>No hay registros.</td>
+                            <td colSpan={5}>No hay registros.</td>
                           </tr> :
                           inconsistences.data.map(({ id, report, created_at }) => {
                             return <tr key={id}>

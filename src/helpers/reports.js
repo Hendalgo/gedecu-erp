@@ -10,12 +10,12 @@ export const getInconsistences = async (query) => {
 };
 
 export const patchInconsistence = async (id) => {
-  const response = await API_INSTANCE.patch(`inconsistences/status/${id}`);
+  const response = await API_INSTANCE.patch(`inconsistences/verify/${id}`);
   return response;
 };
 
 export const patchInconsistencesMassive = async () => {
-  const response = await API_INSTANCE.patch(`inconsistences/status`);
+  const response = await API_INSTANCE.patch(`inconsistences/verify/all`);
   return response;
 };
 
