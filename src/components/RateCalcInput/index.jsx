@@ -11,7 +11,6 @@ export default function RateCalcInput({
   const svgRef = useRef();
   const handleButton = () => {
     onClick();
-    console.log(svgRef.current);
     svgRef.current.classList.toggle("rotate");
   }
   return (

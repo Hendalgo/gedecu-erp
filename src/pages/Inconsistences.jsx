@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { getInconsistences, } from "../helpers/reports";
+import { getInconsistences, patchInconsistence, patchInconsistencesMassive, } from "../helpers/reports";
 import Welcome from "../components/Welcome";
 import FilterTableButtons from "../components/FilterTableButtons";
 import PaginationTable from "../components/PaginationTable";
@@ -80,7 +80,7 @@ const Inconsistences = () => {
   const handlePagination = async ({ selected }) => {
     const newOffset = selected + 1;
     const response = await fetchInconsistences(`&page=${newOffset}`);
-    console.log(response);
+    setInconsistences(response);
   }
 
   const handleBalancesPagination = async ({ selected }) => {
@@ -94,7 +94,46 @@ const Inconsistences = () => {
   }
 
   const handleAccountsPagination = async ({ selected }) => {
-    console.log(selected)
+    const response = await getBankAccounts(`negatives=yes&page=${selected + 1}`);
+    setAccounts(response);
+  }
+
+  const verifyInconsistence = async (id) => {
+    try {
+      let response = await patchInconsistence(id);
+
+      if (response.status == 200) {
+        response = await fetchInconsistences();
+        setInconsistences(response);
+
+        setAlert({
+          message: "Inconsistencia verificada",
+          variant: "success"
+        });
+      }
+    } catch (err) {
+      let errorMessages = handleError(err);
+      setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
+    }
+  }
+
+  const verifyInconsistencesMassive = async () => {
+    try {
+      let response = await patchInconsistencesMassive();
+      if (response.status == 200) {
+        response = await fetchInconsistences();
+        setInconsistences(response);
+
+        setAlert({
+          message: "Inconsistencias verificadas",
+          variant: "success"
+        });
+      }
+
+    } catch (err) {
+      let errorMessages = handleError(err);
+      setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
+    }
   }
 
   return (
@@ -126,21 +165,25 @@ const Inconsistences = () => {
                 <div className="mb-2 d-flex justify-content-end">
                   <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
                 </div>
-                <div className="w-100">
-                  <table className="table table-striped">
+                <div className="mb-2 d-flex justify-content-end">
+                  <button className="btn btn-primary" disabled={!inconsistences || inconsistences.data.length == 0} onClick={() => verifyInconsistencesMassive()}>Verificar todas</button>
+                </div>
+                <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
+                  <table className="m-0 table table-striped">
                     <thead>
                       <tr>
                         <th>ID</th>
                         <th>Usuario</th>
                         <th>Tipo</th>
                         <th>Fecha - Hora</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
                       {
                         inconsistences.data.length == 0 ?
                           <tr>
-                            <td colSpan={4}>No hay registros.</td>
+                            <td colSpan={5}>No hay registros.</td>
                           </tr> :
                           inconsistences.data.map(({ id, report, created_at }) => {
                             return <tr key={id}>
@@ -148,6 +191,9 @@ const Inconsistences = () => {
                               <td>{report.user.name} ({report.user.email})</td>
                               <td>{report.type.name}</td>
                               <td>{useFormatDate(created_at)}</td>
+                              <td>
+                                <button className="btn btn-outline-primary" onClick={() => verifyInconsistence(id)}>Verificar</button>
+                              </td>
                             </tr>
                           })
                       }

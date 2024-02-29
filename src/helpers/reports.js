@@ -9,6 +9,16 @@ export const getInconsistences = async (query) => {
   return response.data;
 };
 
+export const patchInconsistence = async (id) => {
+  const response = await API_INSTANCE.patch(`inconsistences/verify/${id}`);
+  return response;
+};
+
+export const patchInconsistencesMassive = async () => {
+  const response = await API_INSTANCE.patch(`inconsistences/verify/all`);
+  return response;
+};
+
 export const getReportById = async (id) => {
   const response = await API_INSTANCE.get(`${REPORTS_URL}/${id}`);
   return response.data;

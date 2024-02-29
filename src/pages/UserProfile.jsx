@@ -21,16 +21,19 @@ export default function UserProfile() {
   const [accounts, setAccounts] = useState(null);
   const [store, setStore] = useState(null);
   const [alert, setAlert] = useState({messages: [], variant: "danger"});
+  const [loadingAccounts, setLoadingAccounts] = useState(true);
   const { session, setSession } = useContext(SessionContext);
+  const handlesAccounts = [1, 2, 3].includes(session.role_id);
 
   useEffect(() => {
     const fetchData = async () => {
       let errors = [];
 
-      const requests = [
-        getReports("order=created_at&order_by=desc"),
-        getBankAccounts("order=created_at&order_by=desc"),
-      ];
+      const requests = [ getReports("order=created_at&order_by=desc"), ];
+
+      if (handlesAccounts) {
+        requests.push(getBankAccounts("order=created_at&order_by=desc"),);
+      }
 
       if (session.role_id == 3 && session.store) {
         requests.push(getStore(session.store.id));
@@ -45,11 +48,14 @@ export default function UserProfile() {
           errors = errors.concat(handleError(reportsResponse.reason));
         }
 
-        if (accountsResponse.status == "fulfilled") {
-          setAccounts(accountsResponse.value);
-        } else {
-          errors = errors.concat(handleError(accountsResponse.reason));
+        if (accountsResponse) {
+          if (accountsResponse.status == "fulfilled") {
+            setAccounts(accountsResponse.value);
+          } else {
+            errors = errors.concat(handleError(accountsResponse.reason));
+          }
         }
+        setLoadingAccounts(false);
 
         if (storeResponse) {
           if (storeResponse.status == "fulfilled") {
@@ -198,79 +204,82 @@ export default function UserProfile() {
               <ReportsByUserTable data={reports} loading={reports == null} showPagination={false} />
           }
         </section>
-        <section className="mb-2">
-          <div className="row">
-            <div className="col">
-              <Title icon="/bank.svg" title="Cuentas bancarias" />
-              <div className="mt-4">
-                {
-                  accounts ?
-                    <div className="w-100 overflow-hidden mb-4 border rounded">
-                      <table className="m-0 table table-striped">
-                        <thead>
-                          <tr>
-                            <th>Banco</th>
-                            <th>Balance</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {
-                            accounts.data.length > 0 ?
-                              accounts.data.map(({id, bank, balance, currency}) => {
-                                return <tr key={id}>
-                                  <td>{bank.name}</td>
-                                  <td>{formatAmount(balance, currency.shortcode)}</td>
+        {
+          handlesAccounts &&
+          <section className="mb-2">
+            <div className="row">
+              <div className="col">
+                <Title icon="/bank.svg" title="Cuentas bancarias" />
+                <div className="mt-4">
+                  {
+                    !loadingAccounts ?
+                      <div className="w-100 overflow-hidden mb-4 border rounded">
+                        <table className="m-0 table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Banco</th>
+                              <th>Balance</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {
+                              accounts.data.length > 0 ?
+                                accounts.data.map(({id, bank, balance, currency}) => {
+                                  return <tr key={id}>
+                                    <td>{bank.name}</td>
+                                    <td>{formatAmount(balance, currency.shortcode)}</td>
+                                  </tr>
+                                }) :
+                                <tr>
+                                  <td colSpan={2}>No hay registros</td>
                                 </tr>
-                              }) :
-                              <tr>
-                                <td colSpan={2}>No hay registros</td>
-                              </tr>
-                          }
-                        </tbody>
-                      </table>
-                    </div>
-                    :
-                    <TableLoader />
-                }
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                      :
+                      <TableLoader />
+                  }
+                </div>
               </div>
+              {
+                session.store &&
+                              <div className="col">
+                                <Title icon="/map-marker-home.svg" title="Local" />
+                                {
+                                  store &&
+                                          <div className="mt-4 p-3 card">
+                                            <div className="row mb-3">
+                                              <div className="col">
+                                                <p className="m-0 UserProfileStoreLabel">NOMBRE:</p>
+                                                <h6 className="m-0 UserProfileStoreInfo">{store.name}</h6>
+                                              </div>
+                                            </div>
+                                            <div className="row mb-3">
+                                              <div className="col">
+                                                <p className="m-0 UserProfileStoreLabel">DIRECCIÓN:</p>
+                                                <h6 className="m-0 UserProfileStoreInfo">{store.location}</h6>
+                                              </div>
+                                            </div>
+                                            <div className="row mb-3">
+                                              <div className="col">
+                                                <p className="m-0 UserProfileStoreLabel">PAÍS:</p>
+                                                <h6 className="m-0 UserProfileStoreInfo">{store.country.name}</h6>
+                                              </div>
+                                            </div>
+                                            <div className="row mb-3">
+                                              <div className="col">
+                                                <p className="m-0 UserProfileStoreLabel">BALANCE:</p>
+                                                <h6 className="m-0 UserProfileStoreInfo">{formatAmount(store.cash_balance.balance, store.cash_balance.currency.shortcode)}</h6>
+                                              </div>
+                                            </div>
+                                          </div>
+                                }
+                              </div>
+              }
             </div>
-            {
-              session.store &&
-                            <div className="col">
-                              <Title icon="/map-marker-home.svg" title="Local" />
-                              {
-                                store &&
-                                        <div className="mt-4 p-3 card">
-                                          <div className="row mb-3">
-                                            <div className="col">
-                                              <p className="m-0 UserProfileStoreLabel">NOMBRE:</p>
-                                              <h6 className="m-0 UserProfileStoreInfo">{store.name}</h6>
-                                            </div>
-                                          </div>
-                                          <div className="row mb-3">
-                                            <div className="col">
-                                              <p className="m-0 UserProfileStoreLabel">DIRECCIÓN:</p>
-                                              <h6 className="m-0 UserProfileStoreInfo">{store.location}</h6>
-                                            </div>
-                                          </div>
-                                          <div className="row mb-3">
-                                            <div className="col">
-                                              <p className="m-0 UserProfileStoreLabel">PAÍS:</p>
-                                              <h6 className="m-0 UserProfileStoreInfo">{store.country.name}</h6>
-                                            </div>
-                                          </div>
-                                          <div className="row mb-3">
-                                            <div className="col">
-                                              <p className="m-0 UserProfileStoreLabel">BALANCE:</p>
-                                              <h6 className="m-0 UserProfileStoreInfo">{formatAmount(store.cash_balance.balance, store.cash_balance.currency.shortcode)}</h6>
-                                            </div>
-                                          </div>
-                                        </div>
-                              }
-                            </div>
-            }
-          </div>
-        </section>
+          </section>
+        }
       </div>
     </div>
   );

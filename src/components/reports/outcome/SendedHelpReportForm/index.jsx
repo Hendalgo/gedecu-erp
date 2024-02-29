@@ -1,8 +1,8 @@
-import DecimalInput from "../../../DecimalInput";
 import UsersSelect from "../../../UsersSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const SendedHelpReportForm = () => {
   const [user, setUser] = useState(null);
@@ -75,7 +75,7 @@ const SendedHelpReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
         </div>
       </div>
       <input

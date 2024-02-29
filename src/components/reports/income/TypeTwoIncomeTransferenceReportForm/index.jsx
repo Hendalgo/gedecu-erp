@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
-import DecimalInput from "../../../DecimalInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -55,7 +55,7 @@ const TypeTwoIncomeTransferenceReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
         </div>
         <input
           type="hidden"

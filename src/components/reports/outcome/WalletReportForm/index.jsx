@@ -1,9 +1,9 @@
-import DecimalInput from "../../../DecimalInput";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import NumberInput from "../../../NumberInput";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const OutcomeWalletReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -71,7 +71,7 @@ const OutcomeWalletReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto total <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
         </div>
         <input
           type="hidden"

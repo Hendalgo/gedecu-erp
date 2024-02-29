@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
-import DecimalInput from "../../../DecimalInput";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import { Form } from "react-bootstrap";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 const TypeTwoCashDeliveryReportForm = () => {
   const [user, setUser] = useState(null);
@@ -64,7 +64,7 @@ const TypeTwoCashDeliveryReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" onChange={() => null} />
+          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
         </div>
       </div>
       <input

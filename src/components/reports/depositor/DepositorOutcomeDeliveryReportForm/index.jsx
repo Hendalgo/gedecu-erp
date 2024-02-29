@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
-import DecimalInput from "../../../DecimalInput";
 import { SessionContext } from "../../../../context/SessionContext";
+import AmountCurrencyInput from "../../../AmountCurrencyInput";
 
 export default function DepositorOutcomeDeliveryReportForm() {
   const [supplier, setSupplier] = useState(null);
@@ -58,7 +58,7 @@ export default function DepositorOutcomeDeliveryReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <DecimalInput id="amount" name="amount" />
+          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
           <input
             type="hidden"
             name="currency_id"
