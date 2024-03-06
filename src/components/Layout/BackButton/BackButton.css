@@ -1,0 +1,7 @@
+.button svg path {
+  fill: #6C7DA3BF;
+}
+
+.button svg {
+  transform: rotate(45deg);
+}
