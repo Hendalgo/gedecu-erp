@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const OutcomeWalletReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -20,7 +21,13 @@ const OutcomeWalletReportForm = () => {
         errors.push("El campo N° de transferencias es obligatorio.");
       if (formData.get("amount") === "0,00")
         errors.push("El campo Referencia es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -83,6 +90,9 @@ const OutcomeWalletReportForm = () => {
           name="currency"
           value={bankAccount?.currency || ""}
         />
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">

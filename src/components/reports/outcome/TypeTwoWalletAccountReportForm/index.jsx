@@ -3,6 +3,7 @@ import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const TypeTwoWalletAccountReportForm = () => {
   // Reporte 2 > Egreso > Cuenta Billetera Efectivo
@@ -13,15 +14,21 @@ const TypeTwoWalletAccountReportForm = () => {
     e.preventDefault();
     let errors = [];
 
-    const data = new FormData(e.target);
+    const formData = new FormData(e.target);
 
     try {
-      if (data.get("amount") === "0,00")
+      if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
-      handleSubmit(data);
+      handleSubmit(formData);
 
       e.target.reset();
     } catch (error) {
@@ -52,6 +59,9 @@ const TypeTwoWalletAccountReportForm = () => {
           name="currency"
           value={country?.currency || session.country.currency.shortcode}
         />
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">

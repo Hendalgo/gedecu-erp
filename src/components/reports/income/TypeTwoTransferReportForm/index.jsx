@@ -3,6 +3,7 @@ import { getBankAccounts } from "../../../../helpers/banksAccounts";
 import Select from "react-select";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const TypeTwoTransferReportForm = () => {
   // Reporte de traspaso Tipo 2
@@ -124,6 +125,13 @@ const TypeTwoTransferReportForm = () => {
       )
         errors.push("Las cuentas deben implementar la misma moneda.");
 
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -198,17 +206,20 @@ const TypeTwoTransferReportForm = () => {
           </label>
           <AmountCurrencyInput currencySymbol={selectedSenderAccount?.currency} />
         </div>
+        <input
+          type="hidden"
+          name="currency_id"
+          value={selectedSenderAccount?.currency_id || 0}
+        />
+        <input
+          type="hidden"
+          name="currency"
+          value={selectedSenderAccount?.currency || ""}
+        />
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
-      <input
-        type="hidden"
-        name="currency_id"
-        value={selectedSenderAccount?.currency_id || 0}
-      />
-      <input
-        type="hidden"
-        name="currency"
-        value={selectedSenderAccount?.currency || ""}
-      />
       <div className="row text-end">
         <div className="col">
           <button type="submit" className="btn btn-outline-primary">

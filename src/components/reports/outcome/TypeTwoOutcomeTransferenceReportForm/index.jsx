@@ -5,6 +5,7 @@ import { Form } from "react-bootstrap";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const TypeTwoOutcomeTransferenceReportForm = () => {
   const [user, setUser] = useState(null);
@@ -21,7 +22,13 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
       if (!user) errors.push("El campo Gestor es obligatorio.");
       if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -88,6 +95,9 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
           name="currency"
           value={session.country.currency.shortcode}
         />
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
       <div className="row mb-3">
         <div className="col">

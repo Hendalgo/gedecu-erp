@@ -6,6 +6,7 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -65,7 +66,13 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (formData.get("rate") === "0,00")
         errors.push("El campo Tasa es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -184,6 +191,9 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           name="conversionCurrency_id"
           value={country?.currency_id || session.country.currency.id}
         />
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
       <div className="row text-end">
         <div className="col">

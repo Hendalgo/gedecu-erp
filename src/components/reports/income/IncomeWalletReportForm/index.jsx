@@ -3,6 +3,7 @@ import NumberInput from "../../../NumberInput";
 import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const IncomeWalletReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -19,7 +20,13 @@ const IncomeWalletReportForm = () => {
         errors.push("El campo N° de transferencias es obligatorio.");
       if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -71,18 +78,21 @@ const IncomeWalletReportForm = () => {
             Monto <span className="Required">*</span>
           </label>
           <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <input
+            type="hidden"
+            name="currency_id"
+            value={bankAccount?.currency_id || 0}
+          />
+          <input
+            type="hidden"
+            name="currency"
+            value={bankAccount?.currency || ""}
+          />
+        </div>
+        <div className="col-6">
+          <DateInput />
         </div>
       </div>
-      <input
-        type="hidden"
-        name="currency_id"
-        value={bankAccount?.currency_id || 0}
-      />
-      <input
-        type="hidden"
-        name="currency"
-        value={bankAccount?.currency || ""}
-      />
       <div className="row text-end">
         <div className="col">
           <button type="submit" className="btn btn-outline-primary">

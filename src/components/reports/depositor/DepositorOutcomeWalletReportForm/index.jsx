@@ -8,6 +8,7 @@ import RateCalcInput from "../../../RateCalcInput";
 import { USA_CURRENCY } from "../../../../consts/currencies";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 export default function DepositorOutcomeWalletReportForm() {
   const [user, setUser] = useState(null);
@@ -26,19 +27,25 @@ export default function DepositorOutcomeWalletReportForm() {
     let errors = [];
 
     try {
-      const data = new FormData(e.target);
+      const formData = new FormData(e.target);
 
       if (!user) errors.push("El campo Gestor es obligatorio.");
-      if (data.get("deposits_quantity") == 0)
+      if (formData.get("deposits_quantity") == 0)
         errors.push("El campo Cantidad de depósitos es obligatorio.");
-      if (data.get("amount") == "0,00")
+      if (formData.get("amount") == "0,00")
         errors.push("El campo Monto es obligatorio.");
-      if (data.get("rate") == "0,00")
+      if (formData.get("rate") == "0,00")
         errors.push("El campo Tasa es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
-      handleSubmit(data);
+      handleSubmit(formData);
 
       e.target.reset();
     } catch (error) {
@@ -162,6 +169,9 @@ export default function DepositorOutcomeWalletReportForm() {
             value={country?.currency || session.country.currency.shortcode}
           />
           <input type="hidden" name="convert_amount" defaultValue={true} />
+        </div>
+        <div className="col-6">
+          <DateInput />
         </div>
       </div>
       <div className="row mb-3">

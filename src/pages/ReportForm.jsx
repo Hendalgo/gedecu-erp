@@ -9,6 +9,7 @@ import { createReport, getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
 import { getCountries } from "../helpers/countries";
 import { formatAmount } from "../utils/amount";
+import { useFormatDate } from "../hooks/useFormatDate";
 
 export default function ReportForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -356,6 +357,10 @@ export default function ReportForm() {
           ["transferences_quantity", "deposits_quantity"].includes(key)
         ) {
           formattedValue = parseInt(value);
+        } else if (key.includes("date")) {
+          if (value.trim()) {
+            formattedValue = new Date(value).toISOString();
+          }
         } else {
           formattedValue = value.trim();
         }
@@ -363,7 +368,11 @@ export default function ReportForm() {
         newEntry[key] = formattedValue;
 
         if (reportsColumnsMap.has(key)) {
-          newTableEntry[key] = value.trim();
+          formattedValue = value.trim();
+
+          if (key.includes("date")) formattedValue = useFormatDate(formattedValue, false);
+
+          newTableEntry[key] = formattedValue;
         }
       });
 

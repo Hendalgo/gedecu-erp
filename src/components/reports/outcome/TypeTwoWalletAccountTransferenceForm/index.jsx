@@ -3,6 +3,7 @@ import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 export default function TypeTwoWalletAccountTransferenceForm() {
   // Reporte 2 > Egreso > Cuenta Billetera Transferencia
@@ -13,16 +14,22 @@ export default function TypeTwoWalletAccountTransferenceForm() {
     e.preventDefault();
     let errors = [];
 
-    const data = new FormData(e.target);
+    const formData = new FormData(e.target);
 
     try {
       if (!account) errors.push("El campo Cuenta es obligatorio.");
-      if (data.get("amount") === "0,00")
+      if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
-      handleSubmit(data);
+      handleSubmit(formData);
 
       e.target.reset();
     } catch (error) {
@@ -73,6 +80,11 @@ export default function TypeTwoWalletAccountTransferenceForm() {
             name="isDuplicated"
             label={`Duplicado`}
           />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput />
         </div>
       </div>
       <div className="row text-end">

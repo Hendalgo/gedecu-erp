@@ -7,6 +7,7 @@ import { Form } from "react-bootstrap";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const StoreReportForm = () => {
   const [amount, setAmount] = useState(0);
@@ -78,7 +79,13 @@ const StoreReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (formData.get("rate") === "0,00")
         errors.push("El campo Tasa es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -193,6 +200,11 @@ const StoreReportForm = () => {
           <input type="hidden" name="conversionCurrency_id" defaultValue={2} />
           <input type="hidden" name="conversionCurrency" defaultValue={"VES"} />
           <input type="hidden" name="convert_amount" defaultValue={true} />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput />
         </div>
       </div>
       <div className="row mb-3">

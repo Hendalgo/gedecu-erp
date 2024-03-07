@@ -4,6 +4,7 @@ import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const OtherReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -17,6 +18,7 @@ const OtherReportForm = () => {
       setMotive(target.value);
     }
   };
+
   const handleLocalSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -28,7 +30,13 @@ const OtherReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (!formData.get("motive").trim())
         errors.push("El campo Motivo es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -81,6 +89,11 @@ const OtherReportForm = () => {
         name="currency"
         value={bankAccount?.currency || ""}
       />
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput />
+        </div>
+      </div>
       <div className="row mb-3">
         <div className="col">
           <label htmlFor="motive" className="form-label">

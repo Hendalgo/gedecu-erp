@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
 
 const TypeTwoIncomeTransferenceReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
@@ -16,7 +17,13 @@ const TypeTwoIncomeTransferenceReportForm = () => {
       if (!bankAccount) errors.push("El campo Cuenta es obligatorio.");
       if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -67,6 +74,11 @@ const TypeTwoIncomeTransferenceReportForm = () => {
           name="currency"
           value={bankAccount?.currency || ""}
         />
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput />
+        </div>
       </div>
       <div className="row text-end">
         <div className="col">
