@@ -1,12 +1,16 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
-const NumberInput = ({ id = "", name = "" }) => {
+const NumberInput = ({ id = "", name = "", defaultValue = 1 }) => {
   const input = useRef(null);
 
   const handleClick = () => {
     const currentValue = new Number(input.current.value);
     input.current.value = currentValue + 1;
   };
+
+  useEffect(() => {
+    input.current.value = defaultValue;
+  }, [defaultValue]);
 
   return (
     <div className="input-group">
@@ -22,7 +26,7 @@ const NumberInput = ({ id = "", name = "" }) => {
         ref={input}
         id={id}
         name={name}
-        defaultValue={1}
+        defaultValue={defaultValue}
         min={1}
         className="form-control"
       />

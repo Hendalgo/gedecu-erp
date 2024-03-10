@@ -1,14 +1,16 @@
 import UsersSelect from "../../../UsersSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const SendedHelpReportForm = () => {
   const [user, setUser] = useState(null);
   const [bankAccount, setBankAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -41,9 +43,30 @@ const SendedHelpReportForm = () => {
     }
   };
 
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      console.log(data)
+      setUser({
+        value: parseInt(data.user_id),
+        label: data.user
+      });
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
+
   const handleReset = () => {
     setUser(null);
     setBankAccount(null);
+    setDate(getDateString());
   };
 
   return (
@@ -82,7 +105,7 @@ const SendedHelpReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={bankAccount?.currency} />
         </div>
         <input
           type="hidden"
@@ -95,7 +118,7 @@ const SendedHelpReportForm = () => {
           value={bankAccount?.currency || ""}
         />
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

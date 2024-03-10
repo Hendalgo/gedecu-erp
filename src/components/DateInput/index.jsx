@@ -1,21 +1,38 @@
+import { getDateString } from "../../utils/date";
+
 export default function DateInput({
-  name = "date"
+  name = "date",
+  defaultValue = "",
+  value = "",
+  onChange = () => null
 }) {
 
-  const maxDate = new Date().toISOString().split("T").shift();
+  const maxDate = getDateString();
 
   const handleChange = ({ target }) => {
     let { value } = target;
 
     if (!value.trim()) {
-      target.value = maxDate;
+      onChange(maxDate);
+    } else {
+      onChange(value);
     }
   }
 
   return (
     <>
-      <label htmlFor="date" className="form-label">Fecha</label>
-      <input type="date" name={name} id="date" defaultValue={maxDate} max={maxDate} onChange={handleChange} className="form-control" />
+      <label htmlFor="date" className="form-label">
+        Fecha
+      </label>
+      <input
+        type="date"
+        name={name}
+        id="date"
+        value={value}
+        max={maxDate}
+        onChange={handleChange}
+        className="form-control"
+      />
     </>
   );
 }

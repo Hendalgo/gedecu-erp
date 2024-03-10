@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import StoresSelect from "../../../StoresSelect";
 import NumberInput from "../../../NumberInput";
@@ -8,6 +8,7 @@ import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const StoreReportForm = () => {
   const [amount, setAmount] = useState(0);
@@ -15,7 +16,37 @@ const StoreReportForm = () => {
   const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
   const [store, setStore] = useState(null);
   const [bankAccount, setBankAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+
+      setStore({
+        value: parseInt(data.store_id),
+        label: data.store,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency
+      });
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.conversionCurrency_id),
+        currency: data.conversionCurrency
+      });
+      setAmount(parseFloat(data.amount));
+      setRate(parseFloat(data.rate));
+      setRateCurrency({
+        id: parseInt(data.rate_currency),
+      });
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
 
   const handleStoreChange = (option) => {
     let newRateCurrency = { id: 0, shortcode: "" };
@@ -105,6 +136,8 @@ const StoreReportForm = () => {
     setRate(0);
     setStore(null);
     setBankAccount(null);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   let conversionAmount = 0;
@@ -167,13 +200,14 @@ const StoreReportForm = () => {
           <NumberInput
             id="transferences_quantity"
             name="transferences_quantity"
+            defaultValue={selected?.data["transferences_quantity"]}
           />
         </div>
         <div className="col">
           <label htmlFor="amount" className="form-label">
             Monto total en {store?.currency} <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={store?.currency} onChange={handleAmountChange} />
+          <AmountCurrencyInput defaultValue={amount} currencySymbol={store?.currency} onChange={handleAmountChange} />
         </div>
       </div>
       <input type="hidden" name="currency_id" value={store?.currency_id || 0} />
@@ -183,7 +217,7 @@ const StoreReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa de cambio <span className="Required">*</span>
           </label>
-          <RateCalcInput message={rateCalcMessage} disableButton={!store || !bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput defaultValue={rate} message={rateCalcMessage} disableButton={!store || !bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
@@ -204,7 +238,7 @@ const StoreReportForm = () => {
       </div>
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
@@ -214,6 +248,8 @@ const StoreReportForm = () => {
             id="isDuplicated"
             name="isDuplicated"
             label="Duplicado"
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
           />
         </div>
       </div>

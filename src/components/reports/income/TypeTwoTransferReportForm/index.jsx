@@ -4,6 +4,7 @@ import Select from "react-select";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeTwoTransferReportForm = () => {
   // Reporte de traspaso Tipo 2
@@ -12,7 +13,8 @@ const TypeTwoTransferReportForm = () => {
   const [receiverBankAccounts, setReceiverBankAccounts] = useState([]);
   const [selectedReceiverAccount, setSelectedReceiverAccount] = useState(null);
   const bankAccounts = useRef([]);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +44,27 @@ const TypeTwoTransferReportForm = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setSelectedSenderAccount({
+        value: data.senderAccount_id,
+        label: data.senderAccount,
+        currency_id: data.currency_id,
+        currency: data.currency,
+      });
+      setSelectedReceiverAccount({
+        value: data.receiverAccount_id,
+        label: data.receiverAccount,
+        currency_id: data.currency_id,
+        currency: data.currency,
+      });
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
 
   const getOptions = (optionsList = []) => {
     return optionsList.map(({ bank, identifier, currency, id }) => {
@@ -151,6 +174,7 @@ const TypeTwoTransferReportForm = () => {
     setSelectedSenderAccount(null);
     setSenderBankAccounts(getOptions(bankAccounts.current));
     setReceiverBankAccounts(getOptions(bankAccounts.current));
+    setDate(getDateString());
   };
 
   return (
@@ -204,7 +228,7 @@ const TypeTwoTransferReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={selectedSenderAccount?.currency} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={selectedSenderAccount?.currency} />
         </div>
         <input
           type="hidden"
@@ -217,7 +241,7 @@ const TypeTwoTransferReportForm = () => {
           value={selectedSenderAccount?.currency || ""}
         />
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

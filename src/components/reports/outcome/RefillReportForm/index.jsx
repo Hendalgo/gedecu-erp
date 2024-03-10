@@ -1,14 +1,34 @@
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const RefillReportForm = () => {
   // => Reporte de recargas (considerar el nombre)
   const [bankAccount, setBankAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      console.log(data)
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency: data.currency,
+        currency_id: parseInt(data.currency_id),
+      });
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -26,7 +46,7 @@ const RefillReportForm = () => {
           errors.push("La fecha es inválida.");
         }
       }
-  
+
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -43,6 +63,8 @@ const RefillReportForm = () => {
 
   const handleReset = () => {
     setBankAccount(null);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   return (
@@ -66,7 +88,7 @@ const RefillReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={bankAccount?.currency} />
         </div>
       </div>
       <input
@@ -81,12 +103,18 @@ const RefillReportForm = () => {
       />
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
+          <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
+            id="isDuplicated"
+            name="isDuplicated"
+            label="Duplicado"
+          />
         </div>
       </div>
       <div className="row text-end">

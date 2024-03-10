@@ -8,6 +8,7 @@ const StoresSelect = ({
   placeholder = "Selecciona el local",
   noOptionsMessage = "No hay coincidencias",
   query = "",
+  defaultValue = null,
   value = null,
   onChange = () => null,
   onError = () => null,
@@ -44,6 +45,10 @@ const StoresSelect = ({
 
     fetchData();
   }, [query]);
+
+  if (defaultValue) {
+    value = {...defaultValue};
+  }
 
   return (
     <>

@@ -1,17 +1,35 @@
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const OtherReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
+  const [date, setDate] = useState(getDateString());
   const [motive, setMotive] = useState("");
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
   const CHARS_LIMIT = 60;
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      setMotive(data.motive);
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
 
   const handleMotiveChange = ({ target }) => {
     if (target.value.length <= CHARS_LIMIT) {
@@ -76,7 +94,10 @@ const OtherReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={bankAccount?.currency}
+          />
         </div>
       </div>
       <input
@@ -91,7 +112,7 @@ const OtherReportForm = () => {
       />
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
