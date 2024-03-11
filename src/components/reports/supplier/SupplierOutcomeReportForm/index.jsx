@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BanksSelect from "../../../BanksSelect";
 import { getUsers } from "../../../../helpers/users";
@@ -6,6 +6,7 @@ import Select from "react-select";
 import { getBankAccounts } from "../../../../helpers/banksAccounts";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function SupplierOutcomeReportForm() {
   const [bank, setBank] = useState(null);
@@ -13,7 +14,85 @@ export default function SupplierOutcomeReportForm() {
   const [users, setUsers] = useState([]);
   const [bankAccount, setBankAccount] = useState(null);
   const [bankAccounts, setBankAccounts] = useState([]);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+
+  useEffect(() => {
+    const setValues = async () => {
+      if (selected) {
+        const { data } = selected;
+        setBank({
+          value: parseInt(data.bank_id),
+          label: data.bank,
+        });
+        await fetchUsers(data.bank_id);
+        setUser({
+          value: parseInt(data.user_id),
+          label: data.user,
+        });
+        await fetchAccounts(data.user_id, data.bank_id);
+        setBankAccount({
+          value: parseInt(data.account_id),
+          label: data.account,
+          currency_id: parseInt(data.currency_id),
+          currency: data.currency,
+        });
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+    setValues();
+  }, [selected]);
+
+  const fetchUsers = async (bankId) => {
+    try {
+      const usersResponse = await getUsers(
+        `paginated=no&bank=${bankId}`,
+      );
+
+      if (usersResponse) {
+        setUsers(
+          usersResponse.data.map(({ name, email, id }) => {
+            const label = name.concat(" (", email, ")");
+
+            return { label: label, value: id };
+          }),
+        );
+      }
+    } catch ({ message, error }) {
+      setError({ show: true, message: [error.message], variant: "danger" });
+    }
+  };
+
+  const fetchAccounts = async (userId, bankId) => {
+    try {
+      const accountsResponse = await getBankAccounts(
+        `paginated=no&country=2&user=${userId}&bank=${bankId}`,
+      );
+
+      if (accountsResponse)
+        setBankAccounts(
+          accountsResponse.map(
+            ({ name, identifier, bank, id, currency }) => {
+              const label = name.concat(
+                " - ",
+                identifier,
+                " (",
+                bank.name,
+                ")",
+              );
+              return {
+                label: label,
+                value: id,
+                currency: currency.shortcode,
+                currency_id: currency.id,
+              };
+            },
+          ),
+        );
+    } catch ({ message, error }) {
+      setError({ show: true, message: [error.message], variant: "danger" });
+    }
+  };
 
   const handleBankChange = async (option) => {
     if (option?.value !== bank?.value) {
@@ -24,23 +103,7 @@ export default function SupplierOutcomeReportForm() {
       handleUserChange(null);
 
       if (option) {
-        try {
-          const usersResponse = await getUsers(
-            `paginated=no&bank=${option.value}`,
-          );
-
-          if (usersResponse) {
-            setUsers(
-              usersResponse.data.map(({ name, email, id }) => {
-                const label = name.concat(" (", email, ")");
-
-                return { label: label, value: id };
-              }),
-            );
-          }
-        } catch ({ message, error }) {
-          setError({ show: true, message: [error.message], variant: "danger" });
-        }
+        await fetchUsers(option.value);
       }
     }
   };
@@ -52,34 +115,7 @@ export default function SupplierOutcomeReportForm() {
       setBankAccounts([]);
 
       if (option) {
-        try {
-          const accountsResponse = await getBankAccounts(
-            `paginated=no&country=2&user=${option.value}&bank=${bank.value}`,
-          );
-
-          if (accountsResponse)
-            setBankAccounts(
-              accountsResponse.map(
-                ({ name, identifier, bank, id, currency }) => {
-                  const label = name.concat(
-                    " - ",
-                    identifier,
-                    " (",
-                    bank.name,
-                    ")",
-                  );
-                  return {
-                    label: label,
-                    value: id,
-                    currency: currency.shortcode,
-                    currency_id: currency.id,
-                  };
-                },
-              ),
-            );
-        } catch ({ message, error }) {
-          setError({ show: true, message: [error.message], variant: "danger" });
-        }
+        await fetchAccounts(option.value, bank.value);
       }
     }
   };
@@ -117,6 +153,7 @@ export default function SupplierOutcomeReportForm() {
 
   const handleReset = () => {
     setBankAccount(null);
+    setDate(getDateString());
   };
 
   return (
@@ -182,7 +219,10 @@ export default function SupplierOutcomeReportForm() {
             <label htmlFor="amount" className="form-label">
               Monto <span className="Required">*</span>
             </label>
-            <AmountCurrencyInput currencySymbol={bankAccount?.currency || ""} />
+            <AmountCurrencyInput
+              defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+              currencySymbol={bankAccount?.currency || ""}
+            />
           </div>
           <input
             type="hidden"
@@ -197,7 +237,7 @@ export default function SupplierOutcomeReportForm() {
         </div>
         <div className="row mb-3">
           <div className="col-6">
-            <DateInput />
+            <DateInput value={date} onChange={setDate} />
           </div>
         </div>
         <div className="row">
