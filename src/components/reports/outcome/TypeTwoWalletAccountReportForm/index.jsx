@@ -1,14 +1,25 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeTwoWalletAccountReportForm = () => {
   // Reporte 2 > Egreso > Cuenta Billetera Efectivo
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setDate(getDateString(new Date(data.date)));
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -40,14 +51,23 @@ const TypeTwoWalletAccountReportForm = () => {
     }
   };
 
+  const handleReset = () => {
+    setDate(getDateString());
+    setDuplicate(false);
+  }
   return (
-    <form onSubmit={handleLocalSubmit}>
+    <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <div className="row mb-3">
         <div className="col-6">
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={
+              country?.currency || session.country.currency.shortcode
+            }
+          />
         </div>
         <input
           type="hidden"
@@ -60,12 +80,14 @@ const TypeTwoWalletAccountReportForm = () => {
           value={country?.currency || session.country.currency.shortcode}
         />
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">
           <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
             id="isDuplicated"
             name="isDuplicated"
             label={`Duplicado`}

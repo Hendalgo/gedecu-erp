@@ -1,15 +1,30 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import { Form } from "react-bootstrap";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeTwoCashDeliveryReportForm = () => {
   const [user, setUser] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setUser({
+        value: parseInt(data.user_id),
+        label: data.user,
+      });
+      setDate(getDateString(new Date(data.date)));
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -43,6 +58,8 @@ const TypeTwoCashDeliveryReportForm = () => {
 
   const handleReset = () => {
     setUser(null);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   return (
@@ -71,7 +88,12 @@ const TypeTwoCashDeliveryReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={
+              country?.currency || session.country.currency.shortcode
+            }
+          />
         </div>
       </div>
       <input
@@ -86,12 +108,18 @@ const TypeTwoCashDeliveryReportForm = () => {
       />
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">
-          <Form.Check id="isDuplicated" name="isDuplicated" label="Duplicado" />
+          <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
+            id="isDuplicated"
+            name="isDuplicated"
+            label="Duplicado"
+          />
         </div>
       </div>
       <div className="row text-end">

@@ -72,6 +72,7 @@ const OtherReportForm = () => {
   const handleReset = () => {
     setBankAccount(null);
     setMotive("");
+    setDate(getDateString());
   };
 
   return (

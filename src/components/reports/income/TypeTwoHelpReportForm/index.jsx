@@ -1,16 +1,40 @@
 import StoresSelect from "../../../StoresSelect";
 import BankAccountsSelect from "../../../BankAccountsSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeTwoHelpReportForm = () => {
   const [store, setStore] = useState(null);
   const [bankAccount, setBankAccount] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      const currency = country
+        ? { currency_id: country.currency_id, currency: country.currency }
+        : {
+          currency_id: session.country.currency.id,
+          currency: session.country.currency.shortcode,
+        };
+      setStore({
+        ...currency, value: parseInt(data.store_id), label: data.store
+      });
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected, country]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -46,6 +70,7 @@ const TypeTwoHelpReportForm = () => {
   const handleReset = () => {
     setStore(null);
     setBankAccount(null);
+    setDate(getDateString());
   };
 
   return (
@@ -83,7 +108,7 @@ const TypeTwoHelpReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={bankAccount?.currency} />
         </div>
         <input
           type="hidden"
@@ -96,7 +121,7 @@ const TypeTwoHelpReportForm = () => {
           value={bankAccount?.currency || ""}
         />
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

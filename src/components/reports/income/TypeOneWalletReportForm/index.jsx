@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DecimalInput from "../../../DecimalInput";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
@@ -7,12 +7,14 @@ import RateCalcInput from "../../../RateCalcInput";
 import { USA_CURRENCY } from "../../../../consts/currencies";
 import { formatAmount } from "../../../../utils/amount";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeOneWalletReportForm = () => {
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
-  const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [rateCurrency, setRateCurrency] = useState(USA_CURRENCY);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
   const userCountry = {
     id: country?.currency_id || session.country.currency.id,
@@ -20,8 +22,21 @@ const TypeOneWalletReportForm = () => {
   };
 
   useEffect(() => {
-    setRateCurrency(USA_CURRENCY);
-  }, []);
+    if (selected) {
+      const { data } = selected;
+      setAmount(parseFloat(data.amount));
+      setRate(parseFloat(data.rate));
+      let shortcode = USA_CURRENCY.shortcode;
+      if (data.rate_currency != USA_CURRENCY.id) {
+        shortcode = userCountry.shortcode;
+      }
+      setRateCurrency({
+        id: parseInt(data.rate_currency),
+        shortcode
+      });
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected]);
 
   const handleAmountChange = (amount) => {
     if (Number.isNaN(amount))
@@ -92,6 +107,7 @@ const TypeOneWalletReportForm = () => {
   const handleReset = () => {
     setAmount(0);
     setRate(0);
+    setDate(getDateString());
   };
 
   let conversionAmount = 0;
@@ -125,6 +141,7 @@ const TypeOneWalletReportForm = () => {
             N° de transferencias <span className="Required">*</span>
           </label>
           <NumberInput
+            defaultValue={selected?.data.transferences_quantity}
             id="transferences_quantity"
             name="transferences_quantity"
           />
@@ -160,7 +177,7 @@ const TypeOneWalletReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput defaultValue={rate} message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
@@ -190,7 +207,7 @@ const TypeOneWalletReportForm = () => {
       </div>
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

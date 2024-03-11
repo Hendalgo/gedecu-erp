@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import UsersSelect from "../../../UsersSelect";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { Form } from "react-bootstrap";
@@ -6,12 +6,33 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeTwoOutcomeTransferenceReportForm = () => {
   const [user, setUser] = useState(null);
   const [account, setAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(0),
+        currency: "",
+      });
+      setUser({
+        value: parseInt(data.user_id),
+        label: data.user,
+      });
+      setDate(getDateString(new Date(data.date)));
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -46,6 +67,8 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
   const handleReset = () => {
     setUser(null);
     setAccount(null);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   return (
@@ -61,7 +84,7 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
             value={account}
             onChange={setAccount}
             onError={setError}
-            query=""
+            query="&type=1"
           />
         </div>
         <div className="col">
@@ -96,12 +119,14 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
           value={session.country.currency.shortcode}
         />
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col">
           <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
             type="checkbox"
             id="isDuplicated"
             name="isDuplicated"
