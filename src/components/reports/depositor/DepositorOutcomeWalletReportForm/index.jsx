@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
@@ -9,18 +9,42 @@ import { USA_CURRENCY } from "../../../../consts/currencies";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function DepositorOutcomeWalletReportForm() {
   const [user, setUser] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
   const [rateCurrency, setRateCurrency] = useState({...USA_CURRENCY});
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
   const currentCountry = {
     id: country?.currency_id || session.country.currency.id,
     shortcode: country?.currency || session.country.currency.shortcode,
   };
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setUser({
+        value: parseInt(data.user_id),
+        label: data.user,
+      });
+      setAmount(parseFloat(data.amount));
+      setRate(parseFloat(data.rate));
+      let shortcode = USA_CURRENCY.shortcode;
+      if (data.rate_currency != USA_CURRENCY.id) {
+        shortcode = currentCountry.shortcode;
+      }
+      setRateCurrency({
+        id: parseInt(data.rate_currency), shortcode,
+      });
+      setDate(getDateString(new Date(data.date)));
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -61,6 +85,8 @@ export default function DepositorOutcomeWalletReportForm() {
     setUser(null);
     setAmount(0);
     setRate(0);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   const handleAmount = (value) => {
@@ -125,7 +151,7 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="deposits_quantity" className="form-label">
             Cantidad de depósitos <span className="Required">*</span>
           </label>
-          <NumberInput id="deposits_quantity" name="deposits_quantity" />
+          <NumberInput defaultValue={selected?.data.deposits_quantity} id="deposits_quantity" name="deposits_quantity" />
         </div>
       </div>
       <div className="row mb-3">
@@ -133,7 +159,7 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol="USD" onChange={handleAmount} />
+          <AmountCurrencyInput defaultValue={amount} currencySymbol="USD" onChange={handleAmount} />
           <input type="hidden" name="currency_id" value={3} />
           <input type="hidden" name="currency" value="USD" />
         </div>
@@ -141,7 +167,7 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRate} />
+          <RateCalcInput defaultValue={rate} message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRate} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
       </div>
@@ -171,12 +197,14 @@ export default function DepositorOutcomeWalletReportForm() {
           <input type="hidden" name="convert_amount" defaultValue={true} />
         </div>
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col">
           <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
             type="checkbox"
             id="isDuplicated"
             name="isDuplicated"

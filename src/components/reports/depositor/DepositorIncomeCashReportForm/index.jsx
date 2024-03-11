@@ -1,14 +1,29 @@
 import StoresSelect from "../../../StoresSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function DepositorIncomeCashReportForm() {
   const [store, setStore] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setStore({
+        value: parseInt(data.store_id),
+        label: data.store,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -43,6 +58,7 @@ export default function DepositorIncomeCashReportForm() {
 
   const handleReset = () => {
     setStore(null);
+    setDate(getDateString());
   };
 
   return (
@@ -65,7 +81,7 @@ export default function DepositorIncomeCashReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={store?.currency || ""} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={store?.currency || ""} />
           <input
             type="hidden"
             name="currency_id"
@@ -76,7 +92,7 @@ export default function DepositorIncomeCashReportForm() {
       </div>
       <div className="row mb-3">
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row">

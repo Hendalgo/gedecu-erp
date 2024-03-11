@@ -1,15 +1,28 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function DepositorOutcomeSupplierReportForm() {
   const [supplier, setSupplier] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setSupplier({
+        value: parseInt(data.supplier_id),
+        label: data.supplier
+      });
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -46,6 +59,7 @@ export default function DepositorOutcomeSupplierReportForm() {
 
   const handleReset = () => {
     setSupplier(null);
+    setDate(getDateString());
   };
 
   return (
@@ -68,7 +82,11 @@ export default function DepositorOutcomeSupplierReportForm() {
           <label htmlFor="deposits_quantity" className="form-label">
             Cantidad de depósitos <span className="Required">*</span>
           </label>
-          <NumberInput id="deposits_quantity" name="deposits_quantity" />
+          <NumberInput
+            defaultValue={selected?.data.deposits_quantity}
+            id="deposits_quantity"
+            name="deposits_quantity"
+          />
         </div>
       </div>
       <div className="row mb-3">
@@ -76,7 +94,12 @@ export default function DepositorOutcomeSupplierReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={
+              country?.currency || session.country.currency.shortcode
+            }
+          />
           <input
             type="hidden"
             name="currency_id"
@@ -89,7 +112,7 @@ export default function DepositorOutcomeSupplierReportForm() {
           />
         </div>
         <div className="col-6">
-          <DateInput />
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row">
