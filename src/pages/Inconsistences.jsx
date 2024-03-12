@@ -15,6 +15,10 @@ import UsersBalanceTable from "../components/UsersBalanceTable";
 import BankAccountsTable from "../components/BankAccountsTable";
 import { handleError } from "../utils/error";
 import { useFormatDate } from "../hooks/useFormatDate";
+import { Modal } from "react-bootstrap";
+import reportsColumnsMap from "../consts/ReportsColumnsMap";
+import { formatAmount } from "../utils/amount";
+import { divideInGroups } from "../utils/array";
 
 const statusOptions = [
   {id: "yes", name: "Verificado"},
@@ -23,6 +27,7 @@ const statusOptions = [
 
 const Inconsistences = () => {
   const [inconsistences, setInconsistences] = useState(null);
+  const [inconsistenceDetail, setInconsistenceDetail] = useState(null);
   const [accounts, setAccounts] = useState(null);
   const [balances, setBalances] = useState(null);
   const [alert, setAlert] = useState({ message: "", variant: "danger" });
@@ -136,6 +141,41 @@ const Inconsistences = () => {
     }
   }
 
+  const showInconsistence = (inconsistenceId) => {
+    const inconsistence = inconsistences.data.find(({ id }) => id == inconsistenceId);
+    if (inconsistence) {
+      setInconsistenceDetail(inconsistence);
+    }
+  };
+
+  const formatInconsistenceData = () => {
+    if (inconsistenceDetail) {
+      let rows = [];
+      const { data } = inconsistenceDetail;
+
+      const keys = data.map(({ key }) => key);
+
+      for (const key of reportsColumnsMap.keys()) {
+        if (!["isDuplicated"].includes(key)) {
+          if (keys.includes(key)) {
+            const value = data.find((column) => column.key == key).value;
+            let formated = value.trim();
+            if (["amount", "rate", "conversion"].includes(key)) formated = formatAmount(new Number(formated));
+            if (key.includes("date")) formated = useFormatDate(formated, false);
+            rows.push([reportsColumnsMap.get(key), formated]);
+          }
+        }
+      }
+      return divideInGroups(rows);
+    }
+    return [];
+  };
+
+  let reportStyle = {};
+  if (inconsistenceDetail) {
+    reportStyle = JSON.parse(inconsistenceDetail.report.type.config).styles;
+  }
+
   return (
     <div className="container-fluid">
       <section>
@@ -145,78 +185,298 @@ const Inconsistences = () => {
         <form onSubmit={handleSubmit} className="mb-4">
           <div className="row mb-3">
             <div className="col-8">
-              <FilterTableButtons data={statusOptions} callback={handleStatusChange} />
+              <FilterTableButtons
+                data={statusOptions}
+                callback={handleStatusChange}
+              />
             </div>
             <div className="col-4">
-              <SearchBar text="Inconsistencias" change={(value) => searchRef.current = value} />
+              <SearchBar
+                text="Inconsistencias"
+                change={(value) => (searchRef.current = value)}
+              />
             </div>
           </div>
           <div className="row">
             <div className="col-4 d-flex">
-              <input type="date" name="date" id="" onChange={({target}) => dateRef.current = target.value} className="form-control form-control-sm rounded-0 rounded-start" />
-              <button type="submit" className="btn btn-secondary rounded-0 rounded-end">Filtrar</button>
+              <input
+                type="date"
+                name="date"
+                id=""
+                onChange={({ target }) => (dateRef.current = target.value)}
+                className="form-control form-control-sm rounded-0 rounded-start"
+              />
+              <button
+                type="submit"
+                className="btn btn-secondary rounded-0 rounded-end"
+              >
+                Filtrar
+              </button>
             </div>
           </div>
         </form>
         <div>
-          {
-            inconsistences ?
-              <>
-                <div className="mb-2 d-flex justify-content-end">
-                  <PaginationTable handleChange={handlePagination} text="inconsistencias" itemsTotal={inconsistences.total} offset={inconsistences.current_page} quantity={inconsistences.last_page} />
-                </div>
-                <div className="mb-2 d-flex justify-content-end">
-                  <button className="btn btn-primary" disabled={!inconsistences || inconsistences.data.length == 0} onClick={() => verifyInconsistencesMassive()}>Verificar todas</button>
-                </div>
-                <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
-                  <table className="m-0 table table-striped">
-                    <thead>
+          {inconsistences ? (
+            <>
+              <div className="mb-2 d-flex justify-content-end">
+                <PaginationTable
+                  handleChange={handlePagination}
+                  text="inconsistencias"
+                  itemsTotal={inconsistences.total}
+                  offset={inconsistences.current_page}
+                  quantity={inconsistences.last_page}
+                />
+              </div>
+              <div className="mb-2 d-flex justify-content-end">
+                <button
+                  className="btn btn-primary"
+                  disabled={!inconsistences || inconsistences.data.length == 0}
+                  onClick={() => verifyInconsistencesMassive()}
+                >
+                  Verificar todas
+                </button>
+              </div>
+              <div className="w-100 overflow-hidden overflow-x-auto mb-4 border rounded">
+                <table className="m-0 table table-striped">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Usuario</th>
+                      <th>Tipo</th>
+                      <th>Fecha - Hora</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inconsistences.data.length == 0 ? (
                       <tr>
-                        <th>ID</th>
-                        <th>Usuario</th>
-                        <th>Tipo</th>
-                        <th>Fecha - Hora</th>
-                        <th></th>
+                        <td colSpan={5}>No hay registros.</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        inconsistences.data.length == 0 ?
-                          <tr>
-                            <td colSpan={5}>No hay registros.</td>
-                          </tr> :
-                          inconsistences.data.map(({ id, report, created_at }) => {
-                            return <tr key={id}>
-                              <td>#{id.toString().padStart(6, '0')}</td>
-                              <td>{report.user.name} ({report.user.email})</td>
-                              <td>{report.type.name}</td>
-                              <td>{useFormatDate(created_at)}</td>
-                              <td>
-                                <button className="btn btn-outline-primary" onClick={() => verifyInconsistence(id)}>Verificar</button>
-                              </td>
-                            </tr>
-                          })
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </> :
-              <TableLoader />
-          }
+                    ) : (
+                      inconsistences.data.map(({ id, report, created_at }) => {
+                        return (
+                          <tr key={id}>
+                            <td>#{id.toString().padStart(6, "0")}</td>
+                            <td>
+                              {report.user.name} ({report.user.email})
+                            </td>
+                            <td>{report.type.name}</td>
+                            <td>{useFormatDate(created_at)}</td>
+                            <td>
+                              <button
+                                className="btn btn-outline-primary me-2"
+                                onClick={() => verifyInconsistence(id)}
+                              >
+                                Verificar
+                              </button>
+                              <button
+                                className="btn btn-outline-primary"
+                                onClick={() => showInconsistence(id)}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="17"
+                                  height="13"
+                                  viewBox="0 0 17 13"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M15.7875 4.42276C14.1685 1.92492 11.4045 0.405734 8.42802 0.377808C5.45154 0.405734 2.68754 1.92492 1.06859 4.42276C0.215419 5.67484 0.215419 7.32149 1.06859 8.5736C2.68663 11.073 5.45079 12.5937 8.42805 12.6226C11.4045 12.5946 14.1685 11.0755 15.7875 8.57762C16.6425 7.3246 16.6425 5.67575 15.7875 4.42276ZM14.1309 7.43838C12.8949 9.39888 10.7456 10.595 8.42802 10.6122C6.11048 10.595 3.9612 9.39888 2.72514 7.43838C2.3398 6.87226 2.3398 6.12809 2.72514 5.562C3.96116 3.60151 6.11045 2.4054 8.42802 2.38822C10.7456 2.40537 12.8948 3.60151 14.1309 5.562C14.5162 6.12809 14.5162 6.87226 14.1309 7.43838Z"
+                                    fill="#0D6EFD"
+                                  />
+                                  <path
+                                    d="M8.4281 9.18066C9.90852 9.18066 11.1086 7.98054 11.1086 6.50012C11.1086 5.0197 9.90852 3.81958 8.4281 3.81958C6.94768 3.81958 5.74756 5.0197 5.74756 6.50012C5.74756 7.98054 6.94768 9.18066 8.4281 9.18066Z"
+                                    fill="#0D6EFD"
+                                  />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <TableLoader />
+          )}
         </div>
+        {inconsistenceDetail && (
+          <Modal
+            size="lg"
+            centered
+            show={inconsistenceDetail != null}
+            onHide={() => setInconsistenceDetail(null)}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>
+                <p className="m-0 ModalTopTitle">Inconsistencia</p>
+                <p className="m-0 ModalTopSubTitle"></p>
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="container">
+                {formatInconsistenceData().map((row, index) => {
+                  return (
+                    <div key={index} className="row">
+                      {row.map(([key, val]) => {
+                        return (
+                          <div key={key} className="col-6">
+                            <h6
+                              className="m-0"
+                              style={{
+                                color: "#6C7DA3",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {key}
+                            </h6>
+                            <p
+                              style={{
+                                color: "#495057",
+                                fontSize: "16px",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {val}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+                <div className="row">
+                  <div className="col-6">
+                    <h6
+                      className="m-0"
+                      style={{
+                        color: "#6C7DA3",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      RESPONSABLE
+                    </h6>
+                    <p
+                      style={{
+                        color: "#495057",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {inconsistenceDetail.report.user.name}
+                    </p>
+                  </div>
+                  <div className="col-6">
+                    <h6
+                      className="m-0"
+                      style={{
+                        color: "#6C7DA3",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      ROL
+                    </h6>
+                    <p>{}</p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-6">
+                    <h6
+                      className="m-0"
+                      style={{
+                        color: "#6C7DA3",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      FECHA Y HORA
+                    </h6>
+                    <p
+                      style={{
+                        color: "#495057",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {useFormatDate(inconsistenceDetail.created_at)}
+                    </p>
+                  </div>
+                  <div className="col-6">
+                    <h6
+                      className="m-0"
+                      style={{
+                        color: "#6C7DA3",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      ID REPORTE
+                    </h6>
+                    <p
+                      style={{
+                        color: "#495057",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      #{inconsistenceDetail.report_id
+                        .toString()
+                        .padStart(6, "0")}
+                    </p>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-6">
+                    <h6
+                      className="m-0"
+                      style={{
+                        color: "#6C7DA3",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      MOTIVO
+                    </h6>
+                    <p>
+                      <span style={reportStyle} className="rounded p-1">
+                        {inconsistenceDetail.report.type.name} -{" "}
+                        {inconsistenceDetail.report.type.type == "income"
+                          ? "Ingreso"
+                          : "Egreso"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer></Modal.Footer>
+          </Modal>
+        )}
       </section>
       <section className="py-4">
         <p>Cuentas de banco con saldo negativo</p>
-        <BankAccountsTable data={accounts} onPagination={handleAccountsPagination} />
+        <BankAccountsTable
+          data={accounts}
+          onPagination={handleAccountsPagination}
+        />
       </section>
       <section className="py-4">
         <p>Usuarios con saldos diferentes de 0</p>
-        <UsersBalanceTable data={balances} onPaginate={handleBalancesPagination} />
+        <UsersBalanceTable
+          data={balances}
+          onPaginate={handleBalancesPagination}
+        />
       </section>
       <AlertMessage
         show={alert.message.length > 0}
         message={alert.message}
-        setShow={() => setAlert((prev) => ({...prev, message: ""}))}
+        setShow={() => setAlert((prev) => ({ ...prev, message: "" }))}
         variant={alert.variant}
       />
     </div>
