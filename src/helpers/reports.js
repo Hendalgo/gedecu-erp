@@ -18,13 +18,8 @@ export const createReport = async (data) => {
 };
 
 export const updateReport = async (form, id) => {
-  try {
-    const request = await API_INSTANCE.put(REPORTS_URL + "/" + id, form);
-
-    return request;
-  } catch (error) {
-    return error.response;
-  }
+  const response = await API_INSTANCE.put(REPORTS_URL + "/" + id, form);
+  return response;
 };
 
 /**
@@ -110,12 +105,6 @@ export const updateDuplicate = async (id, data) => {
 /**
  * Subreports
  */
-
-export const updateSubreport = async (id, data) => {
-  return `${REPORTS_URL}/subreports/${id}`;
-  // const response = await API_INSTANCE.put();
-  // return response;
-}
 
 export const deleteSubreport = async (id) => {
   const response = await API_INSTANCE.delete(`${REPORTS_URL}/subreports/${id}`);
