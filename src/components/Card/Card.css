@@ -6,6 +6,11 @@
   font-size: 12px;
   color: var(--gray-600, #6c757d);
 }
+.CurrencyName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #052c65;
+}
 .TotalCard {
   font-size: 18px;
   font-weight: 600;
