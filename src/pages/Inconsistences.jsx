@@ -43,7 +43,7 @@ const Inconsistences = () => {
 
     if (dateRef.current) params += `&date=${dateRef.current}`;
 
-    if (statusRef.current) params += `&status=${statusRef.current}`;
+    if (statusRef.current) params += `&verified=${statusRef.current}`;
 
     try {
       return await getInconsistences(`order=created_at&order_by=desc${params}`);
@@ -243,7 +243,7 @@ const Inconsistences = () => {
                       <th>ID</th>
                       <th>Usuario</th>
                       <th>Tipo</th>
-                      <th>Fecha - Hora</th>
+                      <th>Fecha</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -253,7 +253,7 @@ const Inconsistences = () => {
                         <td colSpan={5}>No hay registros.</td>
                       </tr>
                     ) : (
-                      inconsistences.data.map(({ id, report, created_at }) => {
+                      inconsistences.data.map(({ id, inconsistence, report, created_at }) => {
                         return (
                           <tr key={id}>
                             <td>#{id.toString().padStart(6, "0")}</td>
@@ -261,16 +261,10 @@ const Inconsistences = () => {
                               {report.user.name} ({report.user.email})
                             </td>
                             <td>{report.type.name}</td>
-                            <td>{useFormatDate(created_at)}</td>
+                            <td>{useFormatDate(created_at, false)}</td>
                             <td>
                               <button
-                                className="btn btn-outline-primary me-2"
-                                onClick={() => verifyInconsistence(id)}
-                              >
-                                Verificar
-                              </button>
-                              <button
-                                className="btn btn-outline-primary"
+                                className="border-0"
                                 onClick={() => showInconsistence(id)}
                               >
                                 <svg
@@ -290,6 +284,15 @@ const Inconsistences = () => {
                                   />
                                 </svg>
                               </button>
+                              {
+                                inconsistence.verified == 0 &&
+                                <button
+                                  className="ms-2 btn btn-outline-primary"
+                                  onClick={() => verifyInconsistence(inconsistence.id)}
+                                >
+                                  Verificar
+                                </button>
+                              }
                             </td>
                           </tr>
                         );

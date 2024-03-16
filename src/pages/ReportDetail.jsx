@@ -261,7 +261,7 @@ export default function ReportDetail() {
     const now = Date.now();
     const reportDate = new Date(report.created_at).getTime();
     const difference = now - reportDate;
-    if (difference <= DAY_MILLISECONDS && report.editable == "1") return true;
+    if (session.role_id != 1 && difference <= DAY_MILLISECONDS && report.editable == "1") return true;
     return false;
   };
 
