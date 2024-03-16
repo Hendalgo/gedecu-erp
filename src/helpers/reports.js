@@ -1,9 +1,30 @@
 import { REPORTS_URL, API_INSTANCE, REPORTS_TYPE_URL } from "../consts/ApiUrl";
+
+/**
+ * Reports
+ */
 export const getReports = async (query = "") => {
   const request = await API_INSTANCE.get(REPORTS_URL + "?" + query);
   return request.data;
 };
 
+export const getReportById = async (id) => {
+  const response = await API_INSTANCE.get(`${REPORTS_URL}/${id}`);
+  return response.data;
+};
+
+export const createReport = async (data) => {
+  return API_INSTANCE.post(REPORTS_URL, data);
+};
+
+export const updateReport = async (form, id) => {
+  const response = await API_INSTANCE.put(REPORTS_URL + "/" + id, form);
+  return response;
+};
+
+/**
+ * Inconsistences
+ */
 export const getInconsistences = async (query) => {
   const response = await API_INSTANCE.get("inconsistences" + "?" + query);
   return response.data;
@@ -19,23 +40,9 @@ export const patchInconsistencesMassive = async () => {
   return response;
 };
 
-export const getReportById = async (id) => {
-  const response = await API_INSTANCE.get(`${REPORTS_URL}/${id}`);
-  return response.data;
-};
-
-export const createReport = async (data) => {
-  return API_INSTANCE.post(REPORTS_URL, data);
-};
-export const updateReport = async (form, id) => {
-  try {
-    const request = await API_INSTANCE.put(REPORTS_URL + "/" + id, form);
-
-    return request;
-  } catch (error) {
-    return error.response;
-  }
-};
+/**
+ * Report types
+ */
 export const getReportTypes = async (query = "") => {
   try {
     const request = await API_INSTANCE.get(`${REPORTS_TYPE_URL}?${query}`);
@@ -74,6 +81,9 @@ export const updateReportTypes = async (id, data) => {
   }
 };
 
+/**
+ * Duplicates
+ */
 export const getDuplicates = async (query = "") => {
   const response = await API_INSTANCE.get(`${REPORTS_URL}/duplicated?${query}`);
   return response.data;
@@ -91,3 +101,12 @@ export const updateDuplicate = async (id, data) => {
   );
   return response.data;
 };
+
+/**
+ * Subreports
+ */
+
+export const deleteSubreport = async (id) => {
+  const response = await API_INSTANCE.delete(`${REPORTS_URL}/subreports/${id}`);
+  return response;
+}

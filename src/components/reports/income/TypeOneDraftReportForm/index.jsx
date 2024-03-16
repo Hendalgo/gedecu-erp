@@ -9,6 +9,8 @@ import { getUsers } from "../../../../helpers/users";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
 import { VZLA_CURRENCY } from "../../../../consts/currencies";
+import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const TypeOneDraftReportForm = () => {
   const [amount, setAmount] = useState(0);
@@ -17,7 +19,8 @@ const TypeOneDraftReportForm = () => {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [bank, setBank] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
   const originCurrency = useRef({ id: 0, shortcode: "" });
 
@@ -35,6 +38,55 @@ const TypeOneDraftReportForm = () => {
     setRateCurrency(originCurrency.current);
   }, []);
 
+  useEffect(() => {
+    const setValues = async () => {
+      if (selected) {
+        const { data } = selected;
+        setAmount(parseFloat(data.amount));
+        setRate(parseFloat(data.rate));
+        let shortcode = originCurrency.current.shortcode;
+        if (data.rate_currency != originCurrency.current.id) {
+          shortcode = VZLA_CURRENCY.shortcode;
+        }
+        setRateCurrency({
+          id: parseInt(data.rate_currency),
+          shortcode
+        });
+        setBank({
+          value: parseInt(data.bank_id),
+          label: data.bank,
+        });
+
+        await fetchUsers(data.bank_id);
+
+        setUser({
+          value: parseInt(data.user_id),
+          label: data.user,
+        });
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+    setValues();
+  }, [selected]);
+
+  const fetchUsers = async (bankId) => {
+    try {
+      const usersResponse = await getUsers(
+        `paginated=no&bank=${bankId}`,
+      );
+
+      if (usersResponse)
+        setUsers(
+          usersResponse.data.map(({ name, email, id }) => {
+            const label = name.concat(" (", email, ")");
+            return { label: label, value: id };
+          }),
+        );
+    } catch (error) {
+      setError({ show: true, message: [], variant: "danger" });
+    }
+  };
+
   const handleBankChange = async (option) => {
     if (option?.value !== bank?.value) {
       setBank(option);
@@ -42,21 +94,7 @@ const TypeOneDraftReportForm = () => {
       setUser(null);
 
       if (option) {
-        try {
-          const usersResponse = await getUsers(
-            `paginated=no&bank=${option.value}`,
-          );
-
-          if (usersResponse)
-            setUsers(
-              usersResponse.data.map(({ name, email, id }) => {
-                const label = name.concat(" (", email, ")");
-                return { label: label, value: id };
-              }),
-            );
-        } catch (error) {
-          setError({ show: true, message: [], variant: "danger" });
-        }
+        await fetchUsers(option.value);
       }
     }
   };
@@ -107,7 +145,13 @@ const TypeOneDraftReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (formData.get("rate") === "0,00")
         errors.push("El campo Tasa es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -127,6 +171,7 @@ const TypeOneDraftReportForm = () => {
     setBank(null);
     setAmount(0);
     setRate(0);
+    setDate(getDateString());
   };
 
   let conversionAmount = 0;
@@ -194,6 +239,7 @@ const TypeOneDraftReportForm = () => {
             N° de transferencias <span className="Required">*</span>
           </label>
           <NumberInput
+            defaultValue={selected?.data.transferences_quantity}
             id="transferences_quantity"
             name="transferences_quantity"
           />
@@ -231,7 +277,7 @@ const TypeOneDraftReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput message={rateCalcMessage} onChange={handleRateChange} onClick={handleRateCurrencyClick} />
+          <RateCalcInput defaultValue={rate} message={rateCalcMessage} onChange={handleRateChange} onClick={handleRateCurrencyClick} />
           <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
         <div className="col">
@@ -246,6 +292,11 @@ const TypeOneDraftReportForm = () => {
             readOnly
             className="form-control"
           />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

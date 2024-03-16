@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import NumberInput from "../../../NumberInput";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import { SessionContext } from "../../../../context/SessionContext";
@@ -6,14 +6,41 @@ import BankAccountsSelect from "../../../BankAccountsSelect";
 import RateCalcInput from "../../../RateCalcInput";
 import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
+import { USA_CURRENCY } from "../../../../consts/currencies";
 
 const TypeTwoIncomeWalletAccountReportForm = () => {
   const [bankAccount, setBankAccount] = useState(null);
   const [amount, setAmount] = useState(0);
   const [rate, setRate] = useState(0);
   const [rateCurrency, setRateCurrency] = useState({ id: 0, shortcode: "" });
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } =
+    useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      setAmount(parseFloat(data.amount));
+      setRate(parseFloat(data.rate));
+      if (data.rate_currency) {
+        let shortcode = USA_CURRENCY.shortcode;
+        if (data.rate_currency != USA_CURRENCY.id) {
+          shortcode = country ? country.currency : session.country.currency.shortcode;
+        }
+        setRateCurrency((prev) => ({ ...prev, id: parseInt(data.rate_currency), shortcode }));
+      }
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected, country]);
 
   const handleAccountChange = (option) => {
     let newRateCurrency = { id: 0, shortcode: "" };
@@ -22,12 +49,12 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
       newRateCurrency = {
         id: option.currency_id,
         shortcode: option.currency,
-      }
+      };
     }
 
     setRateCurrency(newRateCurrency);
     setBankAccount(option);
-  }
+  };
 
   const handleAmountChange = (amount) => {
     setAmount(amount);
@@ -36,18 +63,18 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
   const handleRateCurrencyClick = () => {
     let newCurrency = {
       id: bankAccount.currency_id,
-      shortcode: bankAccount.currency
+      shortcode: bankAccount.currency,
     };
 
     if (rateCurrency.id == bankAccount.currency_id) {
       newCurrency = {
         id: country?.currency_id || session.country.currency.id,
-        shortcode: country?.currency || session.country.currency.shortcode
-      }
+        shortcode: country?.currency || session.country.currency.shortcode,
+      };
     }
 
     setRateCurrency(newCurrency);
-  }
+  };
 
   const handleRateChange = (rate) => {
     setRate(rate);
@@ -65,6 +92,12 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (formData.get("rate") === "0,00")
         errors.push("El campo Tasa es obligatorio.");
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
 
       if (errors.length > 0) throw new Error(errors.join(";"));
 
@@ -84,6 +117,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
     setAmount(0);
     setRate(0);
     setBankAccount(null);
+    setDate(getDateString());
   };
 
   let conversion = 0;
@@ -108,7 +142,6 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
     }
   }
 
-
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset} autoComplete="off">
       <div className="row mb-3">
@@ -132,6 +165,7 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <NumberInput
             id="transferences_quantity"
             name="transferences_quantity"
+            defaultValue={selected?.data.transferences_quantity}
           />
         </div>
       </div>
@@ -140,7 +174,11 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} onChange={handleAmountChange} />
+          <AmountCurrencyInput
+            defaultValue={amount}
+            currencySymbol={bankAccount?.currency}
+            onChange={handleAmountChange}
+          />
         </div>
         <input
           type="hidden"
@@ -156,7 +194,14 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           <label htmlFor="rate" className="form-label">
             Tasa <span className="Required">*</span>
           </label>
-          <RateCalcInput message={rateCalcMessage} disableButton={!bankAccount} onClick={handleRateCurrencyClick} onChange={handleRateChange} />
+          <RateCalcInput
+            defaultValue={rate}
+            message={rateCalcMessage}
+            disableButton={!bankAccount}
+            onClick={handleRateCurrencyClick}
+            onChange={handleRateChange}
+          />
+          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
         </div>
       </div>
       <div className="row mb-3">
@@ -184,6 +229,9 @@ const TypeTwoIncomeWalletAccountReportForm = () => {
           name="conversionCurrency_id"
           value={country?.currency_id || session.country.currency.id}
         />
+        <div className="col-6">
+          <DateInput value={date} onChange={setDate} />
+        </div>
       </div>
       <div className="row text-end">
         <div className="col">

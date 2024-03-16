@@ -2,13 +2,10 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { SessionContext } from "../context/SessionContext";
 import FilterTableButtons from "../components/FilterTableButtons";
 import SearchBar from "../components/SearchBar";
-import PaginationTable from "../components/PaginationTable";
 import { Outlet, useNavigate } from "react-router-dom";
 import { getReports } from "../helpers/reports";
-import { useFormatDate } from "../hooks/useFormatDate";
 import Welcome from "../components/Welcome";
 import ModalCreateReport from "../components/ModalCreateReport";
-import TableLoader from "../components/Loaders/TableLoader";
 import { DASHBOARD_ROUTE, REPORTS_ROUTE, USERS_ROUTE } from "../consts/Routes";
 import { getUsersRoles } from "../helpers/users";
 import AlertMessage from "../components/AlertMessage";
@@ -68,9 +65,10 @@ export const ReportsIndex = () => {
 
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
-    getReports(
-      `order=created_at&order_by=desc&page=${offset.selected + 1}${form.current.filter_type.value !== "false" ? `&type_id=${form.current.filter_type.value}` : ""}&search=${form.current.search.value}`,
-    ).then((r) => setReports(r));
+    let params = `order=created_at&order_by=desc&page=${offset.selected + 1}`;
+    if (form.current.filter_type.value != "false") params += `&role=${form.current.filter_type.value}`;
+    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    getReports(params).then((r) => setReports(r));
   };
 
   const handleType = (e) => {

@@ -2,11 +2,11 @@ import axios from "axios";
 
 const offset = new Date().getTimezoneOffset() / 60;
 const hour = parseInt(Math.abs(offset));
-const minutes = (offset - hour) * 60;
+const minutes = (Math.abs(offset) - hour) * 60;
 const timeZone = `${offset > 0 ? "-" : "+"}${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
 export const API_INSTANCE = axios.create({
-  baseURL: "https://gedecu.xn--lissexpertespaa-crb.com/api",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "X-Request-With": "XMLHttpRequest",
     Authorization: `Bearer ${localStorage.getItem("token")}`,

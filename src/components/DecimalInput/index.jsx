@@ -7,7 +7,7 @@ const DecimalInput = ({
   onChange = () => null,
   readOnly = false,
 }) => {
-  const inputRef = useRef();
+  const inputRef = useRef(null);
   const prevNumber = useRef("0,00");
 
   const handleInputChange = (e) => {
@@ -31,6 +31,12 @@ const DecimalInput = ({
       prevNumber.current = e.target.value;
     }
   };
+
+  useEffect(() => {
+    if (defaultValue != "0,00") {
+      inputRef.current.value = defaultValue;
+    }
+  }, [defaultValue]);
 
   useEffect(() => {
     inputRef.current.selectionStart = inputRef.current.selectionEnd =

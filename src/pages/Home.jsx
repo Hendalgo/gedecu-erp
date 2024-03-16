@@ -139,12 +139,14 @@ const Home = () => {
                       <div className="col-4"><BalanceLoader /></div>
                       <div className="col-4"><BalanceLoader /></div>
                     </> :
-                    currencies.map(({currency, total, percentage}, index) => {
+                    currencies.map(({currency, total, percentage, name}, index) => {
                       return <div key={index} className="">
                         <Card
-                          currency={`${currency.name} - ${currency.shortcode}`}
+                          currency={`${currency.name} (${currency.shortcode})`}
                           total={total}
                           percent={percentage || 0}
+                          moneyType={name}
+                          currencySymbol={currency.symbol}
                         />
                       </div>
                     })

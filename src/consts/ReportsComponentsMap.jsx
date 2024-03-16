@@ -9,18 +9,25 @@ import IncomeWalletReportForm from "../components/reports/income/IncomeWalletRep
 import ReceivedHelpReportForm from "../components/reports/income/ReceivedHelpReportForm";
 import SupplierReportForm from "../components/reports/income/SupplierReportForm";
 import TypeOneDraftReportForm from "../components/reports/income/TypeOneDraftReportForm";
+import TypeOneIncomeWalletCashReportForm from "../components/reports/income/TypeOneIncomeWalletCashReportForm";
+import TypeOneIncomeWalletTransferenceReportForm from "../components/reports/income/TypeOneIncomeWalletTransferenceReportForm";
 import TypeOneWalletReportForm from "../components/reports/income/TypeOneWalletReportForm";
 import TypeTwoCashReportForm from "../components/reports/income/TypeTwoCashReportForm";
 import TypeTwoHelpReportForm from "../components/reports/income/TypeTwoHelpReportForm";
 import TypeTwoIncomeTransferenceReportForm from "../components/reports/income/TypeTwoIncomeTransferenceReportForm";
 import TypeTwoIncomeWalletAccountReportForm from "../components/reports/income/TypeTwoIncomeWalletAccountReportForm";
 import TypeTwoTransferReportForm from "../components/reports/income/TypeTwoTransferReportForm";
+import WalletBossReportForm from "../components/reports/income/WalletBossReportForm";
 import CreditReportForm from "../components/reports/outcome/CreditReportForm";
 import OtherReportForm from "../components/reports/outcome/OtherReportForm";
+import PayrollReportForm from "../components/reports/outcome/PayrollReportForm";
 import RefillReportForm from "../components/reports/outcome/RefillReportForm";
 import SendedHelpReportForm from "../components/reports/outcome/SendedHelpReportForm";
 import StoreReportForm from "../components/reports/outcome/StoreReportForm";
+import TaxDraftReportForm from "../components/reports/outcome/TaxDraftReportForm";
 import TaxReportForm from "../components/reports/outcome/TaxReportForm";
+import TypeOneOutcomeWalletCashReportForm from "../components/reports/outcome/TypeOneOutcomeWalletCashReportForm";
+import TypeOneOutcomeWalletTransferenceReportForm from "../components/reports/outcome/TypeOneOutcomeWalletTransferenceReportForm";
 import TypeTwoCashDeliveryReportForm from "../components/reports/outcome/TypeTwoCashDeliveryReportForm";
 import TypeTwoDepositReportForm from "../components/reports/outcome/TypeTwoDepositReportForm";
 import TypeTwoOutcomeTransferenceReportForm from "../components/reports/outcome/TypeTwoOutcomeTransferenceReportForm";
@@ -67,10 +74,17 @@ componentsMap.set(35, <TypeTwoOutcomeTransferenceReportForm />);
 componentsMap.set(19, <TaxReportForm />);
 componentsMap.set(20, <CreditReportForm />);
 componentsMap.set(21, <OtherReportForm />);
+componentsMap.set(37, <PayrollReportForm />);
+componentsMap.set(38, <TaxDraftReportForm />);
 
 /* International R1 */
 componentsMap.set(22, <TypeOneWalletReportForm />);
 componentsMap.set(23, <TypeOneDraftReportForm />);
+componentsMap.set(39, <WalletBossReportForm />);
+componentsMap.set(40, <TypeOneIncomeWalletTransferenceReportForm />);
+componentsMap.set(41, <TypeOneIncomeWalletCashReportForm />);
+componentsMap.set(42, <TypeOneOutcomeWalletTransferenceReportForm />);
+componentsMap.set(43, <TypeOneOutcomeWalletCashReportForm />);
 
 /* Depositor */
 

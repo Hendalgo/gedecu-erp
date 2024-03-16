@@ -9,7 +9,6 @@ import ReportsByUserTable from "../components/ReportsByUserTable";
 export default function ReportsByUser() {
   const [reports, setReports] = useState(null);
   const [date, setDate] = useState("");
-  const [offset, setOffset] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const { session } = useContext(SessionContext);
   const { id } = useParams();
@@ -38,9 +37,16 @@ export default function ReportsByUser() {
 
   const handleDate = async (ev) => {
     ev.preventDefault();
-    setOffset(1);
 
     setReports(await getUserReports(`&date=${date}`));
+  };
+
+  const handlePagination = async ({ selected }) => {
+    let params = `&page=${selected + 1}`;
+
+    if (date.trim()) params += `&date=${date}`
+
+    setReports(await getUserReports(params));
   };
 
   if (!reports) return <></>;
@@ -92,7 +98,7 @@ export default function ReportsByUser() {
         </section>
         <section>
           {!isLoading && reports && Array.isArray(reports.data) && (
-            <ReportsByUserTable loading={isLoading} data={reports} />
+            <ReportsByUserTable loading={isLoading} data={reports} onPagination={handlePagination} />
           )}
         </section>
       </div>

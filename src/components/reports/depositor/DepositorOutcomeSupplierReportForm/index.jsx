@@ -1,31 +1,51 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
 import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function DepositorOutcomeSupplierReportForm() {
   const [supplier, setSupplier] = useState(null);
-  const { handleSubmit, setError, country } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setSupplier({
+        value: parseInt(data.supplier_id),
+        label: data.supplier
+      });
+      setDate(getDateString(new Date(data.date)));
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
     let errors = [];
 
     try {
-      const data = new FormData(e.target);
+      const formData = new FormData(e.target);
 
       if (!supplier) errors.push("El campo Proveedor es obligatorio.");
-      if (data.get("deposits_quantity") == 0)
+      if (formData.get("deposits_quantity") == 0)
         errors.push("El campo Cantidad de depósitos es obligatorio.");
-      if (data.get("amount") == "0,00")
+      if (formData.get("amount") == "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
-      handleSubmit(data);
+      handleSubmit(formData);
 
       e.target.reset();
     } catch (error) {
@@ -39,6 +59,7 @@ export default function DepositorOutcomeSupplierReportForm() {
 
   const handleReset = () => {
     setSupplier(null);
+    setDate(getDateString());
   };
 
   return (
@@ -61,7 +82,11 @@ export default function DepositorOutcomeSupplierReportForm() {
           <label htmlFor="deposits_quantity" className="form-label">
             Cantidad de depósitos <span className="Required">*</span>
           </label>
-          <NumberInput id="deposits_quantity" name="deposits_quantity" />
+          <NumberInput
+            defaultValue={selected?.data.deposits_quantity}
+            id="deposits_quantity"
+            name="deposits_quantity"
+          />
         </div>
       </div>
       <div className="row mb-3">
@@ -69,7 +94,12 @@ export default function DepositorOutcomeSupplierReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={country?.currency || session.country.currency.shortcode} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={
+              country?.currency || session.country.currency.shortcode
+            }
+          />
           <input
             type="hidden"
             name="currency_id"
@@ -80,6 +110,9 @@ export default function DepositorOutcomeSupplierReportForm() {
             name="currency"
             value={country?.currency || session.country.currency.shortcode}
           />
+        </div>
+        <div className="col-6">
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row">

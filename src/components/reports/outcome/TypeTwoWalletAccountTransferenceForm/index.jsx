@@ -1,28 +1,52 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Form } from "react-bootstrap";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 export default function TypeTwoWalletAccountTransferenceForm() {
   // Reporte 2 > Egreso > Cuenta Billetera Transferencia
   const [account, setAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [date, setDate] = useState(getDateString());
+  const [duplicate, setDuplicate] = useState(false);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: parseInt(data.currency_id),
+        currency: data.currency,
+      });
+      setDate(getDateString(new Date(data.date)));
+      setDuplicate(data.isDuplicated == "1" ? true : false);
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
     let errors = [];
 
-    const data = new FormData(e.target);
+    const formData = new FormData(e.target);
 
     try {
       if (!account) errors.push("El campo Cuenta es obligatorio.");
-      if (data.get("amount") === "0,00")
+      if (formData.get("amount") === "0,00")
         errors.push("El campo Monto es obligatorio.");
-
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
+  
       if (errors.length > 0) throw new Error(errors.join(";"));
 
-      handleSubmit(data);
+      handleSubmit(formData);
 
       e.target.reset();
     } catch (error) {
@@ -36,6 +60,8 @@ export default function TypeTwoWalletAccountTransferenceForm() {
 
   const handleReset = () => {
     setAccount(null);
+    setDate(getDateString());
+    setDuplicate(false);
   };
 
   return (
@@ -57,7 +83,10 @@ export default function TypeTwoWalletAccountTransferenceForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={account?.currency || ""} />
+          <AmountCurrencyInput
+            defaultValue={selected ? parseFloat(selected.data.amount) : 0}
+            currencySymbol={account?.currency || ""}
+          />
         </div>
         <input
           type="hidden"
@@ -68,7 +97,14 @@ export default function TypeTwoWalletAccountTransferenceForm() {
       </div>
       <div className="row mb-3">
         <div className="col-6">
+          <DateInput value={date} onChange={setDate} />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
           <Form.Check
+            checked={duplicate}
+            onChange={() => setDuplicate((prev) => !prev)}
             id="isDuplicated"
             name="isDuplicated"
             label={`Duplicado`}

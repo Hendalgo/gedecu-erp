@@ -1,13 +1,38 @@
 import BankAccountsSelect from "../../../BankAccountsSelect";
 import UsersSelect from "../../../UsersSelect";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import DateInput from "../../../DateInput";
+import { getDateString } from "../../../../utils/date";
 
 const SupplierReportForm = () => {
   const [user, setUser] = useState(null);
   const [bankAccount, setBankAccount] = useState(null);
-  const { handleSubmit, setError } = useContext(ReportTableContext);
+  const [reference, setReference] = useState("");
+  const [date, setDate] = useState(getDateString());
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+
+  useEffect(() => {
+    if (selected) {
+      const { data } = selected;
+      setUser({
+        value: parseInt(data.supplier_id),
+        label: data.supplier,
+      });
+      setBankAccount({
+        value: parseInt(data.account_id),
+        label: data.account,
+        currency_id: data.currency_id,
+        currency: data.currency,
+      });
+      setReference(data.reference);
+
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
+    }
+  }, [selected]);
 
   const handleLocalSubmit = (e) => {
     e.preventDefault();
@@ -21,6 +46,12 @@ const SupplierReportForm = () => {
         errors.push("El campo Monto es obligatorio.");
       if (!formData.get("reference").trim())
         errors.push("El campo Referencia es obligatorio.");
+      if (formData.get("date")) {
+        const now = new Date(formData.get("date")).getTime();
+        if (now > new Date().getTime()) {
+          errors.push("La fecha es inválida.");
+        }
+      }
 
       if (errors.length > 0) throw new Error(errors.join(";"));
 
@@ -39,6 +70,8 @@ const SupplierReportForm = () => {
   const handleReset = () => {
     setUser(null);
     setBankAccount(null);
+    setReference("");
+    setDate(getDateString());
   };
 
   return (
@@ -78,7 +111,7 @@ const SupplierReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={bankAccount?.currency} />
+          <AmountCurrencyInput defaultValue={selected ? parseFloat(selected.data.amount) : 0} currencySymbol={bankAccount?.currency} />
         </div>
         <input
           type="hidden"
@@ -98,9 +131,16 @@ const SupplierReportForm = () => {
             type="text"
             id="reference"
             name="reference"
+            value={reference}
+            onChange={({target}) => setReference(target.value)}
             maxLength={20}
             className="form-control"
           />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col-6">
+          <DateInput value={date} onChange={setDate} />
         </div>
       </div>
       <div className="row text-end">

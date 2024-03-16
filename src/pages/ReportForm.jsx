@@ -9,6 +9,7 @@ import { createReport, getReportTypes } from "../helpers/reports";
 import { SessionContext } from "../context/SessionContext";
 import { getCountries } from "../helpers/countries";
 import { formatAmount } from "../utils/amount";
+import { useFormatDate } from "../hooks/useFormatDate";
 
 export default function ReportForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -224,27 +225,31 @@ export default function ReportForm() {
       return !metaData || metaData?.type == report;
     });
 
-    if (report == 1 || report == 3) {
+    if (report == 3) {
       return filteredReports.map(({ name, id }) => ({
         label: name,
         value: id,
       }));
     }
 
-    if ([2, 5].includes(report)) {
+    if ([1, 2, 5].includes(report)) {
+      let reportsList = [];
       const incomeReports = [];
       const expenseReports = [];
+      const neutroReports = [];
 
       filteredReports.forEach((type) => {
         if (type) {
           if (type.type === "income")
             incomeReports.push({ label: type.name, value: type.id });
-          if (type.type === "expense" || type.type === "neutro")
+          if (type.type === "expense")
             expenseReports.push({ label: type.name, value: type.id });
+          if (type.type === "neutro")
+            neutroReports.push({ label: type.name, value: type.id });
         }
       });
 
-      return [
+      reportsList.push(
         {
           label: "INGRESO",
           options: incomeReports,
@@ -253,7 +258,16 @@ export default function ReportForm() {
           label: "EGRESO",
           options: expenseReports,
         },
-      ];
+      );
+
+      if (neutroReports.length > 0) {
+        reportsList.push({
+          label: "NEUTRO",
+          options: neutroReports
+        });
+      }
+
+      return reportsList;
     }
 
     if (report == 4) {
@@ -356,6 +370,10 @@ export default function ReportForm() {
           ["transferences_quantity", "deposits_quantity"].includes(key)
         ) {
           formattedValue = parseInt(value);
+        } else if (key.includes("date")) {
+          if (value.trim()) {
+            formattedValue = new Date(value).toISOString();
+          }
         } else {
           formattedValue = value.trim();
         }
@@ -363,7 +381,11 @@ export default function ReportForm() {
         newEntry[key] = formattedValue;
 
         if (reportsColumnsMap.has(key)) {
-          newTableEntry[key] = value.trim();
+          formattedValue = value.trim();
+
+          if (key.includes("date")) formattedValue = useFormatDate(formattedValue, false);
+
+          newTableEntry[key] = formattedValue;
         }
       });
 
