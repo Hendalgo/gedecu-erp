@@ -73,13 +73,13 @@ const Inconsistences = () => {
   const handleStatusChange = async (option) => {
     statusRef.current = option;
     const response = await fetchInconsistences();
-    console.log(response);
+    setInconsistences(response);
   }
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     const response = await fetchInconsistences();
-    console.log(response);
+    setInconsistences(response);
   }
 
   const handlePagination = async ({ selected }) => {
@@ -380,21 +380,6 @@ const Inconsistences = () => {
                         fontWeight: 600,
                       }}
                     >
-                      ROL
-                    </h6>
-                    <p>{}</p>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-6">
-                    <h6
-                      className="m-0"
-                      style={{
-                        color: "#6C7DA3",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
                       FECHA Y HORA
                     </h6>
                     <p
@@ -407,6 +392,8 @@ const Inconsistences = () => {
                       {useFormatDate(inconsistenceDetail.created_at)}
                     </p>
                   </div>
+                </div>
+                <div className="row">
                   <div className="col-6">
                     <h6
                       className="m-0"
@@ -430,8 +417,6 @@ const Inconsistences = () => {
                         .padStart(6, "0")}
                     </p>
                   </div>
-                </div>
-                <div className="row">
                   <div className="col-6">
                     <h6
                       className="m-0"
