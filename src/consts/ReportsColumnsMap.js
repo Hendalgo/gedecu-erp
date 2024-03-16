@@ -2,9 +2,10 @@ const reportsColumnsMap = new Map();
 
 reportsColumnsMap.set("supplier", "Proveedor");
 reportsColumnsMap.set("bank", "Banco");
-reportsColumnsMap.set("user", "Gestor");
+reportsColumnsMap.set("user", "Usuario");
 reportsColumnsMap.set("store", "Local");
 reportsColumnsMap.set("account", "Cuenta bancaria");
+reportsColumnsMap.set("wallet", "Billetera");
 reportsColumnsMap.set("transferences_quantity", "N° de transferencias");
 reportsColumnsMap.set("deposits_quantity", "Cantidad de depósitos");
 reportsColumnsMap.set("senderAccount", "Cuenta emisora");

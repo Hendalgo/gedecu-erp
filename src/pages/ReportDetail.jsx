@@ -44,6 +44,12 @@ export default function ReportDetail() {
   }, [id]);
 
   const handleEditSubreport = (subreportIndex) => {
+    setError({
+      show: false,
+      message: [],
+      variant: "danger",
+    });
+
     const subreport = report.subreports[subreportIndex];
     setSubreportEdit({ ...subreport })
     setEditing(true);
@@ -88,8 +94,14 @@ export default function ReportDetail() {
 
   const handleEditFinish = async () => {
     setLoading(true);
+    const data = report.subreports.map(({ id, data }) => {
+      return {
+        id,
+        ...data,
+      };
+    });
     try {
-      let response = await updateReport(report, report.id);
+      let response = await updateReport(data, report.id);
       if (response.status == 200) {
         setError({
           show: true,
@@ -129,24 +141,16 @@ export default function ReportDetail() {
       const subreport = currentReport.subreports[subreportIndex];
 
       try {
-        let response = { status: 200 };
-        // let response = await deleteSubreport(subreport.id);
+        let response = await deleteSubreport(subreport.id);
 
         if (response.status == 200) {
           currentReport.subreports.splice(subreportIndex, 1);
           setReport(currentReport);
           setError({
             show: true,
-            message: ["Elimincación exitosa"],
+            message: ["Eliminación exitosa"],
             variant: "success",
           });
-          // setTimeout(() => {
-          //   setError({
-          //     show: false,
-          //     message: [],
-          //     variant: "danger",
-          //   });
-          // }, 2000);
         }
       } catch (err) {
         let errorsMessages = handleError(err);
@@ -163,8 +167,7 @@ export default function ReportDetail() {
 
   const handleDeleteConfirm = async () => {
     try {
-      let response = { status: 200 };
-      // let response = await deleteSubreport(selectedSubreport.current.id);
+      let response = await deleteSubreport(selectedSubreport.current.id);
 
       if (response.status == 200) {
         const { user_id } = report;
@@ -258,7 +261,7 @@ export default function ReportDetail() {
     const now = Date.now();
     const reportDate = new Date(report.created_at).getTime();
     const difference = now - reportDate;
-    if (difference <= DAY_MILLISECONDS) return true;
+    if (difference <= DAY_MILLISECONDS && report.editable == "1") return true;
     return false;
   };
 
@@ -380,7 +383,7 @@ export default function ReportDetail() {
             </tfoot>
           </table>
         </div>
-        <Alert show={error.show} variant={error.variant}>
+        <Alert show={error.show} variant={error.variant} dismissible onClose={() => setError((prev) => ({ ...prev, show: false, message: [] }))}>
           <ul className="m-0">
             {error.message.map((message, index) => (
               <li key={index}>{message}</li>
