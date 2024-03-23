@@ -11,6 +11,7 @@ import { getDateString } from "../../../../utils/date";
 const TypeTwoOutcomeTransferenceReportForm = () => {
   const [user, setUser] = useState(null);
   const [account, setAccount] = useState(null);
+  const [amount, setAmount] = useState(0);
   const [date, setDate] = useState(getDateString());
   const [duplicate, setDuplicate] = useState(false);
   const { handleSubmit, setError, selected } = useContext(ReportTableContext);
@@ -29,6 +30,7 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
         value: parseInt(data.user_id),
         label: data.user,
       });
+      setAmount(new Number(data.amount));
       setDate(getDateString(new Date(data.date)));
       setDuplicate(data.isDuplicated == "1" ? true : false);
     }
@@ -106,7 +108,11 @@ const TypeTwoOutcomeTransferenceReportForm = () => {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput currencySymbol={session.country.currency.shortcode} />
+          <AmountCurrencyInput
+            defaultValue={amount}
+            currencySymbol={session.country.currency.shortcode}
+            onChange={setAmount}
+          />
         </div>
         <input
           type="hidden"

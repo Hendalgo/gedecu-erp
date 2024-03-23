@@ -16,9 +16,7 @@ import BankAccountsTable from "../components/BankAccountsTable";
 import { handleError } from "../utils/error";
 import { useFormatDate } from "../hooks/useFormatDate";
 import { Modal } from "react-bootstrap";
-import reportsColumnsMap from "../consts/ReportsColumnsMap";
-import { formatAmount } from "../utils/amount";
-import { divideInGroups } from "../utils/array";
+import ReportCard from "../components/ReportCard";
 
 const statusOptions = [
   {id: "yes", name: "Verificado"},
@@ -148,32 +146,15 @@ const Inconsistences = () => {
     }
   };
 
-  const formatInconsistenceData = () => {
-    if (inconsistenceDetail) {
-      let rows = [];
-      const { data } = inconsistenceDetail;
+  let suggestedPairs = [];
 
-      const keys = data.map(({ key }) => key);
-
-      for (const key of reportsColumnsMap.keys()) {
-        if (!["isDuplicated"].includes(key)) {
-          if (keys.includes(key)) {
-            const value = data.find((column) => column.key == key).value;
-            let formated = value.trim();
-            if (["amount", "rate", "conversion"].includes(key)) formated = formatAmount(new Number(formated));
-            if (key.includes("date")) formated = useFormatDate(formated, false);
-            rows.push([reportsColumnsMap.get(key), formated]);
-          }
-        }
+  if (inconsistenceDetail && !inconsistenceDetail.inconsistence.associated) {
+    const { data } = inconsistenceDetail;
+    Object.entries(data).forEach(([key, val]) => {
+      if (["supplier", "user", "store", ].includes(key)) {
+        suggestedPairs.push(val);
       }
-      return divideInGroups(rows);
-    }
-    return [];
-  };
-
-  let reportStyle = {};
-  if (inconsistenceDetail) {
-    reportStyle = JSON.parse(inconsistenceDetail.report.type.config).styles;
+    });
   }
 
   return (
@@ -240,63 +221,117 @@ const Inconsistences = () => {
                 <table className="m-0 table table-striped">
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Usuario</th>
-                      <th>Tipo</th>
                       <th>Fecha</th>
+                      <th>Usuario</th>
+                      <th>Reporte</th>
+                      {/* Divider */}
+                      <th>Fecha</th>
+                      <th>Usuario</th>
+                      <th>Reporte</th>
+                      <th></th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     {inconsistences.data.length == 0 ? (
                       <tr>
-                        <td colSpan={5}>No hay registros.</td>
+                        <td colSpan={8}>No hay registros.</td>
                       </tr>
                     ) : (
-                      inconsistences.data.map(({ id, inconsistence, report, created_at }) => {
-                        return (
-                          <tr key={id}>
-                            <td>#{id.toString().padStart(6, "0")}</td>
-                            <td>
-                              {report.user.name} ({report.user.email})
-                            </td>
-                            <td>{report.type.name}</td>
-                            <td>{useFormatDate(created_at, false)}</td>
-                            <td>
-                              <button
-                                className="border-0"
-                                onClick={() => showInconsistence(id)}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="17"
-                                  height="13"
-                                  viewBox="0 0 17 13"
-                                  fill="none"
+                      inconsistences.data.map(
+                        ({ id, inconsistence, report, created_at }) => {
+                          let styles = JSON.parse(report.type.config)?.styles;
+                          let pairStyles = null;
+                          if (inconsistence.associated) {
+                            pairStyles = JSON.parse(
+                              inconsistence.associated.report.type.config,
+                            )?.styles;
+                          }
+                          return (
+                            <tr key={id}>
+                              <td>{useFormatDate(created_at, false)}</td>
+                              <td>
+                                {report.user.name} ({report.user.email})
+                              </td>
+                              <td>
+                                <span
+                                  style={{ ...styles }}
+                                  className="p-1 rounded"
                                 >
-                                  <path
-                                    d="M15.7875 4.42276C14.1685 1.92492 11.4045 0.405734 8.42802 0.377808C5.45154 0.405734 2.68754 1.92492 1.06859 4.42276C0.215419 5.67484 0.215419 7.32149 1.06859 8.5736C2.68663 11.073 5.45079 12.5937 8.42805 12.6226C11.4045 12.5946 14.1685 11.0755 15.7875 8.57762C16.6425 7.3246 16.6425 5.67575 15.7875 4.42276ZM14.1309 7.43838C12.8949 9.39888 10.7456 10.595 8.42802 10.6122C6.11048 10.595 3.9612 9.39888 2.72514 7.43838C2.3398 6.87226 2.3398 6.12809 2.72514 5.562C3.96116 3.60151 6.11045 2.4054 8.42802 2.38822C10.7456 2.40537 12.8948 3.60151 14.1309 5.562C14.5162 6.12809 14.5162 6.87226 14.1309 7.43838Z"
-                                    fill="#0D6EFD"
-                                  />
-                                  <path
-                                    d="M8.4281 9.18066C9.90852 9.18066 11.1086 7.98054 11.1086 6.50012C11.1086 5.0197 9.90852 3.81958 8.4281 3.81958C6.94768 3.81958 5.74756 5.0197 5.74756 6.50012C5.74756 7.98054 6.94768 9.18066 8.4281 9.18066Z"
-                                    fill="#0D6EFD"
-                                  />
-                                </svg>
-                              </button>
-                              {
-                                inconsistence.verified == 0 &&
+                                  {report.type.name}
+                                </span>
+                              </td>
+                              {/* Divider */}
+                              {inconsistence.associated ? (
+                                <>
+                                  <td>
+                                    {useFormatDate(
+                                      inconsistence.associated.created_at,
+                                      false,
+                                    )}
+                                  </td>
+                                  <td>
+                                    {inconsistence.associated.report.user.name}{" "}
+                                    (
+                                    {inconsistence.associated.report.user.email}
+                                    )
+                                  </td>
+                                  <td>
+                                    <span
+                                      style={{ ...pairStyles }}
+                                      className="p-1 rounded"
+                                    >
+                                      {
+                                        inconsistence.associated.report.type
+                                          .name
+                                      }
+                                    </span>
+                                  </td>
+                                </>
+                              ) : (
+                                <td colSpan={3} className="text-center">
+                                  Sin pareja
+                                </td>
+                              )}
+                              <td>
                                 <button
-                                  className="ms-2 btn btn-outline-primary"
-                                  onClick={() => verifyInconsistence(inconsistence.id)}
+                                  className="border-0"
+                                  onClick={() => showInconsistence(id)}
                                 >
-                                  Verificar
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="17"
+                                    height="13"
+                                    viewBox="0 0 17 13"
+                                    fill="none"
+                                  >
+                                    <path
+                                      d="M15.7875 4.42276C14.1685 1.92492 11.4045 0.405734 8.42802 0.377808C5.45154 0.405734 2.68754 1.92492 1.06859 4.42276C0.215419 5.67484 0.215419 7.32149 1.06859 8.5736C2.68663 11.073 5.45079 12.5937 8.42805 12.6226C11.4045 12.5946 14.1685 11.0755 15.7875 8.57762C16.6425 7.3246 16.6425 5.67575 15.7875 4.42276ZM14.1309 7.43838C12.8949 9.39888 10.7456 10.595 8.42802 10.6122C6.11048 10.595 3.9612 9.39888 2.72514 7.43838C2.3398 6.87226 2.3398 6.12809 2.72514 5.562C3.96116 3.60151 6.11045 2.4054 8.42802 2.38822C10.7456 2.40537 12.8948 3.60151 14.1309 5.562C14.5162 6.12809 14.5162 6.87226 14.1309 7.43838Z"
+                                      fill="#0D6EFD"
+                                    />
+                                    <path
+                                      d="M8.4281 9.18066C9.90852 9.18066 11.1086 7.98054 11.1086 6.50012C11.1086 5.0197 9.90852 3.81958 8.4281 3.81958C6.94768 3.81958 5.74756 5.0197 5.74756 6.50012C5.74756 7.98054 6.94768 9.18066 8.4281 9.18066Z"
+                                      fill="#0D6EFD"
+                                    />
+                                  </svg>
                                 </button>
-                              }
-                            </td>
-                          </tr>
-                        );
-                      })
+                              </td>
+                              <td>
+                                {inconsistence.verified == 0 && (
+                                  <button
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() =>
+                                      verifyInconsistence(inconsistence.id)
+                                    }
+                                  >
+                                    Verificar
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )
                     )}
                   </tbody>
                 </table>
@@ -308,7 +343,7 @@ const Inconsistences = () => {
         </div>
         {inconsistenceDetail && (
           <Modal
-            size="lg"
+            size="xl"
             centered
             show={inconsistenceDetail != null}
             onHide={() => setInconsistenceDetail(null)}
@@ -320,126 +355,36 @@ const Inconsistences = () => {
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="container">
-                {formatInconsistenceData().map((row, index) => {
-                  return (
-                    <div key={index} className="row">
-                      {row.map(([key, val]) => {
-                        return (
-                          <div key={key} className="col-6">
-                            <h6
-                              className="m-0"
-                              style={{
-                                color: "#6C7DA3",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                              }}
-                            >
-                              {key}
-                            </h6>
-                            <p
-                              style={{
-                                color: "#495057",
-                                fontSize: "16px",
-                                fontWeight: 600,
-                              }}
-                            >
-                              {val}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-                <div className="row">
-                  <div className="col-6">
-                    <h6
-                      className="m-0"
-                      style={{
-                        color: "#6C7DA3",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      RESPONSABLE
-                    </h6>
-                    <p
-                      style={{
-                        color: "#495057",
-                        fontSize: "16px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {inconsistenceDetail.report.user.name}
-                    </p>
-                  </div>
-                  <div className="col-6">
-                    <h6
-                      className="m-0"
-                      style={{
-                        color: "#6C7DA3",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      FECHA Y HORA
-                    </h6>
-                    <p
-                      style={{
-                        color: "#495057",
-                        fontSize: "16px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {useFormatDate(inconsistenceDetail.created_at)}
-                    </p>
-                  </div>
+              <div className="d-flex">
+                <div className="w-50 border-end">
+                  <ReportCard report={inconsistenceDetail} />
                 </div>
-                <div className="row">
-                  <div className="col-6">
-                    <h6
-                      className="m-0"
-                      style={{
-                        color: "#6C7DA3",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      ID REPORTE
-                    </h6>
-                    <p
-                      style={{
-                        color: "#495057",
-                        fontSize: "16px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      #{inconsistenceDetail.report_id
-                        .toString()
-                        .padStart(6, "0")}
-                    </p>
-                  </div>
-                  <div className="col-6">
-                    <h6
-                      className="m-0"
-                      style={{
-                        color: "#6C7DA3",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      MOTIVO
-                    </h6>
-                    <p>
-                      <span style={reportStyle} className="rounded p-1">
-                        {inconsistenceDetail.report.type.name} -{" "}
-                        {inconsistenceDetail.report.type.type == "income"
-                          ? "Ingreso"
-                          : "Egreso"}
-                      </span>
-                    </p>
-                  </div>
+                <div className="w-50">
+                  {inconsistenceDetail.inconsistence.associated ? (
+                    <ReportCard
+                      report={inconsistenceDetail.inconsistence.associated}
+                    />
+                  ) : (
+                    <div className="h-100 w-100 px-4 py-2 bg-light">
+                      <p
+                        style={{
+                          color: "#6C7DA3",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Reporte en espera de:
+                      </p>
+                      <p
+                        style={{
+                          color: "#495057",
+                          fontSize: "16px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {suggestedPairs.join(", ")}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Modal.Body>
