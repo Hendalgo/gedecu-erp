@@ -18,6 +18,7 @@ export default function ReportDetail() {
   const [subreportEdit, setSubreportEdit] = useState(null);
   const selectedSubreport = useRef(null);
   const [editing, setEditing] = useState(false);
+  const [wantsToEdit, setWantsToEdit] = useState(false);
   const [showModal, setShowModal] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
@@ -80,6 +81,7 @@ export default function ReportDetail() {
       selectedSubreport.current = null;
       setEditing(false);
       setSubreportEdit(null);
+      setWantsToEdit(true);
 
       setReport((prev) => ({ ...prev, subreports }));
     } catch (err) {
@@ -103,6 +105,8 @@ export default function ReportDetail() {
     try {
       let response = await updateReport(data, report.id);
       if (response.status == 200) {
+        setReport(prev => ({ ...prev, editable: 0 }));
+        setWantsToEdit(false);
         setError({
           show: true,
           message: ["Edición exitosa"],
@@ -275,7 +279,7 @@ export default function ReportDetail() {
       </section>
       <section>
         {
-          checkDate() &&
+          (wantsToEdit && checkDate()) &&
           <div className="text-end mb-3">
             <button type="button" onClick={handleEditFinish} disabled={loading} className="btn btn-primary">Finalizar edición</button>
           </div>

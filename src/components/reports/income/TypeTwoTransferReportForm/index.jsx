@@ -33,6 +33,25 @@ const TypeTwoTransferReportForm = () => {
           setSenderBankAccounts(options);
 
           setReceiverBankAccounts(options);
+
+          if (selected) {
+            const { data } = selected;
+            handleSenderAccountChange({
+              value: parseInt(data.senderAccount_id),
+              label: data.senderAccount,
+              currency_id: parseInt(data.currency_id),
+              currency: data.currency,
+            });
+            handleReceiverAccountChange({
+              value: parseInt(data.receiverAccount_id),
+              label: data.receiverAccount,
+              currency_id: parseInt(data.currency_id),
+              currency: data.currency,
+            });
+            if (data.date) {
+              setDate(getDateString(new Date(data.date)));
+            }
+          }
         }
       } catch ({ response }) {
         setError({
@@ -43,27 +62,6 @@ const TypeTwoTransferReportForm = () => {
       }
     };
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (selected) {
-      const { data } = selected;
-      setSelectedSenderAccount({
-        value: data.senderAccount_id,
-        label: data.senderAccount,
-        currency_id: data.currency_id,
-        currency: data.currency,
-      });
-      setSelectedReceiverAccount({
-        value: data.receiverAccount_id,
-        label: data.receiverAccount,
-        currency_id: data.currency_id,
-        currency: data.currency,
-      });
-      if (data.date) {
-        setDate(getDateString(new Date(data.date)));
-      }
-    }
   }, [selected]);
 
   const getOptions = (optionsList = []) => {
