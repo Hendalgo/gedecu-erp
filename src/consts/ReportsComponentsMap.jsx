@@ -81,8 +81,10 @@ componentsMap.set(38, <TaxDraftReportForm />);
 componentsMap.set(22, <TypeOneWalletReportForm />);
 componentsMap.set(23, <TypeOneDraftReportForm />);
 componentsMap.set(39, <WalletBossReportForm />);
-componentsMap.set(40, <TypeOneIncomeWalletTransferenceReportForm />);
-componentsMap.set(41, <TypeOneIncomeWalletCashReportForm />);
+componentsMap.set(40, <TypeOneOutcomeWalletTransferenceReportForm />);
+// componentsMap.set(40, <TypeOneIncomeWalletTransferenceReportForm />);
+componentsMap.set(41, <TypeOneOutcomeWalletCashReportForm />);
+// componentsMap.set(41, <TypeOneIncomeWalletCashReportForm />);
 componentsMap.set(42, <TypeOneOutcomeWalletTransferenceReportForm />);
 componentsMap.set(43, <TypeOneOutcomeWalletCashReportForm />);
 
