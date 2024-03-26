@@ -1,5 +1,10 @@
-export const useFormatDate = (date, showTime = true) => {
+export const useFormatDate = (date, showTime = true, removeUTC = false) => {
+  if (removeUTC) {
+    date = date.replace(/Z/gi, "");
+  }
+
   let formatDate = new Date(date);
+
   let options = {
     hour12: true,
     day: "numeric",
@@ -13,7 +18,7 @@ export const useFormatDate = (date, showTime = true) => {
       hour: "numeric",
       minute: "numeric",
       second: "numeric",
-    }
+    };
   }
 
   return formatDate.toLocaleString("es-VE", options);

@@ -1,5 +1,9 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { getInconsistences, patchInconsistence, patchInconsistencesMassive, } from "../helpers/reports";
+import {
+  getInconsistences,
+  patchInconsistence,
+  patchInconsistencesMassive,
+} from "../helpers/reports";
 import Welcome from "../components/Welcome";
 import FilterTableButtons from "../components/FilterTableButtons";
 import PaginationTable from "../components/PaginationTable";
@@ -19,8 +23,8 @@ import { Modal } from "react-bootstrap";
 import ReportCard from "../components/ReportCard";
 
 const statusOptions = [
-  {id: "yes", name: "Verificado"},
-  {id: "no", name: "No verificado"},
+  { id: "yes", name: "Verificado" },
+  { id: "no", name: "No verificado" },
 ];
 
 const Inconsistences = () => {
@@ -36,7 +40,7 @@ const Inconsistences = () => {
   const { session } = useContext(SessionContext);
   const navigate = useNavigate();
 
-  const fetchInconsistences = async (params = '') => {
+  const fetchInconsistences = async (params = "") => {
     if (searchRef.current) params += `&search=${searchRef.current}`;
 
     if (dateRef.current) params += `&date=${dateRef.current}`;
@@ -48,58 +52,70 @@ const Inconsistences = () => {
     } catch (err) {
       let errorMessage = handleError(err);
 
-      setAlert((prev) => ({...prev, message: errorMessage.join(" | "), variant: "danger"}));
+      setAlert((prev) => ({
+        ...prev,
+        message: errorMessage.join(" | "),
+        variant: "danger",
+      }));
     }
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const [inconsistencesResponse, accountsResponse, balancesResponse] = await Promise.all([fetchInconsistences(), getBankAccounts("negatives=yes"), getUsersBalance("moreThanOne=yes")]);
+      const [inconsistencesResponse, accountsResponse, balancesResponse] =
+        await Promise.all([
+          fetchInconsistences(),
+          getBankAccounts("negatives=yes"),
+          getUsersBalance("moreThanOne=yes"),
+        ]);
       setInconsistences(inconsistencesResponse);
       setAccounts(accountsResponse);
       setBalances(balancesResponse);
-    }
+    };
 
     if (session.role_id !== 1) {
       navigate(`${DASHBOARD_ROUTE}/${HOME_ROUTE}`);
     }
 
     fetchData();
-
   }, []);
 
   const handleStatusChange = async (option) => {
     statusRef.current = option;
     const response = await fetchInconsistences();
     setInconsistences(response);
-  }
+  };
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     const response = await fetchInconsistences();
     setInconsistences(response);
-  }
+  };
 
   const handlePagination = async ({ selected }) => {
     const newOffset = selected + 1;
     const response = await fetchInconsistences(`&page=${newOffset}`);
     setInconsistences(response);
-  }
+  };
 
   const handleBalancesPagination = async ({ selected }) => {
     try {
-      const response = await getUsersBalance(`moreThanOne=yes&page=${selected + 1}`);
+      const response = await getUsersBalance(
+        `moreThanOne=yes&page=${selected + 1}`,
+      );
       setBalances(response);
     } catch (err) {
       let errorMessages = handleError(err);
       setAlert({ message: errorMessages.join(" | "), variant: "danger" });
     }
-  }
+  };
 
   const handleAccountsPagination = async ({ selected }) => {
-    const response = await getBankAccounts(`negatives=yes&page=${selected + 1}`);
+    const response = await getBankAccounts(
+      `negatives=yes&page=${selected + 1}`,
+    );
     setAccounts(response);
-  }
+  };
 
   const verifyInconsistence = async (id) => {
     try {
@@ -111,14 +127,14 @@ const Inconsistences = () => {
 
         setAlert({
           message: "Inconsistencia verificada",
-          variant: "success"
+          variant: "success",
         });
       }
     } catch (err) {
       let errorMessages = handleError(err);
       setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
     }
-  }
+  };
 
   const verifyInconsistencesMassive = async () => {
     try {
@@ -129,18 +145,19 @@ const Inconsistences = () => {
 
         setAlert({
           message: "Inconsistencias verificadas",
-          variant: "success"
+          variant: "success",
         });
       }
-
     } catch (err) {
       let errorMessages = handleError(err);
       setAlert((prev) => ({ ...prev, message: errorMessages.join(" | ") }));
     }
-  }
+  };
 
   const showInconsistence = (inconsistenceId) => {
-    const inconsistence = inconsistences.data.find(({ id }) => id == inconsistenceId);
+    const inconsistence = inconsistences.data.find(
+      ({ id }) => id == inconsistenceId,
+    );
     if (inconsistence) {
       setInconsistenceDetail(inconsistence);
     }
@@ -151,7 +168,7 @@ const Inconsistences = () => {
   if (inconsistenceDetail && !inconsistenceDetail.inconsistence.associated) {
     const { data } = inconsistenceDetail;
     Object.entries(data).forEach(([key, val]) => {
-      if (["supplier", "user", "store", ].includes(key)) {
+      if (["supplier", "user", "store"].includes(key)) {
         suggestedPairs.push(val);
       }
     });
@@ -249,7 +266,7 @@ const Inconsistences = () => {
                           }
                           return (
                             <tr key={id}>
-                              <td>{useFormatDate(created_at, false)}</td>
+                              <td>{useFormatDate(created_at, false, true)}</td>
                               <td>
                                 {report.user.name} ({report.user.email})
                               </td>
@@ -268,6 +285,7 @@ const Inconsistences = () => {
                                     {useFormatDate(
                                       inconsistence.associated.created_at,
                                       false,
+                                      true,
                                     )}
                                   </td>
                                   <td>

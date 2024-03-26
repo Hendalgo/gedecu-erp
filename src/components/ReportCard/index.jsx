@@ -4,10 +4,9 @@ import { useFormatDate } from "../../hooks/useFormatDate";
 import reportsColumnsMap from "../../consts/ReportsColumnsMap";
 import { formatAmount } from "../../utils/amount";
 import { divideInGroups } from "../../utils/array";
+import { VZLA_CURRENCY } from "../../consts/currencies";
 
-export default function ReportCard({
-  report,
-}) {
+export default function ReportCard({ report }) {
   const { store } = report.report.user;
 
   const formatInconsistenceData = () => {
@@ -32,12 +31,17 @@ export default function ReportCard({
               }
 
               if (key == "conversion") {
-                shortcode = data["conversionCurrency"];
+                shortcode = VZLA_CURRENCY.shortcode;
+
+                if (data["conversionCurrency"]) {
+                  shortcode = data["conversionCurrency"];
+                }
               }
 
               formated = formatAmount(new Number(formated), shortcode);
             }
-            if (key.includes("date")) formated = useFormatDate(formated, false);
+            if (key.includes("date"))
+              formated = useFormatDate(formated, false, true);
             rows.push([reportsColumnsMap.get(key), formated]);
           }
         }
@@ -163,7 +167,7 @@ export default function ReportCard({
       })}
     </div>
   );
-};
+}
 
 ReportCard.propTypes = {
   report: PropTypes.object.isRequired,
