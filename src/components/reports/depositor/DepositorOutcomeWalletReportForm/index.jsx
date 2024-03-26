@@ -4,26 +4,19 @@ import UsersSelect from "../../../UsersSelect";
 import NumberInput from "../../../NumberInput";
 import { Form } from "react-bootstrap";
 import { SessionContext } from "../../../../context/SessionContext";
-import RateCalcInput from "../../../RateCalcInput";
-import { USA_CURRENCY } from "../../../../consts/currencies";
-import { formatAmount } from "../../../../utils/amount";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
 import DateInput from "../../../DateInput";
 import { getDateString } from "../../../../utils/date";
 
 export default function DepositorOutcomeWalletReportForm() {
   const [user, setUser] = useState(null);
-  const { handleSubmit, setError, country, selected } = useContext(ReportTableContext);
+  const { handleSubmit, setError, country, selected } =
+    useContext(ReportTableContext);
   const { session } = useContext(SessionContext);
   const [amount, setAmount] = useState(0);
-  const [rate, setRate] = useState(0);
-  const [rateCurrency, setRateCurrency] = useState({...USA_CURRENCY});
   const [date, setDate] = useState(getDateString());
   const [duplicate, setDuplicate] = useState(false);
-  const currentCountry = {
-    id: country?.currency_id || session.country.currency.id,
-    shortcode: country?.currency || session.country.currency.shortcode,
-  };
+  const { currency } = session.country;
 
   useEffect(() => {
     if (selected) {
@@ -33,14 +26,6 @@ export default function DepositorOutcomeWalletReportForm() {
         label: data.user,
       });
       setAmount(parseFloat(data.amount));
-      setRate(parseFloat(data.rate));
-      let shortcode = USA_CURRENCY.shortcode;
-      if (data.rate_currency != USA_CURRENCY.id) {
-        shortcode = currentCountry.shortcode;
-      }
-      setRateCurrency({
-        id: parseInt(data.rate_currency), shortcode,
-      });
       setDate(getDateString(new Date(data.date)));
       setDuplicate(data.isDuplicated == "1" ? true : false);
     }
@@ -66,7 +51,7 @@ export default function DepositorOutcomeWalletReportForm() {
           errors.push("La fecha es inválida.");
         }
       }
-  
+
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
@@ -84,7 +69,6 @@ export default function DepositorOutcomeWalletReportForm() {
   const handleReset = () => {
     setUser(null);
     setAmount(0);
-    setRate(0);
     setDate(getDateString());
     setDuplicate(false);
   };
@@ -92,44 +76,6 @@ export default function DepositorOutcomeWalletReportForm() {
   const handleAmount = (value) => {
     setAmount(value);
   };
-
-  const handleRateCurrencyClick = () => {
-    let newCurrency = {...USA_CURRENCY};
-
-    if (rateCurrency.id == USA_CURRENCY.id) {
-      newCurrency = {
-        id: country?.currency_id || session.country.currency.id,
-        shortcode: country?.currency || session.country.currency.shortcode
-      };
-    }
-
-    setRateCurrency(newCurrency);
-  }
-
-  const handleRate = (value) => {
-    setRate(value);
-  };
-
-  let conversion = 0;
-
-  if (rate > 0) {
-    if (rateCurrency.id == USA_CURRENCY.id) {
-      conversion = amount * rate;
-    } else {
-      conversion = amount / rate;
-    }
-  }
-
-  conversion = formatAmount(conversion);
-  let rateCalcMessage = "Seleccione un gestor";
-  if (user) {
-    rateCalcMessage = "1 ";
-    if (rateCurrency.id == USA_CURRENCY.id) {
-      rateCalcMessage += `${USA_CURRENCY.shortcode} a ${rate} ${currentCountry.shortcode}`;
-    } else {
-      rateCalcMessage += `${currentCountry.shortcode} a ${rate} ${USA_CURRENCY.shortcode}`;
-    }
-  }
 
   return (
     <form onSubmit={handleLocalSubmit} onReset={handleReset}>
@@ -151,7 +97,11 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="deposits_quantity" className="form-label">
             Cantidad de depósitos <span className="Required">*</span>
           </label>
-          <NumberInput defaultValue={selected?.data.deposits_quantity} id="deposits_quantity" name="deposits_quantity" />
+          <NumberInput
+            defaultValue={selected?.data.deposits_quantity}
+            id="deposits_quantity"
+            name="deposits_quantity"
+          />
         </div>
       </div>
       <div className="row mb-3">
@@ -159,42 +109,13 @@ export default function DepositorOutcomeWalletReportForm() {
           <label htmlFor="amount" className="form-label">
             Monto <span className="Required">*</span>
           </label>
-          <AmountCurrencyInput defaultValue={amount} currencySymbol="USD" onChange={handleAmount} />
-          <input type="hidden" name="currency_id" value={3} />
-          <input type="hidden" name="currency" value="USD" />
-        </div>
-        <div className="col-6">
-          <label htmlFor="rate" className="form-label">
-            Tasa <span className="Required">*</span>
-          </label>
-          <RateCalcInput defaultValue={rate} message={rateCalcMessage} onClick={handleRateCurrencyClick} onChange={handleRate} />
-          <input type="hidden" name="rate_currency" value={rateCurrency.id} />
-        </div>
-      </div>
-      <div className="row mb-3">
-        <div className="col-6">
-          <label htmlFor="conversion" className="form-label">
-            Conversión
-          </label>
-          <input
-            type="text"
-            name="conversion"
-            id="conversion"
-            value={conversion}
-            readOnly
-            className="form-control"
+          <AmountCurrencyInput
+            defaultValue={amount}
+            currencySymbol={currency.shortcode}
+            onChange={handleAmount}
           />
-          <input
-            type="hidden"
-            name="conversionCurrency_id"
-            value={country?.currency_id || session.country.currency.id}
-          />
-          <input
-            type="hidden"
-            name="conversionCurrency"
-            value={country?.currency || session.country.currency.shortcode}
-          />
-          <input type="hidden" name="convert_amount" defaultValue={true} />
+          <input type="hidden" name="currency_id" value={currency.id} />
+          <input type="hidden" name="currency" value={currency.shortcode} />
         </div>
         <div className="col-6">
           <DateInput value={date} onChange={setDate} />
