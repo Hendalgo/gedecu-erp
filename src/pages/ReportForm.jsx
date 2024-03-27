@@ -263,7 +263,7 @@ export default function ReportForm() {
       if (neutroReports.length > 0) {
         reportsList.push({
           label: "NEUTRO",
-          options: neutroReports
+          options: neutroReports,
         });
       }
 
@@ -383,7 +383,13 @@ export default function ReportForm() {
         if (reportsColumnsMap.has(key)) {
           formattedValue = value.trim();
 
-          if (key.includes("date")) formattedValue = useFormatDate(formattedValue, false);
+          if (key.includes("date")) {
+            formattedValue = useFormatDate(
+              new Date(formattedValue).toISOString(),
+              false,
+              true,
+            );
+          }
 
           newTableEntry[key] = formattedValue;
         }
@@ -659,7 +665,7 @@ export default function ReportForm() {
                         colSpan={tableData.header.length + 1}
                         className="text-end fw-semibold"
                       >
-                        Total { formatAmount(amount, currency) }
+                        Total {formatAmount(amount, currency)}
                       </td>
                     </tr>
                   );

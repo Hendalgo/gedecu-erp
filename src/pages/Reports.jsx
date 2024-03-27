@@ -66,8 +66,11 @@ export const ReportsIndex = () => {
   const handleChange = (offset) => {
     setOffset(offset.selected + 1);
     let params = `order=created_at&order_by=desc&page=${offset.selected + 1}`;
-    if (form.current.filter_type.value != "false") params += `&role=${form.current.filter_type.value}`;
-    if (form.current.search.value) params += `&search=${form.current.search.value}`;
+    if (form.current.filter_type.value != "false")
+      params += `&role=${form.current.filter_type.value}`;
+    if (form.current.search.value)
+      params += `&search=${form.current.search.value}`;
+    if (date) params += `&date=${date}`;
     getReports(params).then((r) => setReports(r));
   };
 
@@ -142,7 +145,11 @@ export const ReportsIndex = () => {
             </div>
           </form>
         </div>
-        <ReportsTable loading={!reports} data={reports} onPaginate={handleChange} />
+        <ReportsTable
+          loading={!reports}
+          data={reports}
+          onPaginate={handleChange}
+        />
         <div className="">
           {modalCreateShow && (
             <ModalCreateReport

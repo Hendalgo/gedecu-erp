@@ -1,6 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteSubreport, getReportById, updateReport } from "../helpers/reports";
+import {
+  deleteSubreport,
+  getReportById,
+  updateReport,
+} from "../helpers/reports";
 import { Alert, Card } from "react-bootstrap";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import { useFormatDate } from "../hooks/useFormatDate";
@@ -52,7 +56,7 @@ export default function ReportDetail() {
     });
 
     const subreport = report.subreports[subreportIndex];
-    setSubreportEdit({ ...subreport })
+    setSubreportEdit({ ...subreport });
     setEditing(true);
   };
 
@@ -63,7 +67,7 @@ export default function ReportDetail() {
 
   const handleEditSubmit = async (formData = new FormData()) => {
     const data = {};
-    const subreports = [ ...report.subreports ];
+    const subreports = [...report.subreports];
 
     formData.forEach((val, key) => {
       data[key] = formatField(val, key);
@@ -74,7 +78,9 @@ export default function ReportDetail() {
     }
 
     try {
-      const subreportIndex = subreports.findIndex(({ id, }) => id == subreportEdit.id);
+      const subreportIndex = subreports.findIndex(
+        ({ id }) => id == subreportEdit.id,
+      );
 
       subreports[subreportIndex].data = data;
 
@@ -105,7 +111,7 @@ export default function ReportDetail() {
     try {
       let response = await updateReport(data, report.id);
       if (response.status == 200) {
-        setReport(prev => ({ ...prev, editable: 0 }));
+        setReport((prev) => ({ ...prev, editable: 0 }));
         setWantsToEdit(false);
         setError({
           show: true,
@@ -140,7 +146,7 @@ export default function ReportDetail() {
       setShowModal(true);
     } else {
       setLoading(true);
-      const currentReport = { ...report, };
+      const currentReport = { ...report };
 
       const subreport = currentReport.subreports[subreportIndex];
 
@@ -158,7 +164,7 @@ export default function ReportDetail() {
         }
       } catch (err) {
         let errorsMessages = handleError(err);
-  
+
         setError((prev) => ({
           ...prev,
           show: true,
@@ -176,12 +182,12 @@ export default function ReportDetail() {
       if (response.status == 200) {
         const { user_id } = report;
         navigate(`../../${USERS_ROUTE}/${user_id}/${REPORTS_ROUTE}`, {
-          relative: "path"
+          relative: "path",
         });
       }
     } catch (err) {
       let errorsMessages = handleError(err);
-  
+
       setError((prev) => ({
         ...prev,
         show: true,
@@ -243,7 +249,11 @@ export default function ReportDetail() {
           formated = formatAmount(formated);
         }
         if (key.includes("date")) {
-          formated = useFormatDate(formated, false);
+          formated = useFormatDate(
+            new Date(formated).toISOString(),
+            false,
+            true,
+          );
         }
 
         return formated;
@@ -265,7 +275,12 @@ export default function ReportDetail() {
     const now = Date.now();
     const reportDate = new Date(report.created_at).getTime();
     const difference = now - reportDate;
-    if (session.role_id != 1 && difference <= DAY_MILLISECONDS && report.editable == "1") return true;
+    if (
+      session.role_id != 1 &&
+      difference <= DAY_MILLISECONDS &&
+      report.editable == "1"
+    )
+      return true;
     return false;
   };
 
@@ -278,12 +293,18 @@ export default function ReportDetail() {
         </div>
       </section>
       <section>
-        {
-          (wantsToEdit && checkDate()) &&
+        {wantsToEdit && checkDate() && (
           <div className="text-end mb-3">
-            <button type="button" onClick={handleEditFinish} disabled={loading} className="btn btn-primary">Finalizar edición</button>
+            <button
+              type="button"
+              onClick={handleEditFinish}
+              disabled={loading}
+              className="btn btn-primary"
+            >
+              Finalizar edición
+            </button>
           </div>
-        }
+        )}
         <div className="w-100 overflow-hidden overflow-x-auto border rounded mb-4">
           <table className="m-0 table table-striped">
             <thead>
@@ -291,12 +312,8 @@ export default function ReportDetail() {
                 {titles.map((title, index) => (
                   <th key={index}>{title}</th>
                 ))}
-                {
-                  session.role_id != 1 && <th></th>
-                }
-                {
-                  session.role_id == 1 && <th></th>
-                }
+                {session.role_id != 1 && <th></th>}
+                {session.role_id == 1 && <th></th>}
               </tr>
             </thead>
             <tbody>
@@ -306,11 +323,9 @@ export default function ReportDetail() {
                     {row.map((cell, childIndex) => (
                       <td key={childIndex}>{cell}</td>
                     ))}
-                    {
-                      session.role_id != 1 &&
+                    {session.role_id != 1 && (
                       <td>
-                        {
-                          checkDate() &&
+                        {checkDate() && (
                           <button
                             type="button"
                             className="TableActionButtons"
@@ -337,11 +352,10 @@ export default function ReportDetail() {
                               </defs>
                             </svg>
                           </button>
-                        }
+                        )}
                       </td>
-                    }
-                    {
-                      session.role_id == 1 &&
+                    )}
+                    {session.role_id == 1 && (
                       <td>
                         <button
                           type="button"
@@ -371,7 +385,7 @@ export default function ReportDetail() {
                           </svg>
                         </button>
                       </td>
-                    }
+                    )}
                   </tr>
                 );
               })}
@@ -379,7 +393,10 @@ export default function ReportDetail() {
             <tfoot>
               {footer.map(({ currency, amount }) => (
                 <tr key={currency}>
-                  <td className="fw-semibold text-end" colSpan={titles.length + 1}>
+                  <td
+                    className="fw-semibold text-end"
+                    colSpan={titles.length + 1}
+                  >
                     Total {currency}: {formatAmount(new Number(amount))}
                   </td>
                 </tr>
@@ -387,7 +404,14 @@ export default function ReportDetail() {
             </tfoot>
           </table>
         </div>
-        <Alert show={error.show} variant={error.variant} dismissible onClose={() => setError((prev) => ({ ...prev, show: false, message: [] }))}>
+        <Alert
+          show={error.show}
+          variant={error.variant}
+          dismissible
+          onClose={() =>
+            setError((prev) => ({ ...prev, show: false, message: [] }))
+          }
+        >
           <ul className="m-0">
             {error.message.map((message, index) => (
               <li key={index}>{message}</li>
@@ -395,21 +419,29 @@ export default function ReportDetail() {
           </ul>
         </Alert>
       </section>
-      {
-        editing &&
+      {editing && (
         <section className="mt-3">
           <div className="text-end mb-3">
-            <button type="button" className="btn btn-danger" onClick={() => handleCloseEdit()}>Cerrar</button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={() => handleCloseEdit()}
+            >
+              Cerrar
+            </button>
           </div>
-          <ReportTableContext.Provider value={{
-            handleSubmit: handleEditSubmit, setError, country: null, selected: subreportEdit
-          }}>
-            {
-              componentsMap.get(report.type_id)
-            }
+          <ReportTableContext.Provider
+            value={{
+              handleSubmit: handleEditSubmit,
+              setError,
+              country: null,
+              selected: subreportEdit,
+            }}
+          >
+            {componentsMap.get(report.type_id)}
           </ReportTableContext.Provider>
         </section>
-      }
+      )}
       <section className="p-2 row mt-3 justify-content-end">
         <Card className="col-5">
           <Card.Header
