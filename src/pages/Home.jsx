@@ -32,6 +32,11 @@ const Home = () => {
   const [alert, setAlert] = useState({ message: "", variant: "danger" });
   const navigate = useNavigate();
 
+  let balance;
+  if ([5, 6].includes(session.role_id)) {
+    balance = session.balance;
+  }
+
   const getErrors = (err) => {
     if (err.response) {
       const { errors, message } = err.response.data;
@@ -43,23 +48,27 @@ const Home = () => {
     }
 
     return [err.message];
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       let errors = [];
-      const promises = [getTotalAmountByCurrency() ,getReports(`order=created_at&order_by=desc`),];
+      const promises = [
+        getTotalAmountByCurrency(),
+        getReports(`order=created_at&order_by=desc`),
+      ];
 
-      if (session.role_id == 1) promises.push(getTotalAmountByBank(),);
-      
-      const [currenciesResponse, reportsResponse, banksResponse,] = await Promise.allSettled(promises);
+      if (session.role_id == 1) promises.push(getTotalAmountByBank());
+
+      const [currenciesResponse, reportsResponse, banksResponse] =
+        await Promise.allSettled(promises);
 
       if (currenciesResponse.status == "fulfilled") {
         setCurrencies(currenciesResponse.value);
       } else {
         errors = errors.concat(getErrors(currenciesResponse.reason));
       }
-      
+
       if (reportsResponse.status == "fulfilled") {
         setReports(reportsResponse.value);
       } else {
@@ -97,20 +106,22 @@ const Home = () => {
                   <h6 className="welcome">Bienvenido, {session.name} 👋</h6>
                   <h4>Vista General</h4>
                 </div>
-                {
-                  useCheckRole(session) &&
+                {useCheckRole(session) && (
                   <AddButton
                     text="Usuario"
-                    add={() => {setModalUser(true)}}
+                    add={() => {
+                      setModalUser(true);
+                    }}
                   />
-                }
-                {
-                  !useCheckRole(session) &&
+                )}
+                {!useCheckRole(session) && (
                   <AddButton
                     text="Reporte"
-                    add={() => navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)}
+                    add={() =>
+                      navigate(`/${DASHBOARD_ROUTE}/${REPORTS_ROUTE}/create`)
+                    }
                   />
-                }
+                )}
               </div>
             </div>
           </div>
@@ -118,42 +129,62 @@ const Home = () => {
       </section>
       <section className="row pt-4">
         <div className="col-9">
-          {
-            useCheckRole(session) &&
+          <div className="row">
+            <Title
+              title="Balances"
+              icon="/chart-histogram.svg"
+              description="Balances por monedas"
+            />
+          </div>
+          {useCheckRole(session) && (
             <>
-              <div className="row">
-                <Title
-                  title="Balances"
-                  icon="/chart-histogram.svg"
-                  description="Balances por monedas"
-                />
-              </div>
               <div
                 className="py-2 d-flex justify-content-between mb-4"
                 style={{ overflowX: "scroll", gap: "3%" }}
               >
-                {
-                  loadingCurrencies ?
-                    <>
-                      <div className="col-4"><BalanceLoader /></div>
-                      <div className="col-4"><BalanceLoader /></div>
-                      <div className="col-4"><BalanceLoader /></div>
-                    </> :
-                    currencies.map(({currency, total, percentage, name}, index) => {
-                      return <div key={index} className="">
-                        <Card
-                          currency={`${currency.name} (${currency.shortcode})`}
-                          total={total}
-                          percent={percentage || 0}
-                          moneyType={name}
-                          currencySymbol={currency.symbol}
-                        />
-                      </div>
-                    })
-                }
+                {loadingCurrencies ? (
+                  <>
+                    <div className="col-4">
+                      <BalanceLoader />
+                    </div>
+                    <div className="col-4">
+                      <BalanceLoader />
+                    </div>
+                    <div className="col-4">
+                      <BalanceLoader />
+                    </div>
+                  </>
+                ) : (
+                  currencies.map(
+                    ({ currency, total, percentage, name }, index) => {
+                      return (
+                        <div key={index} className="">
+                          <Card
+                            currency={`${currency.name} (${currency.shortcode})`}
+                            total={total}
+                            percent={percentage || 0}
+                            moneyType={name}
+                            currencySymbol={currency.symbol}
+                          />
+                        </div>
+                      );
+                    },
+                  )
+                )}
               </div>
             </>
-          }
+          )}
+          {balance && (
+            <div className="py-2 mb-4">
+              <Card
+                currency={`${balance.currency.name} (${balance.currency.shortcode})`}
+                total={balance.balance}
+                moneyType="Efectivo"
+                currencySymbol={balance.currency.symbol}
+                showPercent={false}
+              />
+            </div>
+          )}
           <div className="row">
             <Title
               title="Estadísticas"
@@ -165,28 +196,32 @@ const Home = () => {
             <Chart />
           </div>
         </div>
-        {
-          (useCheckRole(session)) &&
-          <aside className="col-3 radius overflow-hidden overflow-y-auto" style={{ maxHeight: "90vh" }}>
-            {
-              loadingBanks ?
-                <TableLoader height={1400} /> :
-                <div className="BankAmountContainer">
-                  <div className="d-flex flex-column align-items-center BankAmountTop" >
-                    <ReactSVG src="/bank.svg" className="TotalAmountBank" wrapper="span" />
-                    <h6>Montos Bancarios</h6>
-                  </div>
-                  <div style={{ overflowY: "scroll", maxHeight: 500 }} >
-                    {
-                      banks.map((bank, index) => {
-                        return <BankCard key={index} {...bank} />
-                      })
-                    }
-                  </div>
+        {useCheckRole(session) && (
+          <aside
+            className="col-3 radius overflow-hidden overflow-y-auto"
+            style={{ maxHeight: "90vh" }}
+          >
+            {loadingBanks ? (
+              <TableLoader height={1400} />
+            ) : (
+              <div className="BankAmountContainer">
+                <div className="d-flex flex-column align-items-center BankAmountTop">
+                  <ReactSVG
+                    src="/bank.svg"
+                    className="TotalAmountBank"
+                    wrapper="span"
+                  />
+                  <h6>Montos Bancarios</h6>
                 </div>
-            }
+                <div style={{ overflowY: "scroll", maxHeight: 500 }}>
+                  {banks.map((bank, index) => {
+                    return <BankCard key={index} {...bank} />;
+                  })}
+                </div>
+              </div>
+            )}
           </aside>
-        }
+        )}
       </section>
       <section>
         <div className="row">
@@ -197,15 +232,20 @@ const Home = () => {
           />
         </div>
         <div className="pb-2">
-          {
-            session.role_id === 1 ?
-              <ReportsTable loading={loadingReports} data={reports} /> :
-              <ReportsByUserTable loading={loadingReports} data={reports} />
-          }
+          {session.role_id === 1 ? (
+            <ReportsTable loading={loadingReports} data={reports} />
+          ) : (
+            <ReportsByUserTable loading={loadingReports} data={reports} />
+          )}
         </div>
       </section>
       <ModalCreateUser setModalShow={setModalUser} modalShow={modalUser} />
-      <AlertMessage show={alert.message.length > 0} setShow={() => setAlert((prev) => ({ ...prev, message: "" }))} message={alert.message} variant={alert.variant} />
+      <AlertMessage
+        show={alert.message.length > 0}
+        setShow={() => setAlert((prev) => ({ ...prev, message: "" }))}
+        message={alert.message}
+        variant={alert.variant}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ const Card = ({
   img = "/world.svg",
   moneyType = "Cuenta",
   currencySymbol = "$",
+  showPercent = true,
 }) => {
   return (
     <div className="bg-white CardContainer">
@@ -27,14 +28,16 @@ const Card = ({
           <img src={img} alt={currency} />
         </div>
       </div>
-      <div className="pb-4 px-4">
-        {percent >= 0 ? (
-          <ReactSVG src="/up.svg" wrapper="span" />
-        ) : (
-          <ReactSVG src="/down.svg" wrapper="span" />
-        )}
-        <span>{formatAmount(percent)}% día de hoy</span>
-      </div>
+      {showPercent && (
+        <div className="pb-4 px-4">
+          {percent >= 0 ? (
+            <ReactSVG src="/up.svg" wrapper="span" />
+          ) : (
+            <ReactSVG src="/down.svg" wrapper="span" />
+          )}
+          <span>{formatAmount(percent)}% día de hoy</span>
+        </div>
+      )}
     </div>
   );
 };
