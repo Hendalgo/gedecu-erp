@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useContext } from "react";
+import { useEffect, useState, useRef, useContext, Fragment } from "react";
 import {
   getInconsistences,
   patchInconsistence,
@@ -165,7 +165,7 @@ const Inconsistences = () => {
 
   let suggestedPairs = [];
 
-  if (inconsistenceDetail && !inconsistenceDetail.inconsistence.associated) {
+  if (inconsistenceDetail && inconsistenceDetail.inconsistences.length == 0) {
     const { data } = inconsistenceDetail;
     Object.entries(data).forEach(([key, val]) => {
       if (["supplier", "user", "store"].includes(key)) {
@@ -241,7 +241,6 @@ const Inconsistences = () => {
                       <th>Fecha</th>
                       <th>Usuario</th>
                       <th>Reporte</th>
-                      {/* Divider */}
                       <th>Fecha</th>
                       <th>Usuario</th>
                       <th>Reporte</th>
@@ -256,60 +255,63 @@ const Inconsistences = () => {
                       </tr>
                     ) : (
                       inconsistences.data.map(
-                        ({ id, inconsistence, report, created_at }) => {
+                        ({ id, inconsistences, report, created_at }) => {
                           let styles = JSON.parse(report.type.config)?.styles;
-                          let pairStyles = null;
-                          if (inconsistence.associated) {
+                          const { user, type } = report;
+
+                          const userStore = user.store;
+
+                          const inconsistenceSummary = inconsistences.at(0);
+                          let pairStyles;
+                          if (
+                            inconsistenceSummary &&
+                            inconsistenceSummary.report.type.config
+                          ) {
                             pairStyles = JSON.parse(
-                              inconsistence.associated.report.type.config,
+                              inconsistenceSummary.report.type.config,
                             )?.styles;
                           }
+                          const isVerfied = inconsistences.some(({ pivot }) => {
+                            return pivot.verified == 1;
+                          });
+
                           return (
                             <tr key={id}>
                               <td>{useFormatDate(created_at, false, true)}</td>
                               <td>
-                                {report.user.name} ({report.user.email})
+                                {userStore
+                                  ? userStore.name
+                                  : `${user.name} (${user.email})`}
                               </td>
                               <td>
                                 <span
-                                  style={{ ...styles }}
                                   className="p-1 rounded"
+                                  style={{ ...styles }}
                                 >
-                                  {report.type.name}
+                                  {type.name}
                                 </span>
                               </td>
-                              {/* Divider */}
-                              {inconsistence.associated ? (
+                              {inconsistences.length == 0 ? (
+                                <td colSpan={3}>No existen parejas.</td>
+                              ) : (
                                 <>
                                   <td>
                                     {useFormatDate(
-                                      inconsistence.associated.created_at,
+                                      inconsistenceSummary.created_at,
                                       false,
                                       true,
                                     )}
                                   </td>
-                                  <td>
-                                    {inconsistence.associated.report.user.name}{" "}
-                                    (
-                                    {inconsistence.associated.report.user.email}
-                                    )
-                                  </td>
+                                  <td>{`${inconsistenceSummary.report.user.name} (${inconsistenceSummary.report.user.email})`}</td>
                                   <td>
                                     <span
-                                      style={{ ...pairStyles }}
                                       className="p-1 rounded"
+                                      style={{ ...pairStyles }}
                                     >
-                                      {
-                                        inconsistence.associated.report.type
-                                          .name
-                                      }
+                                      {inconsistenceSummary.report.type.name}
                                     </span>
                                   </td>
                                 </>
-                              ) : (
-                                <td colSpan={3} className="text-center">
-                                  Sin pareja
-                                </td>
                               )}
                               <td>
                                 <button
@@ -335,12 +337,10 @@ const Inconsistences = () => {
                                 </button>
                               </td>
                               <td>
-                                {inconsistence.verified == 0 && (
+                                {!isVerfied && (
                                   <button
                                     className="btn btn-outline-primary btn-sm"
-                                    onClick={() =>
-                                      verifyInconsistence(inconsistence.id)
-                                    }
+                                    onClick={() => verifyInconsistence(id)}
                                   >
                                     Verificar
                                   </button>
@@ -377,11 +377,16 @@ const Inconsistences = () => {
                 <div className="w-50 border-end">
                   <ReportCard report={inconsistenceDetail} />
                 </div>
-                <div className="w-50">
-                  {inconsistenceDetail.inconsistence.associated ? (
-                    <ReportCard
-                      report={inconsistenceDetail.inconsistence.associated}
-                    />
+                <div className="w-50 mh-100 overflow-y-auto">
+                  {inconsistenceDetail.inconsistences.length > 0 ? (
+                    inconsistenceDetail.inconsistences.map((inconsistence) => {
+                      return (
+                        <Fragment key={inconsistence.id}>
+                          <ReportCard report={inconsistence} />
+                          <hr />
+                        </Fragment>
+                      );
+                    })
                   ) : (
                     <div className="h-100 w-100 px-4 py-2 bg-light">
                       <p
