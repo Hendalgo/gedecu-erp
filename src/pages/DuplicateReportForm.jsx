@@ -11,6 +11,8 @@ import DuplicateInfoCard from "../components/DuplicateInfoCard";
 import reportsColumnsMap from "../consts/ReportsColumnsMap";
 import { formatAmount } from "../utils/amount";
 import { divideInGroups } from "../utils/array";
+import { useFormatDate } from "../hooks/useFormatDate";
+import { VZLA_CURRENCY } from "../consts/currencies";
 
 export default function DuplicateReportForm() {
   const [duplicate, setDuplicate] = useState(null);
@@ -120,11 +122,31 @@ export default function DuplicateReportForm() {
   let reportRows = [];
 
   for (const key of reportsColumnsMap.keys()) {
-    if (!["isDuplicated"].includes(key)) {
+    if (!["isDuplicated", "currency", "conversionCurrency"].includes(key)) {
       if (Object.keys(reportData).includes(key)) {
         let formated = reportData[key];
-        if (["amount", "rate", "conversion"].includes(key))
-          formated = formatAmount(new Number(formated));
+        if (["amount", "rate", "conversion"].includes(key)) {
+          let shortcode = "";
+
+          if (key == "amount") {
+            shortcode = reportData["currency"];
+          }
+
+          if (key == "conversion") {
+            shortcode = VZLA_CURRENCY.shortcode;
+
+            if (reportData["conversionCurrency"]) {
+              shortcode = reportData["conversionCurrency"];
+            }
+          }
+
+          formated = formatAmount(new Number(formated), shortcode);
+        }
+
+        if (key.includes("date")) {
+          formated = useFormatDate(formated, false, true);
+        }
+
         filteredRows.push([reportsColumnsMap.get(key), formated]);
       }
     }
@@ -274,28 +296,6 @@ export default function DuplicateReportForm() {
                       fontWeight: 600,
                     }}
                   >
-                    FECHA:
-                  </h6>
-                  <p
-                    style={{
-                      color: "#495057",
-                      fontSize: "16px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {new Date(duplicate.created_at).toLocaleString("es-VE")}
-                  </p>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col">
-                  <h6
-                    style={{
-                      color: "#6C7DA3",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                    }}
-                  >
                     ID REPORTE:
                   </h6>
                   <p
@@ -308,6 +308,8 @@ export default function DuplicateReportForm() {
                     #{duplicate.report.id.toString().padStart(6, "0")}
                   </p>
                 </div>
+              </div>
+              <div className="row">
                 <div className="col">
                   <h6
                     style={{

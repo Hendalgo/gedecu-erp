@@ -10,11 +10,17 @@ export default function DuplicateInfoCard({ data = null }) {
   if (data) {
     const filteredFields = [];
     for (const key of reportsColumnsMap.keys()) {
-      if (Object.keys(data).includes(key)) {
-        let formated = data[key];
-        if (key === "amount") formated = formatAmount(formated);
-        if (key === "date") formated = useFormatDate(formated, false);
-        filteredFields.push([reportsColumnsMap.get(key), formated]);
+      if (!key.includes("currency")) {
+        if (Object.keys(data).includes(key)) {
+          let formated = data[key];
+          if (key === "amount") {
+            let shortcode = data["currency"];
+
+            formated = formatAmount(formated, shortcode);
+          }
+          if (key === "date") formated = useFormatDate(formated, false, true);
+          filteredFields.push([reportsColumnsMap.get(key), formated]);
+        }
       }
     }
 
