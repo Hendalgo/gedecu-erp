@@ -233,9 +233,17 @@ const Home = () => {
         </div>
         <div className="pb-2">
           {session.role_id === 1 ? (
-            <ReportsTable loading={loadingReports} data={reports} />
+            <ReportsTable
+              loading={loadingReports}
+              data={reports}
+              showPagination={false}
+            />
           ) : (
-            <ReportsByUserTable loading={loadingReports} data={reports} />
+            <ReportsByUserTable
+              loading={loadingReports}
+              data={reports}
+              showPagination={false}
+            />
           )}
         </div>
       </section>
