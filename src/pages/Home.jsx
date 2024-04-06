@@ -129,13 +129,15 @@ const Home = () => {
       </section>
       <section className="row pt-4">
         <div className="col-9">
-          <div className="row">
-            <Title
-              title="Balances"
-              icon="/chart-histogram.svg"
-              description="Balances por monedas"
-            />
-          </div>
+          {(useCheckRole(session) || balance) && (
+            <div className="row">
+              <Title
+                title="Balances"
+                icon="/chart-histogram.svg"
+                description="Balances por monedas"
+              />
+            </div>
+          )}
           {useCheckRole(session) && (
             <>
               <div

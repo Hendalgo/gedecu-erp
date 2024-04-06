@@ -32,7 +32,7 @@ const datasetsOptions = {
   borderColor: "#198754",
   backgroundColor: "#198754",
   borderWidth: 1,
-}
+};
 
 const options = {
   elements: {
@@ -42,13 +42,13 @@ const options = {
     x: {
       grid: {
         display: false,
-      }
+      },
     },
     y: {},
   },
   plugins: {
     legend: {
-      display: false
+      display: false,
     },
     tooltip: {
       backgroundColor: "#ffffff",
@@ -73,8 +73,8 @@ const options = {
       },
       padding: 12,
     },
-  }
-}
+  },
+};
 
 const Chart = () => {
   const [currencies, setCurrencies] = useState([]);
@@ -88,14 +88,16 @@ const Chart = () => {
 
   const handleErrors = (err) => {
     setAlert((prev) => ({ ...prev, messages: handleError(err) }));
-  }
+  };
 
   useEffect(() => {
     getCurrencies("paginated=no")
       .then((response) => {
-        setCurrencies(response.map(({name, id, shortcode}) => {
-          return { label: `${name} (${shortcode})`, value: id }
-        }));
+        setCurrencies(
+          response.map(({ name, id, shortcode }) => {
+            return { label: `${name} (${shortcode})`, value: id };
+          }),
+        );
 
         fetchData(currency, frecuency);
       })
@@ -113,7 +115,7 @@ const Chart = () => {
     }
 
     fetchData(value, currentFrecuency);
-  }
+  };
 
   const handleFrecuencyChange = ({ target }) => {
     const { value } = target;
@@ -126,13 +128,15 @@ const Chart = () => {
     }
 
     fetchData(currentCurrency, value);
-  }
+  };
 
   const fetchData = async (currency, frecuency) => {
     setAlert((prev) => ({ ...prev, messages: [] }));
 
     try {
-      const { income, neutro, expense } = await getMovementStatistics(`currency=${currency}&period=${frecuency}`);
+      const { income, neutro, expense } = await getMovementStatistics(
+        `currency=${currency}&period=${frecuency}`,
+      );
 
       let keys = new Set();
       const datasets = [];
@@ -168,7 +172,7 @@ const Chart = () => {
           borderColor: "#dc3545",
           backgroundColor: "#dc3545",
           data: [],
-        }
+        },
       );
 
       const labels = Array.from(keys);
@@ -178,6 +182,9 @@ const Chart = () => {
           return new Date(a).getTime() - new Date(b).getTime();
         });
       }
+      if (frecuency == "week") {
+        labels.reverse();
+      }
 
       labels.forEach((key) => {
         let value = 0;
@@ -186,7 +193,7 @@ const Chart = () => {
           if (income[key]) {
             value = income[key];
           }
-  
+
           datasets[0].data.push(value);
         }
 
@@ -195,7 +202,7 @@ const Chart = () => {
           if (neutro[key]) {
             value = neutro[key];
           }
-  
+
           datasets[1].data.push(value);
         }
 
@@ -209,11 +216,10 @@ const Chart = () => {
       });
 
       setChartData((prev) => ({ ...prev, labels, datasets }));
-      
     } catch (err) {
       handleErrors(err);
     }
-  }
+  };
 
   return (
     <div className="w-100 bg-white p-4 rounded border">
@@ -224,35 +230,34 @@ const Chart = () => {
           <span className="Outcome d-flex align-items-center">Egreso</span>
         </div>
         <div className="col-6 row d-flex justify-content-end p-0">
-          <select defaultValue={currency} className="col form-select form-select-sm me-2" onChange={handleCurrencyChange}>
-            {
-              currencies.map(({ value, label }) => {
-                return <option key={value} value={value} label={label}></option>
-              })
-            }
+          <select
+            defaultValue={currency}
+            className="col form-select form-select-sm me-2"
+            onChange={handleCurrencyChange}
+          >
+            {currencies.map(({ value, label }) => {
+              return <option key={value} value={value} label={label}></option>;
+            })}
           </select>
-          <select defaultValue={frecuency} className="col form-select form-select-sm" onChange={handleFrecuencyChange}>
-            {
-              frecuencies.map(({ value, label }) => {
-                return <option key={value} value={value} label={label}></option>
-              })
-            }
+          <select
+            defaultValue={frecuency}
+            className="col form-select form-select-sm"
+            onChange={handleFrecuencyChange}
+          >
+            {frecuencies.map(({ value, label }) => {
+              return <option key={value} value={value} label={label}></option>;
+            })}
           </select>
         </div>
       </div>
       <Alert show={alert.messages.length > 0} variant={alert.variant}>
         <ul className="m-0">
-          {
-            alert.messages.map((message, index) => {
-              return <li key={index}>{message}</li>
-            })
-          }
+          {alert.messages.map((message, index) => {
+            return <li key={index}>{message}</li>;
+          })}
         </ul>
       </Alert>
-      <Line
-        data={chartData}
-        options={options}
-      />
+      <Line data={chartData} options={options} />
     </div>
   );
 };
