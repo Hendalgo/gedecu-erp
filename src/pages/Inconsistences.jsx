@@ -122,6 +122,7 @@ const Inconsistences = () => {
       let response = await patchInconsistence(id);
 
       if (response.status == 200) {
+        setInconsistenceDetail(null);
         response = await fetchInconsistences();
         setInconsistences(response);
 
@@ -163,15 +164,15 @@ const Inconsistences = () => {
     }
   };
 
-  let suggestedPairs = [];
-
-  if (inconsistenceDetail && inconsistenceDetail.inconsistences.length == 0) {
-    const { data } = inconsistenceDetail;
-    Object.entries(data).forEach(([key, val]) => {
-      if (["supplier", "user", "store"].includes(key)) {
-        suggestedPairs.push(val);
-      }
-    });
+  let notMatchedSubreports;
+  let reportStyle;
+  if (inconsistenceDetail) {
+    notMatchedSubreports = inconsistenceDetail.subreports.filter(
+      (subreport) => {
+        return subreport.inconsistences.length == 0;
+      },
+    );
+    reportStyle = JSON.parse(inconsistenceDetail.type.config)?.styles;
   }
 
   return (
@@ -183,33 +184,27 @@ const Inconsistences = () => {
         <form onSubmit={handleSubmit} className="mb-4">
           <div className="row mb-3">
             <div className="col-8">
-              <FilterTableButtons
-                data={statusOptions}
-                callback={handleStatusChange}
-              />
+              <div className="col-4 d-flex">
+                <input
+                  type="date"
+                  name="date"
+                  id=""
+                  onChange={({ target }) => (dateRef.current = target.value)}
+                  className="form-control form-control-sm rounded-0 rounded-start"
+                />
+                <button
+                  type="submit"
+                  className="btn btn-secondary rounded-0 rounded-end"
+                >
+                  Filtrar
+                </button>
+              </div>
             </div>
             <div className="col-4">
               <SearchBar
                 text="Inconsistencias"
                 change={(value) => (searchRef.current = value)}
               />
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-4 d-flex">
-              <input
-                type="date"
-                name="date"
-                id=""
-                onChange={({ target }) => (dateRef.current = target.value)}
-                className="form-control form-control-sm rounded-0 rounded-start"
-              />
-              <button
-                type="submit"
-                className="btn btn-secondary rounded-0 rounded-end"
-              >
-                Filtrar
-              </button>
             </div>
           </div>
         </form>
@@ -241,39 +236,19 @@ const Inconsistences = () => {
                       <th>Fecha</th>
                       <th>Usuario</th>
                       <th>Reporte</th>
-                      <th>Fecha</th>
-                      <th>Usuario</th>
-                      <th>Reporte</th>
-                      <th></th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     {inconsistences.data.length == 0 ? (
                       <tr>
-                        <td colSpan={8}>No hay registros.</td>
+                        <td colSpan={4}>No hay registros.</td>
                       </tr>
                     ) : (
                       inconsistences.data.map(
-                        ({ id, inconsistences, report, created_at }) => {
-                          let styles = JSON.parse(report.type.config)?.styles;
-                          const { user, type } = report;
-
+                        ({ id, type, user, created_at }) => {
+                          let styles = JSON.parse(type.config)?.styles;
                           const userStore = user.store;
-
-                          const inconsistenceSummary = inconsistences.at(0);
-                          let pairStyles;
-                          if (
-                            inconsistenceSummary &&
-                            inconsistenceSummary.report.type.config
-                          ) {
-                            pairStyles = JSON.parse(
-                              inconsistenceSummary.report.type.config,
-                            )?.styles;
-                          }
-                          const isVerfied = inconsistences.some(({ pivot }) => {
-                            return pivot.verified == 1;
-                          });
 
                           return (
                             <tr key={id}>
@@ -291,28 +266,6 @@ const Inconsistences = () => {
                                   {type.name}
                                 </span>
                               </td>
-                              {inconsistences.length == 0 ? (
-                                <td colSpan={3}>No existen parejas.</td>
-                              ) : (
-                                <>
-                                  <td>
-                                    {useFormatDate(
-                                      inconsistenceSummary.created_at,
-                                      false,
-                                      true,
-                                    )}
-                                  </td>
-                                  <td>{`${inconsistenceSummary.report.user.name} (${inconsistenceSummary.report.user.email})`}</td>
-                                  <td>
-                                    <span
-                                      className="p-1 rounded"
-                                      style={{ ...pairStyles }}
-                                    >
-                                      {inconsistenceSummary.report.type.name}
-                                    </span>
-                                  </td>
-                                </>
-                              )}
                               <td>
                                 <button
                                   className="border-0"
@@ -336,16 +289,6 @@ const Inconsistences = () => {
                                   </svg>
                                 </button>
                               </td>
-                              <td>
-                                {!isVerfied && (
-                                  <button
-                                    className="btn btn-outline-primary btn-sm"
-                                    onClick={() => verifyInconsistence(id)}
-                                  >
-                                    Verificar
-                                  </button>
-                                )}
-                              </td>
                             </tr>
                           );
                         },
@@ -368,48 +311,96 @@ const Inconsistences = () => {
           >
             <Modal.Header closeButton>
               <Modal.Title>
-                <p className="m-0 ModalTopTitle">Inconsistencia</p>
-                <p className="m-0 ModalTopSubTitle"></p>
+                <p className="m-0 ModalTopTitle">
+                  Inconsistencia - #
+                  {inconsistenceDetail.id.toString().padStart(6, "0")}
+                </p>
+                <div className="row m-0">
+                  <p
+                    className="m-0 p-0 col-6"
+                    style={{
+                      fontSize: "12px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#6C7DA3",
+                      }}
+                    >
+                      Creado por:{" "}
+                    </span>
+                    <span>
+                      {inconsistenceDetail.user.store
+                        ? inconsistenceDetail.user.store.name
+                        : `${inconsistenceDetail.user.name} - (${inconsistenceDetail.user.email})`}
+                    </span>
+                  </p>
+                  <p
+                    className="m-0 p-0 col-6"
+                    style={{
+                      fontSize: "12px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#6C7DA3",
+                      }}
+                    >
+                      Motivo:{" "}
+                    </span>
+                    <span style={{ ...reportStyle }} className="p-1 rounded">
+                      {inconsistenceDetail.type.name} -{" "}
+                      {inconsistenceDetail.type.type == "income"
+                        ? "Ingreso"
+                        : "Egreso"}
+                    </span>
+                  </p>
+                </div>
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <div className="d-flex">
-                <div className="w-50 border-end">
-                  <ReportCard report={inconsistenceDetail} />
-                </div>
-                <div className="w-50 mh-100 overflow-y-auto">
-                  {inconsistenceDetail.inconsistences.length > 0 ? (
-                    inconsistenceDetail.inconsistences.map((inconsistence) => {
-                      return (
-                        <Fragment key={inconsistence.id}>
-                          <ReportCard report={inconsistence} />
-                          <hr />
-                        </Fragment>
-                      );
-                    })
-                  ) : (
-                    <div className="h-100 w-100 px-4 py-2 bg-light">
-                      <p
-                        style={{
-                          color: "#6C7DA3",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Reporte en espera de:
-                      </p>
-                      <p
-                        style={{
-                          color: "#495057",
-                          fontSize: "16px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {suggestedPairs.join(", ")}
-                      </p>
+              {notMatchedSubreports.map((subreport) => {
+                let suggestedPairs = [];
+                const { data } = subreport;
+                Object.entries(data).forEach(([key, val]) => {
+                  if (["supplier", "user", "store"].includes(key)) {
+                    suggestedPairs.push(val);
+                  }
+                });
+
+                return (
+                  <Fragment key={subreport.id}>
+                    <div className="d-flex">
+                      <div className="w-50 border-end">
+                        <ReportCard
+                          report={subreport}
+                          onClick={verifyInconsistence}
+                        />
+                      </div>
+                      <div className="px-4 py-2 w-50 mh-100 overflow-y-auto bg-light">
+                        <p
+                          style={{
+                            color: "#6C7DA3",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Reporte en espera de:
+                        </p>
+                        <p
+                          style={{
+                            color: "#495057",
+                            fontSize: "16px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {suggestedPairs.join(", ")}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
+                    <hr />
+                  </Fragment>
+                );
+              })}
             </Modal.Body>
             <Modal.Footer></Modal.Footer>
           </Modal>
