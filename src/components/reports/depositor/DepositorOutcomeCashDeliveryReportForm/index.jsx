@@ -1,51 +1,48 @@
 import { useContext, useEffect, useState } from "react";
+import { getDateString } from "../../../../utils/date";
 import { ReportTableContext } from "../../../../context/ReportTableContext";
 import UsersSelect from "../../../UsersSelect";
-import { SessionContext } from "../../../../context/SessionContext";
 import AmountCurrencyInput from "../../../AmountCurrencyInput";
+import { SessionContext } from "../../../../context/SessionContext";
 import DateInput from "../../../DateInput";
-import { getDateString } from "../../../../utils/date";
+import MotiveTextarea from "../../../MotiveTextarea";
+import { validateFields } from "../../../../utils/text";
 
-export default function DepositorOutcomeDeliveryReportForm() {
-  const [supplier, setSupplier] = useState(null);
+export default function DepositorOutcomeCashDeliveryReportForm() {
+  const [boss, setBoss] = useState(null);
   const [date, setDate] = useState(getDateString());
-  const { handleSubmit, setError, country, selected } =
-    useContext(ReportTableContext);
+  const [motive, setMotive] = useState("");
   const { session } = useContext(SessionContext);
+  const { handleSubmit, setError, selected } = useContext(ReportTableContext);
+  const { currency } = session.country;
 
   useEffect(() => {
     if (selected) {
       const { data } = selected;
-      setSupplier({
+      setBoss({
         value: parseInt(data.user_id),
         label: data.user,
       });
-      setDate(getDateString(new Date(data.date)));
+      setMotive(data.motive);
+      if (data.date) {
+        setDate(getDateString(new Date(data.date)));
+      }
     }
   }, [selected]);
 
-  const handleLocalSubmit = (e) => {
-    e.preventDefault();
+  const handleLocalSubmit = (ev) => {
+    ev.preventDefault();
+    const formData = new FormData(ev.target);
     let errors = [];
 
     try {
-      const formData = new FormData(e.target);
-
-      if (!supplier) errors.push("El campo Proveedor es obligatorio.");
-      if (formData.get("amount") == "0,00")
-        errors.push("El campo Monto es obligatorio.");
-      if (formData.get("date")) {
-        const now = new Date(formData.get("date")).getTime();
-        if (now > new Date().getTime()) {
-          errors.push("La fecha es inválida.");
-        }
-      }
+      errors = validateFields(formData);
 
       if (errors.length > 0) throw new Error(errors.join(";"));
 
       handleSubmit(formData);
 
-      e.target.reset();
+      ev.target.reset();
     } catch (error) {
       setError({
         show: true,
@@ -56,8 +53,9 @@ export default function DepositorOutcomeDeliveryReportForm() {
   };
 
   const handleReset = () => {
-    setSupplier(null);
+    setBoss(null);
     setDate(getDateString());
+    setMotive("");
   };
 
   return (
@@ -65,15 +63,14 @@ export default function DepositorOutcomeDeliveryReportForm() {
       <div className="row mb-3">
         <div className="col">
           <label htmlFor="user_id" className="form-label">
-            Caja Fuerte <span className="Required">*</span>
+            Jefe <span className="Required">*</span>
           </label>
           <UsersSelect
             id="user"
             name="user"
-            value={supplier}
-            query={`&role=6&country=${country?.value || session.country_id}`}
-            placeholder="Seleccione el usuario caja fuerte"
-            onChange={setSupplier}
+            value={boss}
+            query={`&role=7`}
+            onChange={setBoss}
             onError={setError}
           />
         </div>
@@ -83,25 +80,20 @@ export default function DepositorOutcomeDeliveryReportForm() {
           </label>
           <AmountCurrencyInput
             defaultValue={selected ? parseFloat(selected.data.amount) : 0}
-            currencySymbol={
-              country?.currency || session.country.currency.shortcode
-            }
+            currencySymbol={currency.shortcode}
           />
-          <input
-            type="hidden"
-            name="currency_id"
-            value={country?.currency_id || session.country.currency.id}
-          />
-          <input
-            type="hidden"
-            name="currency"
-            value={country?.currency || session.country.currency.shortcode}
-          />
+          <input type="hidden" name="currency_id" value={currency.id} />
+          <input type="hidden" name="currency" value={currency.shortcode} />
         </div>
       </div>
       <div className="row mb-3">
         <div className="col-6">
           <DateInput value={date} onChange={setDate} />
+        </div>
+      </div>
+      <div className="row mb-3">
+        <div className="col">
+          <MotiveTextarea value={motive} onChange={setMotive} />
         </div>
       </div>
       <div className="row">

@@ -2,7 +2,9 @@ import DepositBoxIncomeCashReportForm from "../components/reports/deposit-box/De
 import DepositBoxOutcomeCashReportForm from "../components/reports/deposit-box/DepositBoxOutcomeCashReportForm";
 import DepositBoxOutcomeDeliveryReportForm from "../components/reports/deposit-box/DepositBoxOutcomeDeliveryReportForm";
 import DepositorIncomeCashReportForm from "../components/reports/depositor/DepositorIncomeCashReportForm";
+import DepositorOutcomeCashDeliveryReportForm from "../components/reports/depositor/DepositorOutcomeCashDeliveryReportForm";
 import DepositorOutcomeDeliveryReportForm from "../components/reports/depositor/DepositorOutcomeDeliveryReportForm";
+import DepositorOutcomeExpensesReportForm from "../components/reports/depositor/DepositorOutcomeExpensesReportForm";
 import DepositorOutcomeSupplierReportForm from "../components/reports/depositor/DepositorOutcomeSupplierReportForm";
 import DepositorOutcomeWalletReportForm from "../components/reports/depositor/DepositorOutcomeWalletReportForm";
 import IncomeWalletReportForm from "../components/reports/income/IncomeWalletReportForm";
@@ -97,6 +99,8 @@ componentsMap.set(27, <DepositorIncomeCashReportForm />);
 componentsMap.set(28, <DepositorOutcomeWalletReportForm />);
 componentsMap.set(29, <DepositorOutcomeSupplierReportForm />);
 componentsMap.set(30, <DepositorOutcomeDeliveryReportForm />);
+componentsMap.set(45, <DepositorOutcomeCashDeliveryReportForm />);
+componentsMap.set(46, <DepositorOutcomeExpensesReportForm />);
 
 /* Deposit Box */
 
